@@ -18,7 +18,7 @@ from tkinter import messagebox
 #====================Window====================
 """
 This is where the basic window
-is initiated and setup
+is initiated and setup.
 """
 window=Tk()
 window.title("PyPassword 3")
