@@ -18,6 +18,14 @@ data takes place here.
 These functions are used for generating passwords, 
 and also encrypting and decrypting data.
 """
+
+def encrypt(plainText,key):
+	pass
+
+def decrypt(plainText,key):
+	pass
+
+
 #====================Core Classes====================
 """
 The PEM core classes are the classes that form the basic 
@@ -45,5 +53,6 @@ class masterPod:
 	def __init__(self,name):
 		self.masterName=name
 		self.children={}
+
 
 
