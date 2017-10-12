@@ -10,4 +10,16 @@ and all decrypting and encrypting of
 data takes place here.
 """
 
-#==========IMPORTS==========
+#====================Imports====================
+
+#====================Functions====================
+"""
+These functions are used for generating passwords, 
+and also encrypting and decrypting data.
+"""
+#====================Core Classes====================
+"""
+The PEM core classes are the classes that form the basic 
+structure of PyPasswords security, they are the classes
+the sensitive data is stored in.
+"""
