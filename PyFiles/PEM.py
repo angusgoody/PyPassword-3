@@ -24,3 +24,23 @@ The PEM core classes are the classes that form the basic
 structure of PyPasswords security, they are the classes
 the sensitive data is stored in.
 """
+
+class pod:
+	"""
+	A pod is what
+	each account in PyPassword
+	is stored in.
+	"""
+	def __init__(self,master,podTitle):
+		self.master=master
+		self.podTitle=podTitle
+		self.podVault={}
+
+	def addData(self,):
+
+class masterPod:
+	"""
+	The vault contains
+	all a users accounts which
+	are individually called Pods
+	"""

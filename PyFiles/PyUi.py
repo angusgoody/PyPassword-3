@@ -14,6 +14,19 @@ are created and used.
 from tkinter import *
 
 
+#====================LOG====================
+
+class log:
+	"""
+	The Log class stores logged
+	events in the program, errors
+	etc.
+	"""
+	def __init__(self,logName):
+		self.logName=logName
+		self.logData={}
+		self.systemData={}
+
 #====================Functions====================
 """
 This section is for functions that aid with the user
