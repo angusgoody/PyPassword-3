@@ -13,6 +13,11 @@ are created and used.
 #====================Imports====================
 from tkinter import *
 
+#====================Log====================
+
+class log:
+	def __init__(self,logName):
+		self.logName=logName
 
 #====================Functions====================
 """
