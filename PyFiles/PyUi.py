@@ -29,6 +29,18 @@ interface elements of PyPassword
 Core Classes are the core custom classes in PyPassword
 that are the top level of objects.
 """
+
+class mainFrame(Frame):
+	"""
+	The mainFrame is the core
+	class of PyPassword and makes
+	up most of the user interface elements
+	in PyPassword. It is a frame class
+	which has more customization and efficiency.
+	"""
+	def __init__(self,parent):
+		Frame.__init__(self,parent)
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes

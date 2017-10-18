@@ -20,9 +20,20 @@ and also encrypting and decrypting data.
 """
 
 def encrypt(plainText,key):
-	pass
+	"""
+	The encrypt function will
+	take the inputs of plain text,
+	encrypt it using the key and 
+	return the result
+	"""
 
 def decrypt(plainText,key):
+	"""
+	The decrypt function will
+	take the inputs of plain text,
+	decrypt it using the key and 
+	return the result
+	"""
 	pass
 
 
