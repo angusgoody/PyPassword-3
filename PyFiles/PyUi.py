@@ -16,8 +16,32 @@ from tkinter import *
 #====================Log====================
 
 class log:
+	"""
+	The log is a way of recording
+	events that go on throughout 
+	the program. Each file has its own
+	log which it reports to during runtime
+	"""
+	logs={}
 	def __init__(self,logName):
 		self.logName=logName
+		#Add the log to all logs
+		log.logs[logName]=self
+		#Store the data
+		self.systemData={}
+		self.generalData={}
+	def report(self,message,*extra,**kwargs):
+		"""
+		The report method reports
+		 a problem or event to the 
+		 log.
+		"""
+		#Create message string
+		if len(extra) > 0:
+			for item in extra:
+				message+=item
+				message+=" "
+
 
 #====================Functions====================
 """
@@ -46,3 +70,34 @@ class mainFrame(Frame):
 Secondary classes are classes that inherit from the core classes
 and are more program specific.
 """
+
+class multiView(mainFrame):
+	"""
+	The multi view is a class
+	which allows multiple frames
+	to be displayed in one place
+	and swapped around.
+	"""
+	def __init__(self,parent):
+		mainFrame.__init__(self,parent)
+		#Store the view info
+		self.views={}
+		self.currentView=None
+
+
+	def addView(self,frameToDisplay,name):
+		"""
+		This method will allow a frame
+		to be added to the multi view 
+		"""
+		self.views[name]=frameToDisplay
+
+	def showView(self,frameName):
+		"""
+		This method will load a frame
+		to dislpay on the multiview
+		"""
+		#Check valid parameter
+		if frameName in self.views:
+			pass
+

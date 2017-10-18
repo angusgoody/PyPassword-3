@@ -25,6 +25,9 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("400x300")
 
+#====================User Interface====================
+
+#======Status======
 
 #====================END====================
 window.mainloop()
