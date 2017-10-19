@@ -11,13 +11,110 @@ data takes place here.
 """
 
 #====================Imports====================
+import pickle
+from datetime import datetime
 
+#====================Log====================
+class log:
+	"""
+	The log is a way of recording
+	events that go on throughout 
+	the program. Each file has its own
+	log which it reports to during runtime
+	"""
+	logs={}
+	def __init__(self,logName):
+		self.logName=logName
+		#Add the log to all logs
+		log.logs[logName]=self
+		#Store the data
+		self.systemData={}
+		self.generalData={}
+		#Store tags
+		self.tags={}
 
+	def report(self,message,*extra,**kwargs):
+		"""
+		The report method reports
+		 a problem or event to the 
+		 log.
+		"""
+		#Variables
+		dataDictionary=self.generalData
+		tag="Default"
+
+		#Create message string
+		if len(extra) > 0:
+			for item in extra:
+				message+=str(item)
+				message+=" "
+
+		#Check for tags
+		if "tag" in kwargs:
+			tag=kwargs["tag"]
+
+		#Check for system or default data
+		if "system" in kwargs:
+			if kwargs["system"]:
+				dataDictionary=self.systemData
+
+		#Get current time
+		currentTime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+		#Report to class
+		dataDictionary[currentTime]=message
+
+	def saveLog(self):
+		"""
+		This method will save the log
+		to file using pickle. It can then
+		viewed and loaded in PyPassword, 
+		error and default data will only be saved
+		to file to save space.
+		"""
+		fileName=self.logName+"Log.log"
+		#Open the file
+		file=open("PyLogs/"+fileName,"a")
+
+		#Save the default data
+		for item in self.generalData:
+			writeString=str(self.generalData[item])
+			writeString+=","
+			writeString+=item
+			writeString+=",Default\n"
+			file.write(writeString)
+
+		#Close file
+		file.close()
+
+#Initiate PEM log
+log=log("Encryption")
 #====================Functions====================
 """
 These functions are used for generating passwords, 
 and also encrypting and decrypting data.
 """
+
+def openPickle(fileName):
+	"""
+	This function opens a pickle file
+	and returns the content
+	"""
+	try:
+		content=pickle.load( open( fileName, "rb" ) )
+	except:
+		log.report("Error reading file when pickling")
+		return None
+	else:
+		return content
+
+def savePickle(content,fileName):
+	"""
+	This function will dump
+	a pickle file
+	"""
+	pickle.dump(content, open( fileName, "wb" ) )
+	log.report("Save complete exported to",fileName,tag="File")
 
 def encrypt(plainText,key):
 	"""

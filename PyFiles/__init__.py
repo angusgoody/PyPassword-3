@@ -15,7 +15,8 @@ PyPassword 3
 #====================Imports====================
 from tkinter import *
 from tkinter import messagebox
-
+from PyFiles import PyUi
+from PyFiles import PEM
 #====================Window====================
 """
 This is where the basic window

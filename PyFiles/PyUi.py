@@ -12,35 +12,10 @@ are created and used.
 
 #====================Imports====================
 from tkinter import *
-
 #====================Log====================
 
-class log:
-	"""
-	The log is a way of recording
-	events that go on throughout 
-	the program. Each file has its own
-	log which it reports to during runtime
-	"""
-	logs={}
-	def __init__(self,logName):
-		self.logName=logName
-		#Add the log to all logs
-		log.logs[logName]=self
-		#Store the data
-		self.systemData={}
-		self.generalData={}
-	def report(self,message,*extra,**kwargs):
-		"""
-		The report method reports
-		 a problem or event to the 
-		 log.
-		"""
-		#Create message string
-		if len(extra) > 0:
-			for item in extra:
-				message+=item
-				message+=" "
+
+
 
 
 #====================Functions====================
