@@ -279,6 +279,7 @@ class masterPod:
 	which stores all the smaller data
 	for every account stored in PyPassword
 	"""
+	currentMasterPod=None
 	def __init__(self,name):
 		#Name of the master pod
 		self.masterName=name
@@ -294,7 +295,10 @@ class masterPod:
 		"""
 		This method saves the master pod to file
 		and ensures all the data is encrypted and
-		secure
+		secure, it also allows .mp files
+		to be opened from other locations and then
+		auto saved in the correct place if the directory
+		is invalid
 		"""
 		#Ensure all pods are secure
 		for pod in self.pods:

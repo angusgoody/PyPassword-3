@@ -12,7 +12,7 @@ are created and used.
 
 #====================Imports====================
 from tkinter import *
-from PyFiles.PEM import logClass
+from PEM import logClass
 
 #====================Log====================
 
