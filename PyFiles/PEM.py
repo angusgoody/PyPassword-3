@@ -13,20 +13,21 @@ data takes place here.
 #====================Imports====================
 import pickle
 from datetime import datetime
+import os
 
 #====================Log====================
-class log:
+class logClass:
 	"""
-	The log is a way of recording
+	The logClass is a way of recording
 	events that go on throughout 
 	the program. Each file has its own
-	log which it reports to during runtime
+	logClass which it reports to during runtime
 	"""
 	logs={}
 	def __init__(self,logName):
 		self.logName=logName
-		#Add the log to all logs
-		log.logs[logName]=self
+		#Add the logClass to all logs
+		logClass.logs[logName]=self
 		#Store the data
 		self.systemData={}
 		self.generalData={}
@@ -37,7 +38,7 @@ class log:
 		"""
 		The report method reports
 		 a problem or event to the 
-		 log.
+		 logClass.
 		"""
 		#Variables
 		dataDictionary=self.generalData
@@ -46,8 +47,9 @@ class log:
 		#Create message string
 		if len(extra) > 0:
 			for item in extra:
-				message+=str(item)
 				message+=" "
+				message+=str(item)
+
 
 		#Check for tags
 		if "tag" in kwargs:
@@ -66,15 +68,25 @@ class log:
 
 	def saveLog(self):
 		"""
-		This method will save the log
+		This method will save the logClass
 		to file using pickle. It can then
 		viewed and loaded in PyPassword, 
 		error and default data will only be saved
 		to file to save space.
 		"""
+		#Create the file name
 		fileName=self.logName+"Log.log"
+
+		#Get working directory
+		currentDirectory=os.path.dirname(os.getcwd())
+		#Create file name
+		fileName=currentDirectory+"/"+"/PyLogs"+"/"+fileName
+		#If the directory does not exist create it
+		if not os.path.isdir(currentDirectory+"/PyLogs"):
+			os.makedirs(currentDirectory+"/PyLogs")
+
 		#Open the file
-		file=open("PyLogs/"+fileName,"a")
+		file=open(fileName,"a")
 
 		#Save the default data
 		for item in self.generalData:
@@ -86,9 +98,9 @@ class log:
 
 		#Close file
 		file.close()
+#Initiate PEM logClass
+log=logClass("Encryption")
 
-#Initiate PEM log
-log=log("Encryption")
 #====================Functions====================
 """
 These functions are used for generating passwords, 
@@ -103,7 +115,7 @@ def openPickle(fileName):
 	try:
 		content=pickle.load( open( fileName, "rb" ) )
 	except:
-		log.report("Error reading file when pickling")
+		logClass.report("Error reading file when pickling")
 		return None
 	else:
 		return content
@@ -114,7 +126,7 @@ def savePickle(content,fileName):
 	a pickle file
 	"""
 	pickle.dump(content, open( fileName, "wb" ) )
-	log.report("Save complete exported to",fileName,tag="File")
+	logClass.report("Save complete exported to", fileName, tag="File")
 
 def encrypt(plainText,key):
 	"""
