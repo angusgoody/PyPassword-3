@@ -15,6 +15,10 @@ import pickle
 from datetime import datetime
 import os
 
+#====================Variables====================
+dataDirectory="PyData"
+logDirectory="PyLogs"
+filesDirectory="PyFiles"
 #====================Log====================
 class logClass:
 	"""
@@ -77,13 +81,7 @@ class logClass:
 		#Create the file name
 		fileName=self.logName+"Log.log"
 
-		#Get working directory
-		currentDirectory=getWorkingDirectory()
-		#Create file name
-		fileName=currentDirectory+"/"+"/PyLogs"+"/"+fileName
-		#If the directory does not exist create it
-		if not os.path.isdir(currentDirectory+"/PyLogs"):
-			os.makedirs(currentDirectory+"/PyLogs")
+		fileName=getLocalFileName(fileName,"Logs")
 
 		#Open the file
 		file=open(fileName,"a")
@@ -101,6 +99,7 @@ class logClass:
 
 #Initiate PEM logClass
 log=logClass("Encryption")
+log.report("Another test","ye")
 
 #====================Functions====================
 """
@@ -108,9 +107,66 @@ These functions are used for generating passwords,
 and also encrypting and decrypting data.
 """
 
+#Folder and Directory functions
 def getWorkingDirectory():
+	"""
+	Will return the current working directory the program is in
+	"""
 	currentDirectory=os.path.dirname(os.getcwd())
+	return currentDirectory
 
+def getLocalFileName(baseFileName,indicator):
+	"""
+	This function will return a string used
+	for saving files in the new PyPassword
+	file structure, it will get the current
+	directory and the subfolder and add the file
+	name so files are saved in the correct place
+	"""
+	#Setup variable for file name
+	wholeFileName=""
+
+	#Get the working directory
+	currentDirectory=getWorkingDirectory()
+
+	#Find correct sub folder to match parameter
+	subFolder=""
+	if indicator.upper() == "FILES":
+		subFolder=filesDirectory
+	elif indicator.upper() == "LOGS":
+		subFolder=logDirectory
+	else:
+		subFolder=dataDirectory
+
+	#Add subFolder to base directory
+	wholeFileName=currentDirectory+"/"+subFolder
+
+	#If the directory does not exist create it
+	if not os.path.isdir(wholeFileName):
+		os.makedirs(wholeFileName)
+
+	#Add base file to file name
+	wholeFileName=wholeFileName+"/"+str(baseFileName)
+
+	#Return
+	return wholeFileName
+
+def checkFileName(fileName):
+	"""
+	This function will check a file name
+	to see if the directory exists
+	and if a file can be saved there
+	"""
+	if fileName:
+		directory=os.path.dirname(fileName)
+		if not os.path.isdir(directory):
+			log.report("Invalid directory detected",fileName)
+			return False
+		else:
+			return True
+	else:
+		return False
+#Pickle Functions
 def openPickle(fileName):
 	"""
 	This function opens a pickle file
@@ -149,7 +205,7 @@ def decrypt(plainText,key):
 	"""
 	pass
 
-
+log.saveLog()
 #====================Core Classes====================
 """
 The PEM core classes are the classes that form the basic 
@@ -211,6 +267,8 @@ class pod:
 				self.vault[secureName]=secureData
 				#Remove old data
 				del (self.vault,item)
+
+			log.report(unlockOrLock,"pod vault",self.podName)
 		else:
 			log.report("Attempted to encrypt locked vault")
 
@@ -224,10 +282,35 @@ class masterPod:
 	def __init__(self,name):
 		#Name of the master pod
 		self.masterName=name
+		self.baseName=self.masterName+".mp"
 		#Where the pods are stored
 		self.pods={}
 		#The master key used for encryption
 		self.masterKey=None
+		#Where the master pod is saved
+		self.location=None
+
+	def save(self):
+		"""
+		This method saves the master pod to file
+		and ensures all the data is encrypted and
+		secure
+		"""
+		#Ensure all pods are secure
+		for pod in self.pods:
+			if pod.vaultState != "Locked":
+				pod.unlockVault("Lock")
+
+		#First check location is valid
+		if checkFileName(self.location) is False:
+			#If not create a new file in the correct place
+			fileName=getLocalFileName(self.baseName,"Data")
+			self.location=fileName
+		else:
+			fileName=self.location
+
+		#Save self to pickle
+		savePickle(self,fileName)
 
 
 
