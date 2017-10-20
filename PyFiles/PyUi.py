@@ -12,11 +12,11 @@ are created and used.
 
 #====================Imports====================
 from tkinter import *
+from PyFiles.PEM import logClass
+
 #====================Log====================
 
-
-
-
+log=logClass("User Interface")
 
 #====================Functions====================
 """

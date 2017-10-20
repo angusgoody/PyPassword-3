@@ -78,7 +78,7 @@ class logClass:
 		fileName=self.logName+"Log.log"
 
 		#Get working directory
-		currentDirectory=os.path.dirname(os.getcwd())
+		currentDirectory=getWorkingDirectory()
 		#Create file name
 		fileName=currentDirectory+"/"+"/PyLogs"+"/"+fileName
 		#If the directory does not exist create it
@@ -98,6 +98,7 @@ class logClass:
 
 		#Close file
 		file.close()
+
 #Initiate PEM logClass
 log=logClass("Encryption")
 
@@ -106,6 +107,9 @@ log=logClass("Encryption")
 These functions are used for generating passwords, 
 and also encrypting and decrypting data.
 """
+
+def getWorkingDirectory():
+	currentDirectory=os.path.dirname(os.getcwd())
 
 def openPickle(fileName):
 	"""
@@ -126,7 +130,7 @@ def savePickle(content,fileName):
 	a pickle file
 	"""
 	pickle.dump(content, open( fileName, "wb" ) )
-	logClass.report("Save complete exported to", fileName, tag="File")
+	log.report("Save complete exported to", fileName, tag="File")
 
 def encrypt(plainText,key):
 	"""
@@ -161,8 +165,55 @@ class pod:
 	encryption
 	"""
 	def __init__(self,master,podName):
+		#Store the parent master pod
 		self.master=master
+		#Name of the pod
 		self.podName=podName
+		#Encrypted vault where info is stored
+		self.vault={}
+		#Store template type
+		self.templateType="Login"
+		#Store Vault state
+		self.vaultState="Unlocked"
+
+	def unlockVault(self,unlockOrLock):
+		"""
+		This method will secure the pod vault
+		and encrypt all the data inside ready
+		to save to file
+		"""
+		#Check the vault is in the correct state
+		valid=False
+		if unlockOrLock == "Lock":
+			if self.vaultState == "Unlocked":
+				valid=True
+		else:
+			if self.vaultState == "Locked":
+				valid=True
+
+		if valid:
+			#Get the key to encrypt with
+			encryptionKey=self.master.masterKey
+			#Iterate through pod
+			for item in self.vault:
+
+				#Encrypt data
+				if unlockOrLock == "Lock":
+					secureName=encrypt(item,encryptionKey)
+					secureData=encrypt(self.vault[item],encryptionKey)
+
+				#Decrypt data
+				else:
+					secureName=decrypt(item,encryptionKey)
+					secureData=decrypt(self.vault[item],encryptionKey)
+
+				#Add to the vault
+				self.vault[secureName]=secureData
+				#Remove old data
+				del (self.vault,item)
+		else:
+			log.report("Attempted to encrypt locked vault")
+
 
 class masterPod:
 	"""
@@ -171,8 +222,14 @@ class masterPod:
 	for every account stored in PyPassword
 	"""
 	def __init__(self,name):
+		#Name of the master pod
 		self.masterName=name
-		self.children={}
+		#Where the pods are stored
+		self.pods={}
+		#The master key used for encryption
+		self.masterKey=None
+
+
 
 
 
