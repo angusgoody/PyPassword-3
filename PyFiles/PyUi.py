@@ -40,11 +40,64 @@ class mainFrame(Frame):
 	def __init__(self,parent):
 		Frame.__init__(self,parent)
 
+	def colour(self,chosenColour,**kwargs):
+		"""
+		The colour method will change 
+		the colour of the frame and all
+		the children of the frame 
+		"""
+		pass
+
+	def addBinding(self,bindButton,bindFunction):
+		"""
+		This method will allow the widget
+		to be binded to a function recursively meaning
+		all the children are also binded.
+		"""
+		pass
+
+class mainButton(mainFrame):
+	"""
+	The main Button class
+	if a custom button class
+	that handles bindings and colours
+	etc
+	"""
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
 and are more program specific.
 """
+class contextBar(mainFrame):
+	"""
+	The contextBar class will be a class
+	that stretches across the screen and has
+	contextual buttons to execute. That can
+	be swapped and modified to suit onscreen
+	actions
+	"""
+	def __init__(self,parent):
+		mainFrame.__init__(self,parent)
+
+		#Store name and command in dictionary
+		self.nameDict={}
+		#The array that stores buttons
+		self.buttonArray=[]
+		#Store number of active sections
+		self.sections=0
+		#Section Types
+		self.sectionTypes=["Button","Checkbutton"]
+
+	def addPlaceholder(self):
+		"""
+		This method will add a section to 
+		the context bar which can be used
+		to add a button
+		"""
+		self.sections+=1
+		self.buttonArray.append("")
+
+
 
 class multiView(mainFrame):
 	"""

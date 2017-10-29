@@ -14,7 +14,6 @@ data takes place here.
 import pickle
 from datetime import datetime
 import os
-
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
@@ -99,7 +98,6 @@ class logClass:
 
 #Initiate PEM logClass
 log=logClass("Encryption")
-log.report("Another test","ye")
 
 #====================Functions====================
 """
@@ -166,6 +164,7 @@ def checkFileName(fileName):
 			return True
 	else:
 		return False
+
 #Pickle Functions
 def openPickle(fileName):
 	"""
@@ -175,7 +174,7 @@ def openPickle(fileName):
 	try:
 		content=pickle.load( open( fileName, "rb" ) )
 	except:
-		logClass.report("Error reading file when pickling")
+		log.report("Error reading file when pickling")
 		return None
 	else:
 		return content
@@ -183,11 +182,12 @@ def openPickle(fileName):
 def savePickle(content,fileName):
 	"""
 	This function will dump
-	a pickle file
+	a pickle file to a directory
 	"""
 	pickle.dump(content, open( fileName, "wb" ) )
 	log.report("Save complete exported to", fileName, tag="File")
 
+#Encryption functions
 def encrypt(plainText,key):
 	"""
 	The encrypt function will
@@ -213,18 +213,18 @@ structure of PyPasswords security, they are the classes
 the sensitive data is stored in.
 """
 
-class pod:
+class peaPod:
 	"""
-	The pod class is a class
+	The peaPod class is a class
 	for each account stored in PyPasssword.
 	It will securely store data using
 	encryption
 	"""
-	def __init__(self,master,podName):
-		#Store the parent master pod
+	def __init__(self,master,peaName):
+		#Store the parent master peaPod
 		self.master=master
-		#Name of the pod
-		self.podName=podName
+		#Name of the peaPod
+		self.peaName=peaName
 		#Encrypted vault where info is stored
 		self.vault={}
 		#Store template type
@@ -234,9 +234,10 @@ class pod:
 
 	def unlockVault(self,unlockOrLock):
 		"""
-		This method will secure the pod vault
-		and encrypt all the data inside ready
-		to save to file
+		This method will secure the vault
+		and encrypt or decrypt the vault 
+		depending on the parameter passed
+		to the function.
 		"""
 		#Check the vault is in the correct state
 		valid=False
@@ -250,7 +251,7 @@ class pod:
 		if valid:
 			#Get the key to encrypt with
 			encryptionKey=self.master.masterKey
-			#Iterate through pod
+			#Iterate through peaPod
 			for item in self.vault:
 
 				#Encrypt data
@@ -268,32 +269,31 @@ class pod:
 				#Remove old data
 				del (self.vault,item)
 
-			log.report(unlockOrLock,"pod vault",self.podName)
+			log.report(unlockOrLock,"peaPod vault",self.peaName)
 		else:
 			log.report("Attempted to encrypt locked vault")
 
-
 class masterPod:
 	"""
-	The master pod class is the class
+	The master peaPod class is the class
 	which stores all the smaller data
 	for every account stored in PyPassword
 	"""
 	currentMasterPod=None
 	def __init__(self,name):
-		#Name of the master pod
+		#Name of the master peaPod
 		self.masterName=name
 		self.baseName=self.masterName+".mp"
 		#Where the pods are stored
-		self.pods={}
+		self.peas={}
 		#The master key used for encryption
 		self.masterKey=None
-		#Where the master pod is saved
+		#Where the master peaPod is saved
 		self.location=None
 
 	def save(self):
 		"""
-		This method saves the master pod to file
+		This method saves the master peaPod to file
 		and ensures all the data is encrypted and
 		secure, it also allows .mp files
 		to be opened from other locations and then
@@ -301,7 +301,7 @@ class masterPod:
 		is invalid
 		"""
 		#Ensure all pods are secure
-		for pod in self.pods:
+		for pod in self.peas:
 			if pod.vaultState != "Locked":
 				pod.unlockVault("Lock")
 
