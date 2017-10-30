@@ -17,7 +17,7 @@ from PEM import logClass
 #====================Log====================
 
 log=logClass("User Interface")
-
+log.saveLog()
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -44,7 +44,16 @@ def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 		except:
 			log.report("Could not bind function to",type(parent))
 
-def recursiveColour(parent,colour,**kwargs):
+def basicChangeColour(widget,colour):
+	#Items who's highlight background is changed
+	highlightItems=["Entry", "Button", "Text", "Listbox", "OptionMenu", "Menu"]
+	#Change colour
+	if type(widget) in highlightItems:
+		widget.config(highlightbackground=colour)
+	else:
+		widget.config(bg=colour)
+
+def recursiveColour(parent, colour, **kwargs):
 	"""
 	The recursive colour function
 	will change the colour of widgets
@@ -53,19 +62,36 @@ def recursiveColour(parent,colour,**kwargs):
 	#Items to exclude
 	excludeItems=[]
 
-	#Items who's highlight background is changed
-	highlightItems=["Entry", "Button", "Text", "Listbox", "OptionMenu", "Menu"]
-
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:
 		#Add new items to exclude
 		excludeItems.extend(kwargs["exclude"])
 
-	#Check if parent has children
-	if "winfo_children" in dir(parent):
-		pass
-	else:
-		pass
+	overide=False
+	if "overide" in kwargs:
+		overide=kwargs["overide"]
+
+	#Check parent is valid
+	if type(parent) not in excludeItems:
+
+		#Get parent attributes and methods
+		parentAtt=dir(parent)
+
+		#Check other attributes
+		valid=True
+		if "preserveColour" in parentAtt:
+			if parent.preserveColour:
+				valid=False
+		if overide:
+			valid=True
+		if valid:
+			#Change parent
+			basicChangeColour(parent,colour)
+			#Check for children
+			if "winfo_children" in parentAtt:
+				for child in parent.winfo_children():
+					recursiveColour(child,colour,exclude=excludeItems,overide=overide)
+
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -85,13 +111,14 @@ class mainFrame(Frame):
 
 		#Should colour be changed during recursion
 		self.preserveColour=False
+
 	def colour(self,chosenColour,**kwargs):
 		"""
 		The colour method will change 
 		the colour of the frame and all
 		the children of the frame 
 		"""
-		pass
+		recursiveColour(self,chosenColour)
 
 	def addBinding(self,bindButton,bindFunction):
 		"""
@@ -99,7 +126,7 @@ class mainFrame(Frame):
 		to be binded to a function recursively meaning
 		all the children are also binded.
 		"""
-		pass
+		recursiveBind(self,bindButton,bindFunction)
 
 class mainButton(mainFrame):
 	"""
@@ -110,24 +137,32 @@ class mainButton(mainFrame):
 	"""
 	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent)
+		#Preserve button colour
+		self.preserveColour=True
 		#Store the command
 		self.command=None
 		#Store button state
-		self.state=True
+		self.state=False
 		self.hoverState=False
 		#Button colour variables
 		self.hoverColour="#61D9CD"
 		self.clickedColour="#60EFD0"
 		self.disabledColour="#ACB4B4"
-		self.enabledColour="#EEF6F5"
-		#Text frame
-		self.textFrame=mainFrame(self)
-		self.textFrame.pack(expand=True)
+		self.disabledFG="#939797"
+		self.enabledColour="#2CF3C7"
+		self.enabledFG="#000000"
 		#Text
 		self.textVar=StringVar()
-		self.textLabel=Label(self.textFrame)
+		self.textVar.set("Button")
+		self.textLabel=Label(self,textvariable=self.textVar,width=12)
+		self.textLabel.pack(expand=True)
 		#Bindings
-		recursiveBind(self,"<Enter>",)
+		self.addBinding("<Enter>",lambda event: self.hover())
+		self.addBinding("<Leave>",lambda event: self.hover())
+		self.addBinding("<Button-1>",lambda event: self.runCommand())
+		#Initiate Button state
+		self.changeState(True)
+
 
 	def runCommand(self):
 		"""
@@ -135,7 +170,7 @@ class mainButton(mainFrame):
 		stored inside the button
 		"""
 		#Check the button has a command
-		if self.command:
+		if self.command and self.state:
 			try:
 				self.command()
 			except:
@@ -153,7 +188,33 @@ class mainButton(mainFrame):
 			if self.hoverState == False:
 				#Activate hover
 				self.hoverState=True
-				#Change colour
+				#Change colour#
+				self.colour(self.hoverColour)
+			else:
+				#Deactivate hover
+				self.hoverState=False
+				#Change colours
+				self.colour(self.enabledColour)
+
+	def changeState(self,TrueOrFalse):
+		"""
+		The change state method will change
+		the state of the button.
+		True = On
+		False = Off 
+		"""
+		#Turn on
+		if TrueOrFalse == True and self.state == False:
+			self.state=True
+			#Change colours
+			self.colour(self.enabledColour,overide=True)
+			self.textLabel.config(fg=self.enabledFG)
+		#Turn off
+		elif TrueOrFalse == False and self.state:
+			self.state=False
+			#Change colours
+			self.colour(self.disabledColour,overide=True)
+			self.textLabel.config(fg=self.disabledFG)
 
 
 
@@ -190,7 +251,7 @@ class contextBar(mainFrame):
 		to add a button
 		"""
 		self.sections+=1
-		self.buttonArray.append("")
+		self.buttonArray.append(mainButton(self))
 
 
 

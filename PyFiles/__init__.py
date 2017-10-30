@@ -26,9 +26,10 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("400x300")
 
-frame=Frame(window)
+but=mainButton(window)
+but.colour("#F951A3")
+but.pack(expand=True,fill=BOTH)
 
-recursiveBind(frame,"<Enter>","")
 
 #====================User Interface====================
 

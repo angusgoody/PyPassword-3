@@ -205,7 +205,6 @@ def decrypt(plainText,key):
 	"""
 	pass
 
-log.saveLog()
 #====================Core Classes====================
 """
 The PEM core classes are the classes that form the basic 
