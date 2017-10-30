@@ -70,7 +70,6 @@ def recursiveColour(parent, colour, **kwargs):
 	overide=False
 	if "overide" in kwargs:
 		overide=kwargs["overide"]
-
 	#Check parent is valid
 	if type(parent) not in excludeItems:
 
@@ -118,15 +117,15 @@ class mainFrame(Frame):
 		the colour of the frame and all
 		the children of the frame 
 		"""
-		recursiveColour(self,chosenColour)
+		recursiveColour(self,chosenColour,**kwargs)
 
-	def addBinding(self,bindButton,bindFunction):
+	def addBinding(self,bindButton,bindFunction,**kwargs):
 		"""
 		This method will allow the widget
 		to be binded to a function recursively meaning
 		all the children are also binded.
 		"""
-		recursiveBind(self,bindButton,bindFunction)
+		recursiveBind(self,bindButton,bindFunction,**kwargs)
 
 class mainButton(mainFrame):
 	"""
@@ -143,9 +142,9 @@ class mainButton(mainFrame):
 		self.command=None
 		#Store button state
 		self.state=False
-		self.hoverState=False
+		self.hoverOn=False
 		#Button colour variables
-		self.hoverColour="#61D9CD"
+		self.hoverColour="#E852F3"
 		self.clickedColour="#60EFD0"
 		self.disabledColour="#ACB4B4"
 		self.disabledFG="#939797"
@@ -157,9 +156,10 @@ class mainButton(mainFrame):
 		self.textLabel=Label(self,textvariable=self.textVar,width=12)
 		self.textLabel.pack(expand=True)
 		#Bindings
-		self.addBinding("<Enter>",lambda event: self.hover())
-		self.addBinding("<Leave>",lambda event: self.hover())
+		self.addBinding("<Enter>",lambda event: self.hover(True))
+		self.addBinding("<Leave>",lambda event: self.hover(False))
 		self.addBinding("<Button-1>",lambda event: self.runCommand())
+
 		#Initiate Button state
 		self.changeState(True)
 
@@ -176,25 +176,27 @@ class mainButton(mainFrame):
 			except:
 				log.report("Error executing button command",tag="Error")
 
-	def hover(self):
+	def hover(self,inOut):
 		"""
 		This method is run when the mouse
 		hovers over the button, depending
 		on the state of the button it will change 
 		colour
+		True = In
+		False = Out
 		"""
 		if self.state:
 			#If the hover state is false then hover is not active
-			if self.hoverState == False:
+			if inOut:
 				#Activate hover
-				self.hoverState=True
+				self.hoverOn=True
 				#Change colour#
-				self.colour(self.hoverColour)
+				self.colour(self.hoverColour,overide=True)
 			else:
 				#Deactivate hover
-				self.hoverState=False
+				self.hoverOn=False
 				#Change colours
-				self.colour(self.enabledColour)
+				self.colour(self.enabledColour,overide=True)
 
 	def changeState(self,TrueOrFalse):
 		"""

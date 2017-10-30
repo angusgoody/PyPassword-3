@@ -28,7 +28,7 @@ window.geometry("400x300")
 
 but=mainButton(window)
 but.colour("#F951A3")
-but.pack(expand=True,fill=BOTH)
+but.pack(expand=True)
 
 
 #====================User Interface====================
