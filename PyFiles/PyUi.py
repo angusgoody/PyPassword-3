@@ -23,6 +23,49 @@ log=logClass("User Interface")
 This section is for functions that aid with the user
 interface elements of PyPassword
 """
+
+def recursiveBind(parent,bindButton,bindFunction,**kwargs):
+	"""
+	This function will bind a function
+	recursively to a widget, this means
+	all the children of the widget
+	will also be binded to the same function
+	"""
+	#Check if the parent has children
+	if "winfo_children" in dir(parent):
+		#Bind the parent
+		parent.bind(bindButton,bindFunction)
+		#Bind the children
+		for child in parent.winfo_children():
+			recursiveBind(child,bindButton,bindFunction)
+	else:
+		try:
+			parent.bind(bindButton,bindFunction)
+		except:
+			log.report("Could not bind function to",type(parent))
+
+def recursiveColour(parent,colour,**kwargs):
+	"""
+	The recursive colour function
+	will change the colour of widgets
+	recursively
+	"""
+	#Items to exclude
+	excludeItems=[]
+
+	#Items who's highlight background is changed
+	highlightItems=["Entry", "Button", "Text", "Listbox", "OptionMenu", "Menu"]
+
+	#Check to see if any widgets should be excluded
+	if "exclude" in kwargs:
+		#Add new items to exclude
+		excludeItems.extend(kwargs["exclude"])
+
+	#Check if parent has children
+	if "winfo_children" in dir(parent):
+		pass
+	else:
+		pass
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -40,6 +83,8 @@ class mainFrame(Frame):
 	def __init__(self,parent):
 		Frame.__init__(self,parent)
 
+		#Should colour be changed during recursion
+		self.preserveColour=False
 	def colour(self,chosenColour,**kwargs):
 		"""
 		The colour method will change 
@@ -63,6 +108,56 @@ class mainButton(mainFrame):
 	that handles bindings and colours
 	etc
 	"""
+	def __init__(self,parent,**kwargs):
+		mainFrame.__init__(self,parent)
+		#Store the command
+		self.command=None
+		#Store button state
+		self.state=True
+		self.hoverState=False
+		#Button colour variables
+		self.hoverColour="#61D9CD"
+		self.clickedColour="#60EFD0"
+		self.disabledColour="#ACB4B4"
+		self.enabledColour="#EEF6F5"
+		#Text frame
+		self.textFrame=mainFrame(self)
+		self.textFrame.pack(expand=True)
+		#Text
+		self.textVar=StringVar()
+		self.textLabel=Label(self.textFrame)
+		#Bindings
+		recursiveBind(self,"<Enter>",)
+
+	def runCommand(self):
+		"""
+		This method will execute the command
+		stored inside the button
+		"""
+		#Check the button has a command
+		if self.command:
+			try:
+				self.command()
+			except:
+				log.report("Error executing button command",tag="Error")
+
+	def hover(self):
+		"""
+		This method is run when the mouse
+		hovers over the button, depending
+		on the state of the button it will change 
+		colour
+		"""
+		if self.state:
+			#If the hover state is false then hover is not active
+			if self.hoverState == False:
+				#Activate hover
+				self.hoverState=True
+				#Change colour
+
+
+
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes

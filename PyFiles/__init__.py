@@ -26,6 +26,10 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("400x300")
 
+frame=Frame(window)
+
+recursiveBind(frame,"<Enter>","")
+
 #====================User Interface====================
 
 #======Status======
