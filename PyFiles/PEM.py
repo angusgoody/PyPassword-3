@@ -212,7 +212,6 @@ structure of PyPasswords security, they are the classes
 the sensitive data is stored in.
 """
 
-<<<<<<< HEAD
 class pod:
 	"""
 	A pod is what
@@ -225,6 +224,7 @@ class pod:
 		self.podVault={}
 
 	def addData(self,):
+		pass
 
 class masterPod:
 	"""
@@ -232,7 +232,6 @@ class masterPod:
 	all a users accounts which
 	are individually called Pods
 	"""
-=======
 class peaPod:
 	"""
 	The peaPod class is a class
@@ -340,4 +339,3 @@ class masterPod:
 
 
 
->>>>>>> origin/master
