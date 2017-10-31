@@ -18,6 +18,8 @@ from PEM import logClass
 
 log=logClass("User Interface")
 log.saveLog()
+#====================Preset variables====================
+
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -143,34 +145,95 @@ class mainButton(mainFrame):
 		#Store button state
 		self.state=False
 		self.hoverOn=False
+		self.pressing=False
 		#Button colour variables
-		self.hoverColour="#E852F3"
-		self.clickedColour="#60EFD0"
+		self.enabledColour="#FFFFFF"
+		self.enabledFG="#000000"
+		self.hoverColour="#F4F3F5"
+		self.clickedColour="#A9F955"
 		self.disabledColour="#ACB4B4"
 		self.disabledFG="#939797"
-		self.enabledColour="#2CF3C7"
-		self.enabledFG="#000000"
+		#Width
+		self.labelWidth=12
 		#Text
 		self.textVar=StringVar()
 		self.textVar.set("Button")
-		self.textLabel=Label(self,textvariable=self.textVar,width=12)
+		self.textLabel=Label(self,textvariable=self.textVar,width=self.labelWidth)
 		self.textLabel.pack(expand=True)
 		#Bindings
 		self.addBinding("<Enter>",lambda event: self.hover(True))
 		self.addBinding("<Leave>",lambda event: self.hover(False))
 		self.addBinding("<Button-1>",lambda event: self.runCommand())
+		self.addBinding("<ButtonRelease-1>",lambda event: self.pressBind(False))
+
+		#Check for Kwargs
+		self.updateButton(**kwargs)
 
 		#Initiate Button state
 		self.changeState(True)
 
+	def updateButton(self,**kwargs):
+		"""
+		This method will allow all aspects
+		of the button to be updated using
+		kwargs
+		"""
+		#Get kwargs
+		self.textVar.set(kwargs.get("text",self.textVar))
+		self.command=kwargs.get("command",self.command)
+		self.textLabel.config(width=kwargs.get("width",self.labelWidth))
+		#Colour kwargs
+		self.enabledColour=kwargs.get("enabledColour",self.enabledColour)
+		self.enabledFG=kwargs.get("enabledFG",self.enabledFG)
+		self.hoverColour=kwargs.get("hoverColour",self.hoverColour)
+		self.clickedColour=kwargs.get("clickedColour",self.clickedColour)
+		self.disabledColour=kwargs.get("disabledColour",self.disabledColour)
+		self.disabledFG=kwargs.get("disabledFG",self.disabledFG)
+
+	def changeButtonColour(self,bg,**kwargs):
+		"""
+		This method is used to change the buttons colour
+		and change its background and text colour if needed
+		temporarily only
+		"""
+		#Check for FG colour
+		fg=self.enabledFG
+		if "fg" in kwargs:
+			fg=kwargs["fg"]
+		#Change the colours with overide True
+		self.colour(bg,overide=True)
+		self.textLabel.config(fg=fg)
+
+	def pressBind(self,pressOrRelease):
+		"""
+		Function that handles button
+		click release events and changes
+		colour depending on what user is doing
+		True = pressing
+		False = release
+		"""
+		#Check button is active
+		if self.state:
+			#If user clicks button show clicked colour
+			if pressOrRelease:
+				self.pressing=True
+				self.changeButtonColour(self.clickedColour)
+			#When user releases mouse change back
+			else:
+				self.pressing=False
+				self.changeButtonColour(self.hoverColour)
 
 	def runCommand(self):
 		"""
 		This method will execute the command
 		stored inside the button
 		"""
+		#Activate colour
+		self.pressBind(True)
 		#Check the button has a command
 		if self.command and self.state:
+
+			#Run the command
 			try:
 				self.command()
 			except:
@@ -188,10 +251,14 @@ class mainButton(mainFrame):
 		if self.state:
 			#If the hover state is false then hover is not active
 			if inOut:
-				#Activate hover
-				self.hoverOn=True
-				#Change colour#
-				self.colour(self.hoverColour,overide=True)
+				#Only change to hover if user isn't still pressing button
+				if self.pressing == False:
+					#Activate hover
+					self.hoverOn=True
+					#Change colour#
+					self.colour(self.hoverColour,overide=True)
+				else:
+					self.pressBind(True)
 			else:
 				#Deactivate hover
 				self.hoverOn=False
@@ -209,14 +276,12 @@ class mainButton(mainFrame):
 		if TrueOrFalse == True and self.state == False:
 			self.state=True
 			#Change colours
-			self.colour(self.enabledColour,overide=True)
-			self.textLabel.config(fg=self.enabledFG)
+			self.changeButtonColour(self.enabledColour,fg=self.enabledFG)
 		#Turn off
 		elif TrueOrFalse == False and self.state:
 			self.state=False
 			#Change colours
-			self.colour(self.disabledColour,overide=True)
-			self.textLabel.config(fg=self.disabledFG)
+			self.changeButtonColour(self.disabledColour,fg=self.disabledFG)
 
 
 
