@@ -29,9 +29,9 @@ window.geometry("400x300")
 
 sub=mainFrame(window)
 sub.pack(expand=True)
-myButton=mainButton(sub,text="One",enabledColour="#B9F781")
+myButton=mainButton(sub,text="One",enabledColour="#5DAEE3",hoverColour="#A0E3E2")
 myButton.pack()
-myButton2=mainButton(sub,text="Two",enabledColour="#87F4F7")
+myButton2=mainButton(sub,text="Two",enabledColour="#5DAEE3",clickedColour="#E380CB")
 myButton2.pack()
 #====================User Interface====================
 

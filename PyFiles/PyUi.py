@@ -106,6 +106,65 @@ def recursiveColour(parent, colour, **kwargs):
 				for child in parent.winfo_children():
 					recursiveColour(child,colour,exclude=excludeItems,overide=overide)
 
+#Hex
+def convertHex(value,intoDecOrHex):
+	"""
+	Convert a decimal to hex or hex to decimal
+	"""
+	if intoDecOrHex == "Decimal":
+		return int("0x" + str(value), 16)
+	else:
+		hexValue = "#"
+		hexValue = hexValue + str((format(value, '02x')).upper())
+		return hexValue
+
+def getHexSections(hexValue):
+	"""
+	This will split a 6 digit hex number into pairs and store them
+	in an array
+	"""
+	if len(hexValue) <= 7 and "#" in hexValue:
+		#Removes the #
+		colourData = hexValue.replace("#", "")
+		# Split HEX number into pairs
+		colourSections = [colourData[i:i + 2] for i in range(0, len(colourData), 2)]
+		return colourSections
+
+def getDecimalHexSections(hexValue):
+	hexSections=getHexSections(hexValue)
+	decimalArray=[]
+	for item in hexSections:
+		decimalValue=convertHex(item,"Decimal")
+		decimalArray.append(decimalValue)
+	return decimalArray
+
+def getColourForBackground(hexValue):
+	"""
+	This function will return white or black as a text colour
+	depending on what the background colour passed to it is. For
+	example if a dark background is passed then white will be returned because
+	white shows up on dark best.
+	"""
+	chosenColour="Black"
+	whiteCounter = 0
+
+	#Checks the hex number is standard
+	if len(hexValue) <= 7 and "#" in hexValue:
+
+		colourSections=getHexSections(hexValue)
+		for x in colourSections:
+			#Convert to decimal
+			y=convertHex(x,"Decimal")
+			#If its less than half way between 0 and FF which is 255
+			if y < 128:
+				whiteCounter += 1
+		if whiteCounter > 1:
+			#White is returned
+			chosenColour = "#ffffff"
+		else:
+			#Black is returned
+			chosenColour = "#000000"
+	return chosenColour
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -159,6 +218,8 @@ class mainButton(mainFrame):
 		self.state=False
 		self.hoverOn=False
 		self.pressing=False
+		#Fonts
+		self.font="Avenir 14"
 		#Button colour variables
 		self.enabledColour="#FFFFFF"
 		self.enabledFG="#000000"
@@ -171,7 +232,7 @@ class mainButton(mainFrame):
 		#Text
 		self.textVar=StringVar()
 		self.textVar.set("Button")
-		self.textLabel=Label(self,textvariable=self.textVar,width=self.labelWidth)
+		self.textLabel=Label(self,textvariable=self.textVar,width=self.labelWidth,font=self.font)
 		self.textLabel.pack(expand=True)
 		#Bindings
 		self.addBinding("<Enter>",lambda event: self.hover(True))
@@ -192,6 +253,7 @@ class mainButton(mainFrame):
 		kwargs
 		"""
 		#Get kwargs
+		self.font=kwargs.get("font",self.font)
 		self.textVar.set(kwargs.get("text",self.textVar))
 		self.command=kwargs.get("command",self.command)
 		self.textLabel.config(width=kwargs.get("width",self.labelWidth))
@@ -202,6 +264,9 @@ class mainButton(mainFrame):
 		self.clickedColour=kwargs.get("clickedColour",self.clickedColour)
 		self.disabledColour=kwargs.get("disabledColour",self.disabledColour)
 		self.disabledFG=kwargs.get("disabledFG",self.disabledFG)
+
+		#Updates
+		self.textLabel.config(font=self.font)
 
 	def changeButtonColour(self,bg,**kwargs):
 		"""
@@ -315,6 +380,9 @@ class contextBar(mainFrame):
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
+		#Preset bar colours, fonts etc
+		self.font="Avenir"
+		self.enabledColour="#E8EDEA"
 		#Store name and command in dictionary
 		self.nameDict={}
 		#The array that stores buttons
@@ -345,7 +413,6 @@ class multiView(mainFrame):
 		#Store the view info
 		self.views={}
 		self.currentView=None
-
 
 	def addView(self,frameToDisplay,name):
 		"""
