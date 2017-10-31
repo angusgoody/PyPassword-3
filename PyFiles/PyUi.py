@@ -274,13 +274,9 @@ class mainButton(mainFrame):
 		and change its background and text colour if needed
 		temporarily only
 		"""
-		#Check for FG colour
-		fg=self.enabledFG
-		if "fg" in kwargs:
-			fg=kwargs["fg"]
 		#Change the colours with overide True
 		self.colour(bg,overide=True)
-		self.textLabel.config(fg=fg)
+		self.textLabel.config(fg=getColourForBackground(bg))
 
 	def pressBind(self,pressOrRelease):
 		"""
@@ -334,14 +330,14 @@ class mainButton(mainFrame):
 					#Activate hover
 					self.hoverOn=True
 					#Change colour#
-					self.colour(self.hoverColour,overide=True)
+					self.changeButtonColour(self.hoverColour)
 				else:
 					self.pressBind(True)
 			else:
 				#Deactivate hover
 				self.hoverOn=False
 				#Change colours
-				self.colour(self.enabledColour,overide=True)
+				self.changeButtonColour(self.enabledColour)
 
 	def changeState(self,TrueOrFalse):
 		"""
@@ -354,12 +350,12 @@ class mainButton(mainFrame):
 		if TrueOrFalse == True and self.state == False:
 			self.state=True
 			#Change colours
-			self.changeButtonColour(self.enabledColour,fg=self.enabledFG)
+			self.changeButtonColour(self.enabledColour)
 		#Turn off
 		elif TrueOrFalse == False and self.state:
 			self.state=False
 			#Change colours
-			self.changeButtonColour(self.disabledColour,fg=self.disabledFG)
+			self.changeButtonColour(self.disabledColour)
 
 
 
@@ -399,7 +395,9 @@ class contextBar(mainFrame):
 		to add a button
 		"""
 		self.sections+=1
+		newButton=mainButton(self)
 		self.buttonArray.append(mainButton(self))
+
 
 class multiView(mainFrame):
 	"""
