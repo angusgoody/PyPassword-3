@@ -333,8 +333,6 @@ class contextBar(mainFrame):
 		self.sections+=1
 		self.buttonArray.append(mainButton(self))
 
-
-
 class multiView(mainFrame):
 	"""
 	The multi view is a class
