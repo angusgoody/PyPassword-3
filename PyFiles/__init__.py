@@ -27,12 +27,8 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("400x300")
 
-sub=mainFrame(window)
-sub.pack(expand=True)
-myButton=mainButton(sub,text="One",enabledColour="#274E62",hoverColour="#FFFFFF")
-myButton.pack()
-myButton2=mainButton(sub,text="Two",enabledColour="#5DAEE3",clickedColour="#E380CB")
-myButton2.pack()
+newBar=contextBar(window,places=3)
+newBar.pack(side=BOTTOM,fill=X)
 #====================User Interface====================
 
 #======Status======

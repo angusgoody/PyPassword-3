@@ -373,12 +373,13 @@ class contextBar(mainFrame):
 	be swapped and modified to suit onscreen
 	actions
 	"""
-	def __init__(self,parent):
+	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent)
-
 		#Preset bar colours, fonts etc
 		self.font="Avenir"
 		self.enabledColour="#E8EDEA"
+		self.hoverColour="#DFE4E2"
+		self.defaultText="Comand"
 		#Store name and command in dictionary
 		self.nameDict={}
 		#The array that stores buttons
@@ -387,6 +388,11 @@ class contextBar(mainFrame):
 		self.sections=0
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
+		#Generate preset placeholders
+		self.presetPlaces=1
+		self.presetPlaces=kwargs.get("places",self.presetPlaces)
+		for x in range(self.presetPlaces):
+			self.addPlaceholder()
 
 	def addPlaceholder(self):
 		"""
@@ -395,8 +401,14 @@ class contextBar(mainFrame):
 		to add a button
 		"""
 		self.sections+=1
-		newButton=mainButton(self)
-		self.buttonArray.append(mainButton(self))
+		#Create Button
+		newButton=mainButton(self,enabledColour=self.enabledColour,
+		                     hoverColour=self.hoverColour,text=self.defaultText)
+		#Add button to array
+		self.buttonArray.append(newButton)
+		#Show the button on the bar itself
+		newButton.pack(fill=X,expand=True,side=RIGHT)
+
 
 
 class multiView(mainFrame):
