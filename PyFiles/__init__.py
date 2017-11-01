@@ -29,6 +29,11 @@ window.geometry("400x300")
 
 newBar=contextBar(window,places=3)
 newBar.pack(side=BOTTOM,fill=X)
+
+def temp():
+	newBar.addButton(1,"REPLACEMENT",enabledColour="#D4AEF7")
+newBar.addButton(0,"Custom",enabledColour="#E49373",command=temp)
+newBar.addButton(1,"TEST",enabledColour="#87EFF7")
 #====================User Interface====================
 
 #======Status======

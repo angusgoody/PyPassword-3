@@ -268,6 +268,10 @@ class mainButton(mainFrame):
 		#Updates
 		self.textLabel.config(font=self.font)
 
+		#Only update colour if mouse is not over button
+		if self.state == True and self.hoverOn == False and self.pressing == False:
+			self.changeButtonColour(self.enabledColour)
+
 	def changeButtonColour(self,bg,**kwargs):
 		"""
 		This method is used to change the buttons colour
@@ -407,9 +411,15 @@ class contextBar(mainFrame):
 		#Add button to array
 		self.buttonArray.append(newButton)
 		#Show the button on the bar itself
-		newButton.pack(fill=X,expand=True,side=RIGHT)
+		newButton.pack(fill=X,expand=True,side=LEFT)
 
-
+	def addButton(self,index,title,**kwargs):
+		"""
+		This method allows a button to be added
+		to the context bar
+		"""
+		if index+1 <= len(self.buttonArray) and index >= 0:
+			self.buttonArray[index].updateButton(text=title,**kwargs)
 
 class multiView(mainFrame):
 	"""
