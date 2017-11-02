@@ -481,6 +481,7 @@ class contextBar(mainFrame):
 			self.addPlaceholder()
 
 		#Update
+		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour"}
 		self.updateBar(**kwargs)
 
 	def updateBar(self,**kwargs):
@@ -488,7 +489,8 @@ class contextBar(mainFrame):
 		Update the bar with KWARGS
 		"""
 		#Get kwargs
-		self.font=kwargs.get("font",self.font)
+		for att in self.mainAttributes:
+			att=kwargs.get(self.mainAttributes[att],att)
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(font=self.font)
