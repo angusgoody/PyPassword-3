@@ -232,7 +232,7 @@ class mainButton(mainFrame):
 		#Text
 		self.textVar=StringVar()
 		self.textVar.set("Button")
-		self.textLabel=Label(self,textvariable=self.textVar,width=self.labelWidth,font=self.font)
+		self.textLabel=mainLabel(self,textvariable=self.textVar,width=self.labelWidth,font=self.font)
 		self.textLabel.pack(expand=True)
 		#Bindings
 		self.addBinding("<Enter>",lambda event: self.hover(True))
@@ -281,7 +281,7 @@ class mainButton(mainFrame):
 		"""
 		#Change the colours with overide True
 		self.colour(bg,overide=True)
-		self.textLabel.config(fg=getColourForBackground(bg))
+		self.textLabel.colour(bg)
 
 	def pressBind(self,pressOrRelease):
 		"""
@@ -372,16 +372,17 @@ class mainLabel(Label):
 	"""
 	def __init__(self,parent,**kwargs):
 		Label.__init__(self,parent)
+		self.parent=parent
 		#Store text data
 		self.textVar=StringVar()
 		self.textVar.set("Label")
 		#Store look of the label
 		self.fg=None
-		self.colour="#FFFFFF"
+		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
 		#Initiate update
 		self.update(**kwargs)
-		
+
 	def update(self,**kwargs):
 		"""
 		The update method will allow the
@@ -391,15 +392,23 @@ class mainLabel(Label):
 		self.textVar=kwargs.get("textvariable",self.textVar)
 		self.font=kwargs.get("font",self.font)
 		self.fg=kwargs.get("fg",self.fg)
-		self.colour=kwargs.get("colour",self.colour)
+		self.colourVar=kwargs.get("colour",self.colourVar)
 
 		#Update
-		self.config(textvariable=self.textVar)
+		self.config(textvariable=self.textVar,font=self.font)
 		if self.fg == None:
-			self.config(fg=getColourForBackground(self.colour),font=self.font)
+			self.colour(self.colourVar)
 		else:
 			self.config(fg=self.fg)
 
+	def colour(self,background):
+		"""
+		The colour method will change the colour
+		of the background and automatically 
+		change text colour to suit
+		"""
+		self.config(bg=background)
+		self.config(fg=getColourForBackground(background))
 
 
 

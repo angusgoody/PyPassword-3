@@ -39,7 +39,7 @@ area.pack(expand=True,fill=BOTH)
 #Screens
 screen1=screen(area,"Screen 1")
 screen1.colour("#A9F955")
-main=mainLabel(screen1,font="Avenir 25",text="Hi")
+main=mainLabel(screen1,font="Avenir 25",text="Hi",colour="#47FFF1")
 main.pack(expand=True)
 screen2=screen(area,"Screen 2")
 screen2.colour("#ADDCFC")
