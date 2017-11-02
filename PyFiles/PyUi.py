@@ -254,7 +254,8 @@ class mainButton(mainFrame):
 		"""
 		#Get kwargs
 		self.font=kwargs.get("font",self.font)
-		self.textVar.set(kwargs.get("text",self.textVar))
+		self.textVar.set(kwargs.get("text",self.textVar.get()))
+		self.textVar=kwargs.get("textvariable",self.textVar)
 		self.command=kwargs.get("command",self.command)
 		self.textLabel.config(width=kwargs.get("width",self.labelWidth))
 		#Colour kwargs
@@ -265,9 +266,9 @@ class mainButton(mainFrame):
 		self.disabledColour=kwargs.get("disabledColour",self.disabledColour)
 		self.disabledFG=kwargs.get("disabledFG",self.disabledFG)
 
-		#Updates
+		#Update the widgets etc
 		self.textLabel.config(font=self.font)
-
+		self.textLabel.config(textvariable=self.textVar)
 		#Only update colour if mouse is not over button
 		if self.state == True and self.hoverOn == False and self.pressing == False:
 			self.changeButtonColour(self.enabledColour)
@@ -380,7 +381,7 @@ class contextBar(mainFrame):
 	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent)
 		#Preset bar colours, fonts etc
-		self.font="Avenir"
+		self.font="Avenir 14"
 		self.enabledColour="#E8EDEA"
 		self.hoverColour="#DFE4E2"
 		self.defaultText="Comand"
@@ -392,11 +393,26 @@ class contextBar(mainFrame):
 		self.sections=0
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
+
 		#Generate preset placeholders
 		self.presetPlaces=1
 		self.presetPlaces=kwargs.get("places",self.presetPlaces)
 		for x in range(self.presetPlaces):
 			self.addPlaceholder()
+
+		#Update
+		self.updateBar()
+
+	def updateBar(self,**kwargs):
+		"""
+		Update the bar with KWARGS
+		"""
+		#Get kwargs
+		self.font=kwargs.get("font",self.font)
+
+		#Update
+		for button in self.buttonArray:
+			button.updateButton(font=self.font)
 
 	def addPlaceholder(self):
 		"""
@@ -413,13 +429,13 @@ class contextBar(mainFrame):
 		#Show the button on the bar itself
 		newButton.pack(fill=X,expand=True,side=LEFT)
 
-	def addButton(self,index,title,**kwargs):
+	def addButton(self,index,**kwargs):
 		"""
 		This method allows a button to be added
 		to the context bar
 		"""
 		if index+1 <= len(self.buttonArray) and index >= 0:
-			self.buttonArray[index].updateButton(text=title,**kwargs)
+			self.buttonArray[index].updateButton(**kwargs)
 
 class multiView(mainFrame):
 	"""
