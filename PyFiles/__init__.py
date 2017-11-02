@@ -17,6 +17,8 @@ from tkinter import *
 from tkinter import messagebox
 from PyUi import *
 from PEM import *
+from PIL import Image, ImageTk
+
 #====================Window====================
 """
 This is where the basic window
@@ -27,19 +29,24 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("400x300")
 
+statusBar=contextBar(window)
+statusBar.pack(side=BOTTOM,fill=X)
+
+
 area=mainFrame(window)
 area.pack(expand=True,fill=BOTH)
 
 #Screens
 screen1=screen(area,"Screen 1")
 screen1.colour("#A9F955")
+main=mainLabel(screen1,font="Avenir 25",text="Hi")
+main.pack(expand=True)
 screen2=screen(area,"Screen 2")
 screen2.colour("#ADDCFC")
 screen3=screen(area,"Screen 3")
 screen3.colour("#F9D33A")
 
-statusBar=contextBar(window)
-statusBar.pack(side=BOTTOM,fill=X)
+
 
 
 statusVar=StringVar()

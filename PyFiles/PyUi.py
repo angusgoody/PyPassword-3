@@ -362,6 +362,45 @@ class mainButton(mainFrame):
 			#Change colours
 			self.changeButtonColour(self.disabledColour)
 
+class mainLabel(Label):
+	"""
+	The main label widget is a custom
+	label widget that is more advanced
+	because it can change colour depending
+	on its background and has more control
+	over font etc.
+	"""
+	def __init__(self,parent,**kwargs):
+		Label.__init__(self,parent)
+		#Store text data
+		self.textVar=StringVar()
+		self.textVar.set("Label")
+		#Store look of the label
+		self.fg=None
+		self.colour="#FFFFFF"
+		self.font="Avenir 14"
+		#Initiate update
+		self.update(**kwargs)
+		
+	def update(self,**kwargs):
+		"""
+		The update method will allow the
+		label to be changed with kwargs
+		"""
+		self.textVar.set(kwargs.get("text",self.textVar.get()))
+		self.textVar=kwargs.get("textvariable",self.textVar)
+		self.font=kwargs.get("font",self.font)
+		self.fg=kwargs.get("fg",self.fg)
+		self.colour=kwargs.get("colour",self.colour)
+
+		#Update
+		self.config(textvariable=self.textVar)
+		if self.fg == None:
+			self.config(fg=getColourForBackground(self.colour),font=self.font)
+		else:
+			self.config(fg=self.fg)
+
+
 
 
 
@@ -401,10 +440,6 @@ class screen(mainFrame):
 				print(self.screenName)
 			#Set as last screen
 			screen.lastScreen=self
-
-
-
-
 
 class contextBar(mainFrame):
 	"""
