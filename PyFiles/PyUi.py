@@ -179,7 +179,7 @@ class mainFrame(Frame):
 	in PyPassword. It is a frame class
 	which has more customization and efficiency.
 	"""
-	def __init__(self,parent):
+	def __init__(self,parent,**kwargs):
 		Frame.__init__(self,parent)
 
 		#Should colour be changed during recursion
@@ -370,6 +370,42 @@ class mainButton(mainFrame):
 Secondary classes are classes that inherit from the core classes
 and are more program specific.
 """
+
+class screen(mainFrame):
+	"""
+	The screenclass is a class
+	for every screen in PyPassword.
+	It is a frame that can be hidden and shown
+	"""
+	lastScreen=None
+	statusVar=None
+	def __init__(self,parent,screenName,**kwargs):
+		mainFrame.__init__(self,parent)
+		self.screenName=screenName
+	def show(self):
+		"""
+		The show method will show the screen,
+		it does this by hiding the last used screen
+		and showing the current screen
+		"""
+		#Stop screen being reloaded
+		if screen.lastScreen != self:
+			#Hide last screen
+			if "pack_forget" in dir(screen.lastScreen):
+				screen.lastScreen.pack_forget()
+			#Show current screen
+			self.pack(expand=True,fill=BOTH)
+			#Update the status var
+			if "set" in dir(screen.statusVar):
+				screen.statusVar.set(self.screenName)
+				print(self.screenName)
+			#Set as last screen
+			screen.lastScreen=self
+
+
+
+
+
 class contextBar(mainFrame):
 	"""
 	The contextBar class will be a class
@@ -401,7 +437,7 @@ class contextBar(mainFrame):
 			self.addPlaceholder()
 
 		#Update
-		self.updateBar()
+		self.updateBar(**kwargs)
 
 	def updateBar(self,**kwargs):
 		"""
@@ -409,7 +445,6 @@ class contextBar(mainFrame):
 		"""
 		#Get kwargs
 		self.font=kwargs.get("font",self.font)
-
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(font=self.font)
