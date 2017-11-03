@@ -75,7 +75,7 @@ def recursiveColour(parent, colour, **kwargs):
 	recursively
 	"""
 	#Items to exclude
-	excludeItems=[]
+	excludeItems=[Entry]
 
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:
@@ -378,6 +378,7 @@ class mainLabel(Label):
 		self.textVar.set("Label")
 		#Store look of the label
 		self.fg=None
+
 		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
 		#Initiate update
@@ -410,6 +411,23 @@ class mainLabel(Label):
 		self.config(bg=background)
 		self.config(fg=getColourForBackground(background))
 
+class advancedListbox(Listbox):
+	"""
+	The advanced Listbox class is a class that
+	modifies the standard tkinter listbox
+	but adds more customization and adds a scroll
+	bar
+	"""
+	def __init__(self,parent):
+		Listbox.__init__(self,parent)
+
+		#Add a scrollbar
+		self.scrollBar=Scrollbar(self)
+		self.scrollBar.pack(side=RIGHT,fill=Y)
+		self.scrollBar.config(command=self.yview)
+		self.config(yscrollcommand=self.scrollBar.set)
+
+
 
 
 
@@ -418,6 +436,37 @@ class mainLabel(Label):
 Secondary classes are classes that inherit from the core classes
 and are more program specific.
 """
+
+class topLabel(mainFrame):
+	"""
+	The top strip class
+	is a class which goes at 
+	the top of a screen to
+	show a message.
+	"""
+	def __init__(self,parent,**kwargs):
+		mainFrame.__init__(self,parent)
+		#Create center frame
+		self.centerFrame=mainFrame(self)
+		self.centerFrame.pack(expand=True)
+		#Create Label
+		self.textVar=StringVar()
+		self.textVar.set("Label")
+		self.textLabel=mainLabel(self.centerFrame,font="Avenir 20",textvariable=self.textVar)
+		self.textLabel.pack(expand=True,fill=X)
+		#Update
+		self.updateLabel(**kwargs)
+
+	def updateLabel(self,**kwargs):
+		"""
+		Update the strip with kwargs
+		"""
+		#Get Text Variable
+		self.textVar.set(kwargs.get("text",self.textVar.get()))
+		self.textVar=kwargs.get("text",self.textVar)
+
+		#Update
+		self.textLabel.update(textvaribale=self.textVar)
 
 class screen(mainFrame):
 	"""
