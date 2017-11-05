@@ -101,7 +101,12 @@ def findMasterPods(directory):
         for file in files:
             #Get master pod name
             displayName=getRootName(directory)
-            #Add to listbox
+            #Create instance
+            masterPodInstance=loadMasterPod(file)
+            if masterPodInstance:
+                #Add to listbox
+                openListbox.addObject(displayName,masterPodInstance)
+
 
 
     else:
@@ -119,7 +124,7 @@ def findMasterPods(directory):
 #====================Initial Loaders====================
 
 openScreen.show()
-print(findFiles(getWorkingDirectory(),".py"))
+print(findFiles(getWorkingDirectory(),".mp"))
 #====================END====================
 window.mainloop()
 

@@ -183,7 +183,6 @@ def findFiles(directory,extension):
 	#print(files)
 	return filesFound
 
-
 def getRootName(directory):
 	return os.path.splitext(directory.fileName)[0]
 
@@ -301,7 +300,7 @@ class masterPod:
 	for every account stored in PyPassword
 	"""
 	currentMasterPod=None
-	loadedPods=[]
+	loadedPods={}
 	def __init__(self,name):
 		#Name of the master peaPod
 		self.masterName=name
@@ -315,7 +314,7 @@ class masterPod:
 		#Where the master peaPod is saved
 		self.location=None
 		#Add to loaded pods
-		masterPod.loadedPods.append(self)
+		masterPod.loadedPods[self.masterName]=self
 
 	def save(self):
 		"""
@@ -353,10 +352,11 @@ def loadMasterPod(fileName):
 	contents=openPickle(fileName)
 	if contents:
 		if type(contents) == masterPod:
-			podKey=masterPod.key
-			print(podKey)
+			#Add to loaded pods dictionary
+			masterPod.loadedPods[contents.masterName]=contents
+			#Return the master pod
+			return contents
 
 
-
-
+#====================Testing area====================
 
