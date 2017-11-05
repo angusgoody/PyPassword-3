@@ -34,24 +34,25 @@ window.geometry("400x300")
 
 #====================User Interface====================
 
-#======Status======
+#======Status and context======
+#region status
 statusVar=StringVar()
 statusVar.set("Home")
 statusBar=contextBar(window)
 statusBar.pack(side=BOTTOM,fill=X)
-statusBar.addButton(0,textvariable=statusVar,enabledColour="#706EE6",hoverColour="#7A78FB")
+statusBar.addButton(0,textvariable=statusVar,enabledColour="#134611",hoverColour="#134611")
 
+context=contextBar(window)
+context.pack(side=BOTTOM,fill=X)
 
+#endregion
 #======Login Screen======
 #region Login
 loginScreen=screen(window,"Login")
 
 #Context
-loginContext=contextBar(loginScreen,places=3)
-loginContext.pack(side=BOTTOM,fill=X)
+loginScreen.context=context
 
-loginContext.addButton(1,enabledColour="#95EE9B",hoverColour="#9DFCA3",
-                       clickedColour="#F951A3",text="Unlock")
 #Center
 loginSub=mainFrame(loginScreen)
 loginSub.pack(expand=True,fill=X,padx=20)
@@ -74,12 +75,11 @@ openTopLabel=topLabel(openScreen,text="Select Pod")
 openTopLabel.pack(side=TOP,fill=X)
 
 #Context
-openContext=contextBar(openScreen,places=3)
-openContext.pack(side=BOTTOM,fill=X)
-#Context buttons
-openContext.addButton(0,text="Create New")
-openContext.addButton(1,text="Open",enabledColour="#2EE697")
-openContext.addButton(2,text="Open Other")
+openScreen.context=context
+openScreen.addContextInfo(0,text="Create New")
+openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697",command=lambda: loginScreen.show())
+openScreen.addContextInfo(2,text="Open Other")
+
 
 
 #Listbox
@@ -134,6 +134,9 @@ def findMasterPods(directory):
 
 #====================Testing Area====================
 
+loginScreen.addContextInfo(0,enabledColour="#95EE9B",hoverColour="#9DFCA3",
+                       clickedColour="#F951A3",text="Go back",command=lambda: openScreen.show())
+loginScreen.addContextInfo(1,text="Place")
 #====================Initial Loaders====================
 
 openScreen.show()

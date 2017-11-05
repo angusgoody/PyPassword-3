@@ -12,7 +12,7 @@ are created and used.
 
 #====================Imports====================
 from tkinter import *
-from PEM import logClass
+from PEM import *
 from random import randint
 #====================Log====================
 
@@ -517,12 +517,17 @@ class screen(mainFrame):
 	The screenclass is a class
 	for every screen in PyPassword.
 	It is a frame that can be hidden and shown
+	the screen will also store the preset
+	context buttons 
 	"""
 	lastScreen=None
 	statusVar=None
 	def __init__(self,parent,screenName,**kwargs):
 		mainFrame.__init__(self,parent)
 		self.screenName=screenName
+		#Store the context bar information
+		self.context=None
+		self.contextInfo={}
 	def show(self):
 		"""
 		The show method will show the screen,
@@ -539,9 +544,26 @@ class screen(mainFrame):
 			#Update the status var
 			if "set" in dir(screen.statusVar):
 				screen.statusVar.set(self.screenName)
-				print(self.screenName)
 			#Set as last screen
 			screen.lastScreen=self
+
+			#Update the contexts
+			if type(self.context) == contextBar:
+				numberOfButtons=len(self.contextInfo)
+				if numberOfButtons > 0:
+					#Set context to correct number of places
+					self.context.setPlaceholders(numberOfButtons)
+					#Add the context buttons
+					for position in self.contextInfo:
+						self.context.addButton(position,**self.contextInfo[position])
+				else:
+					self.context.resetBar()
+
+			else:
+				print("Not given a context bar")
+	def addContextInfo(self,position,**kwargs):
+		self.contextInfo[position]=kwargs
+
 
 class contextBar(mainFrame):
 	"""
@@ -634,6 +656,35 @@ class contextBar(mainFrame):
 		"""
 		if index+1 <= len(self.buttonArray) and index >= 0:
 			self.buttonArray[index].updateButton(**kwargs)
+
+	def setPlaceholders(self,numberOfPlaceHolders):
+		"""
+		This method sets the context bar
+		to the exact number of placeholders
+		"""
+		numberOfButtons=len(self.buttonArray)
+		if numberOfButtons != numberOfPlaceHolders:
+			diff=numberOfButtons-numberOfPlaceHolders
+			#Iterate through modulus of difference
+			for x in range(abs(diff)):
+				#Buttons need to be removed
+				if diff > 0:
+					self.removePlaceholder()
+				#Buttons are added
+				else:
+					self.addPlaceholder()
+
+	def resetBar(self):
+		"""
+		This method resets all the buttons
+		and removes commands
+		"""
+		for button in self.buttonArray:
+			button.command=None
+			button.textVar.set("Button")
+
+
+
 
 class multiView(mainFrame):
 	"""
