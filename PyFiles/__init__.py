@@ -45,7 +45,6 @@ statusBar.addButton(0,textvariable=statusVar,enabledColour="#706EE6",hoverColour
 #======Login Screen======
 #region Login
 loginScreen=screen(window,"Login")
-#loginScreen.show()
 
 #Context
 loginContext=contextBar(loginScreen,places=3)
@@ -81,6 +80,8 @@ openContext.pack(side=BOTTOM,fill=X)
 openContext.addButton(0,text="Create New")
 openContext.addButton(1,text="Open",enabledColour="#2EE697")
 openContext.addButton(2,text="Open Other")
+
+
 #Listbox
 openListbox=advancedListbox(openScreen)
 openListbox.pack(expand=True,fill=BOTH)
@@ -88,20 +89,37 @@ openListbox.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
-def attempt():
-	data=loginEntry.get()
-	if data != "Harry":
-		loginScreen.colour("#E68AAA")
-		loginVar.set("Incorrect")
-	else:
-		loginScreen.colour("#95E68A")
-		loginVar.set("Correct")
+def findMasterPods(directory):
+    """
+    This function will find master pod
+    files in a certain directory and 
+    load them into the listbox 
+    """
+    files=findFiles(directory,".mp")
+    if len(files) > 0:
+        #Iterate
+        for file in files:
+            #Get master pod name
+            displayName=getRootName(directory)
+            #Add to listbox
 
-loginEntry.bind("<Return>",lambda event: attempt())
+
+    else:
+        log.report("No mp files found in directory")
+        return None
+
+
+
+
+#====================Bindings====================
+
 
 #====================Testing Area====================
-openScreen.show()
 
+#====================Initial Loaders====================
+
+openScreen.show()
+print(findFiles(getWorkingDirectory(),".py"))
 #====================END====================
 window.mainloop()
 

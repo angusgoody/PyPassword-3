@@ -165,6 +165,28 @@ def checkFileName(fileName):
 	else:
 		return False
 
+def findFiles(directory,extension):
+	"""
+	This function searches through
+	a directory to look for a certain 
+	file type and return an array with
+	the files
+	"""
+	filesFound=[]
+	for root, dirs, files in os.walk(directory, topdown=False):
+		for name in files:
+			fileFound=(os.path.join(root, name))
+			base=os.path.basename(fileFound)
+			if base.endswith(extension):
+				filesFound.append(fileFound)
+
+	#print(files)
+	return filesFound
+
+
+def getRootName(directory):
+	return os.path.splitext(directory.fileName)[0]
+
 #Pickle Functions
 def openPickle(fileName):
 	"""
@@ -279,16 +301,21 @@ class masterPod:
 	for every account stored in PyPassword
 	"""
 	currentMasterPod=None
+	loadedPods=[]
 	def __init__(self,name):
 		#Name of the master peaPod
 		self.masterName=name
 		self.baseName=self.masterName+".mp"
+		#Store the key
+		self.key=None
 		#Where the pods are stored
 		self.peas={}
 		#The master key used for encryption
 		self.masterKey=None
 		#Where the master peaPod is saved
 		self.location=None
+		#Add to loaded pods
+		masterPod.loadedPods.append(self)
 
 	def save(self):
 		"""
@@ -314,6 +341,20 @@ class masterPod:
 
 		#Save self to pickle
 		savePickle(self,fileName)
+
+#====================Core Functions====================
+
+def loadMasterPod(fileName):
+	"""
+	Load a master pod from directory
+	and create a class instance 
+	"""
+	#De Pickle the file
+	contents=openPickle(fileName)
+	if contents:
+		if type(contents) == masterPod:
+			podKey=masterPod.key
+			print(podKey)
 
 
 

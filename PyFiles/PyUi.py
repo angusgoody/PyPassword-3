@@ -419,13 +419,27 @@ class advancedListbox(Listbox):
 	bar
 	"""
 	def __init__(self,parent):
-		Listbox.__init__(self,parent)
+		Listbox.__init__(self,parent,font="Avenir 22")
 
 		#Add a scrollbar
 		self.scrollBar=Scrollbar(self)
 		self.scrollBar.pack(side=RIGHT,fill=Y)
 		self.scrollBar.config(command=self.yview)
 		self.config(yscrollcommand=self.scrollBar.set)
+		#Store objects
+		self.data={}
+
+	def addObject(self,displayName,object):
+		"""
+		This method will allow an object
+		to be added to a listbox and 
+		return the object instead of plain text
+		"""
+		#Add reference in dictionary
+		self.data[displayName]=object
+		#Add to listbox
+		self.insert(displayName,END)
+
 
 
 
@@ -558,6 +572,30 @@ class contextBar(mainFrame):
 		self.buttonArray.append(newButton)
 		#Show the button on the bar itself
 		newButton.pack(fill=X,expand=True,side=LEFT)
+
+	def removePlaceholder(self,*index):
+		"""
+		This will remove a placeholder
+		from the context bar, if an index
+		is not specified the end button
+		will be removed
+		"""
+		defaultIndex=0
+		#If index is specified
+		if len(index) > 0:
+			#Set Default index
+			defaultIndex=index[0]
+
+		#Set default index as last item
+		else:
+			if len(self.buttonArray) > 0:
+				defaultIndex=len(self.buttonArray)-1
+
+		if defaultIndex+1 <= len(self.buttonArray) and defaultIndex >= 0:
+			#Destroy the widget and remove from array
+			self.buttonArray[defaultIndex].destroy()
+			#Remove from array
+			del self.buttonArray[defaultIndex]
 
 	def addButton(self,index,**kwargs):
 		"""
