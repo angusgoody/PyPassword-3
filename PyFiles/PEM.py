@@ -14,10 +14,13 @@ data takes place here.
 import pickle
 from datetime import datetime
 import os
+from random import choice
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
 filesDirectory="PyFiles"
+#====================Arrays====================
+masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 #====================Log====================
 class logClass:
 	"""
@@ -180,11 +183,10 @@ def findFiles(directory,extension):
 			if base.endswith(extension):
 				filesFound.append(fileFound)
 
-	#print(files)
 	return filesFound
 
 def getRootName(directory):
-	return os.path.splitext(directory.fileName)[0]
+	return os.path.splitext(os.path.basename(directory))[0]
 
 #Pickle Functions
 def openPickle(fileName):
@@ -304,6 +306,7 @@ class masterPod:
 	def __init__(self,name):
 		#Name of the master peaPod
 		self.masterName=name
+		self.masterColour=choice(masterPodColours)
 		self.baseName=self.masterName+".mp"
 		#Store the key
 		self.key=None

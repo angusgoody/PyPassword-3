@@ -89,6 +89,22 @@ openListbox.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
+def addMasterPodToScreen(masterPodInstance):
+    """
+    This function will add a master pod
+    class to the screen on the UI and 
+    ensure it's in the loaded dictionary
+    """
+    if type(masterPodInstance) is masterPod:
+        #Get the name to be displayed
+        displayName=masterPodInstance.masterName
+        #Check for master pod colour
+        masterPodColour=masterPodInstance.masterColour
+        #Add to listbox
+        openListbox.addObject(displayName,masterPodInstance,colour=masterPodColour)
+        #Add to dictionary
+        masterPod.loadedPods[displayName]=masterPodInstance
+
 def findMasterPods(directory):
     """
     This function will find master pod
@@ -100,14 +116,11 @@ def findMasterPods(directory):
         #Iterate
         for file in files:
             #Get master pod name
-            displayName=getRootName(directory)
+            displayName=getRootName(file)
             #Create instance
             masterPodInstance=loadMasterPod(file)
-            if masterPodInstance:
-                #Add to listbox
-                openListbox.addObject(displayName,masterPodInstance)
-
-
+            #Add to listbox
+            addMasterPodToScreen(masterPodInstance)
 
     else:
         log.report("No mp files found in directory")
@@ -124,7 +137,7 @@ def findMasterPods(directory):
 #====================Initial Loaders====================
 
 openScreen.show()
-print(findFiles(getWorkingDirectory(),".mp"))
+findMasterPods(getWorkingDirectory())
 #====================END====================
 window.mainloop()
 

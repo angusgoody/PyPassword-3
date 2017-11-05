@@ -13,7 +13,7 @@ are created and used.
 #====================Imports====================
 from tkinter import *
 from PEM import logClass
-
+from random import randint
 #====================Log====================
 
 log=logClass("User Interface")
@@ -165,6 +165,20 @@ def getColourForBackground(hexValue):
 			#Black is returned
 			chosenColour = "#000000"
 	return chosenColour
+
+def generateHexColour():
+	"""
+	This function will generate a random HEX colour
+
+	"""
+	baseNumber=randint(1,16777216)
+	hexValue=convertHex(baseNumber,"Hex")
+	hexLeng=len(hexValue)
+	while hexLeng != 7:
+		hexValue=hexValue+"0"
+		hexLeng=len(hexValue)
+	return hexValue
+
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -428,18 +442,34 @@ class advancedListbox(Listbox):
 		self.config(yscrollcommand=self.scrollBar.set)
 		#Store objects
 		self.data={}
+		#Store names and colours
+		self.colourData={}
 
-	def addObject(self,displayName,object):
+	def addObject(self,displayName,object,**kwargs):
 		"""
 		This method will allow an object
 		to be added to a listbox and 
 		return the object instead of plain text
 		"""
+		#Get colour for listbox element
+		colour=generateHexColour()
+		colour=kwargs.get("colour",colour)
 		#Add reference in dictionary
 		self.data[displayName]=object
+		self.colourData[displayName]=colour
 		#Add to listbox
-		self.insert(displayName,END)
+		self.insert(END,displayName)
+		self.itemconfig(END,bg=colour)
+		self.itemconfig(END,fg=getColourForBackground(colour))
 
+	def updateObject(self,name,newObject):
+		"""
+		This method will update the object
+		stored inside the listbox
+		but keep the same key value
+		"""
+		if name in self.data:
+			self.data[name]=newObject
 
 
 
