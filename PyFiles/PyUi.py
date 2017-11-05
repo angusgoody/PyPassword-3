@@ -520,14 +520,27 @@ class screen(mainFrame):
 	the screen will also store the preset
 	context buttons 
 	"""
+	#Store last screen loaded
 	lastScreen=None
+	#Store the status variable
 	statusVar=None
+	#Store protected screens
+	protectedScreens=[]
 	def __init__(self,parent,screenName,**kwargs):
 		mainFrame.__init__(self,parent)
 		self.screenName=screenName
 		#Store the context bar information
 		self.context=None
 		self.contextInfo={}
+		#Does screen show sensitive info?
+		self.protected=False
+
+		#Update from kwargs
+		self.protected=kwargs.get("protected",self.protected)
+
+		#Update
+		if self.protected:
+			screen.protectedScreens.append(self)
 
 	def show(self):
 		"""
@@ -543,8 +556,9 @@ class screen(mainFrame):
 			#Show current screen
 			self.pack(expand=True,fill=BOTH)
 			#Update the status var
-			if "set" in dir(screen.statusVar):
-				screen.statusVar.set(self.screenName)
+			if screen.statusVar:
+				if type(screen.statusVar) == StringVar:
+					screen.statusVar.set(self.screenName)
 			#Set as last screen
 			screen.lastScreen=self
 
@@ -566,7 +580,6 @@ class screen(mainFrame):
 	def addContextInfo(self,position,**kwargs):
 		self.contextInfo[position]=kwargs
 
-
 class contextBar(mainFrame):
 	"""
 	The contextBar class will be a class
@@ -581,8 +594,8 @@ class contextBar(mainFrame):
 		self.font="Avenir 14"
 		self.enabledColour="#E8EDEA"
 		self.hoverColour="#DFE4E2"
-		self.clickedColour="#F7CB3A"
-		self.defaultText="Comand"
+		self.clickedColour="#C5F71C"
+		self.defaultText=""
 		#Store name and command in dictionary
 		self.nameDict={}
 		#The array that stores buttons
@@ -700,9 +713,8 @@ class contextBar(mainFrame):
 			                                     clickedColour=self.clickedColour,
 			                                     text=self.defaultText,
 			                                     command=None)
-
-
-
+			#Ensures the button isn't still being pressed when context changes
+			self.buttonArray[index].pressBind(False)
 
 class multiView(mainFrame):
 	"""

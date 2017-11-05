@@ -38,6 +38,8 @@ window.geometry("400x300")
 #region status
 statusVar=StringVar()
 statusVar.set("Home")
+#Set screen variable up
+screen.statusVar=statusVar
 statusBar=contextBar(window)
 statusBar.pack(side=BOTTOM,fill=X)
 statusBar.addButton(0,textvariable=statusVar,enabledColour="#134611",hoverColour="#134611")
@@ -134,9 +136,6 @@ def findMasterPods(directory):
 
 #====================Testing Area====================
 
-loginScreen.addContextInfo(0,enabledColour="#95EE9B",hoverColour="#9DFCA3",
-                       clickedColour="#F951A3",text="Go back",command=lambda: openScreen.show())
-loginScreen.addContextInfo(1,text="Place")
 #====================Initial Loaders====================
 
 openScreen.show()
