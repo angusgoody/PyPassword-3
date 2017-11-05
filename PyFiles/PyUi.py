@@ -528,6 +528,7 @@ class screen(mainFrame):
 		#Store the context bar information
 		self.context=None
 		self.contextInfo={}
+
 	def show(self):
 		"""
 		The show method will show the screen,
@@ -561,6 +562,7 @@ class screen(mainFrame):
 
 			else:
 				print("Not given a context bar")
+
 	def addContextInfo(self,position,**kwargs):
 		self.contextInfo[position]=kwargs
 
@@ -579,6 +581,7 @@ class contextBar(mainFrame):
 		self.font="Avenir 14"
 		self.enabledColour="#E8EDEA"
 		self.hoverColour="#DFE4E2"
+		self.clickedColour="#F7CB3A"
 		self.defaultText="Comand"
 		#Store name and command in dictionary
 		self.nameDict={}
@@ -596,7 +599,8 @@ class contextBar(mainFrame):
 			self.addPlaceholder()
 
 		#Update
-		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour"}
+		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
+		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
 		self.updateBar(**kwargs)
 
 	def updateBar(self,**kwargs):
@@ -655,6 +659,7 @@ class contextBar(mainFrame):
 		to the context bar
 		"""
 		if index+1 <= len(self.buttonArray) and index >= 0:
+			self.resetButton(index)
 			self.buttonArray[index].updateButton(**kwargs)
 
 	def setPlaceholders(self,numberOfPlaceHolders):
@@ -679,9 +684,22 @@ class contextBar(mainFrame):
 		This method resets all the buttons
 		and removes commands
 		"""
-		for button in self.buttonArray:
-			button.command=None
-			button.textVar.set("Button")
+		for x in range(0,len(self.buttonArray)):
+			self.resetButton(x)
+
+	def resetButton(self,index):
+		"""
+		This method will reset
+		the colours and hover colours
+		of all the bar buttons, this is so
+		colours don't overwrite new buttons
+		"""
+		if index+1 <= len(self.buttonArray) and index >= 0:
+			self.buttonArray[index].updateButton(enabledColour=self.enabledColour,
+			                                     hoverColour=self.hoverColour,
+			                                     clickedColour=self.clickedColour,
+			                                     text=self.defaultText,
+			                                     command=None)
 
 
 
