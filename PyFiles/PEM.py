@@ -15,10 +15,12 @@ import pickle
 from datetime import datetime
 import os
 from random import choice
+from tkinter import PhotoImage
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
 filesDirectory="PyFiles"
+assetDirectory="PyAssets"
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 #====================Log====================
@@ -136,6 +138,8 @@ def getLocalFileName(baseFileName,indicator):
 		subFolder=filesDirectory
 	elif indicator.upper() == "LOGS":
 		subFolder=logDirectory
+	elif indicator.upper() == "ASSETS":
+		subFolder=assetDirectory
 	else:
 		subFolder=dataDirectory
 
@@ -152,7 +156,7 @@ def getLocalFileName(baseFileName,indicator):
 	#Return
 	return wholeFileName
 
-def checkFileName(fileName):
+def checkLocation(fileName):
 	"""
 	This function will check a file name
 	to see if the directory exists
@@ -186,8 +190,24 @@ def findFiles(directory,extension):
 	return filesFound
 
 def getRootName(directory):
+	#Get the root file name of directory
 	return os.path.splitext(os.path.basename(directory))[0]
 
+def getPicture(pictureName):
+	"""
+	This function will attempt to find 
+	a picture in the PyAssets directory and 
+	return the result as a photoImage.
+	"""
+	#Get full name
+	fullName=getLocalFileName(pictureName,"Assets")
+	#Check file exists
+	if (os.path.exists(fullName)):
+		photo=PhotoImage(file=fullName)
+	else:
+		photo=PhotoImage(file="")
+
+	return photo
 #Pickle Functions
 def openPickle(fileName):
 	"""
@@ -334,7 +354,7 @@ class masterPod:
 				pod.unlockVault("Lock")
 
 		#First check location is valid
-		if checkFileName(self.location) is False:
+		if checkLocation(self.location) is False:
 			#If not create a new file in the correct place
 			fileName=getLocalFileName(self.baseName,"Data")
 			self.location=fileName

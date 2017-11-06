@@ -17,7 +17,6 @@ from tkinter import *
 from tkinter import messagebox
 from PyUi import *
 from PEM import *
-from PIL import Image, ImageTk
 
 #====================Window====================
 """
@@ -27,7 +26,7 @@ is initiated and setup.
 
 window=Tk()
 window.title("PyPassword 3")
-window.geometry("400x300")
+window.geometry("570x450")
 
 
 
@@ -40,14 +39,39 @@ statusVar=StringVar()
 statusVar.set("Home")
 #Set screen variable up
 screen.statusVar=statusVar
-statusBar=contextBar(window)
+statusBar=mainLabel(window,textvariable=statusVar,font="Avenir_Bold 15")
+statusBar.colour("#55617C")
 statusBar.pack(side=BOTTOM,fill=X)
-statusBar.addButton(0,textvariable=statusVar,enabledColour="#134611",hoverColour="#134611")
 
 context=contextBar(window)
 context.pack(side=BOTTOM,fill=X)
 
 #endregion
+
+#======Splash Screen======
+splashScreen=screen(window,"PyPassword")
+
+#Setup Context bar
+splashScreen.context=context
+splashScreen.addContextInfo(0,text="Go to pods",enabledColour="#1BF293",
+                            hoverColour="#92EE9C",clickedColour="#89FBB8")
+splashScreen.addContextInfo(1,text="Exit",enabledColour="#F87FB2",
+                            hoverColour="#F89DB8",clickedColour="#F86975")
+
+#Create centered frame for logo
+splashCenter=mainFrame(splashScreen)
+splashCenter.pack(expand=True)
+
+#Get the logo for PyPassword
+splashImage=getPicture("PyPassword 3 logo.gif")
+
+splashLabel=Label(splashCenter,image=splashImage)
+splashLabel.pack()
+
+mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#FFFFFF").pack()
+
+splashScreen.colour("#5D5D8B")
+
 #======Login Screen======
 #region Login
 loginScreen=screen(window,"Login")
@@ -91,6 +115,7 @@ openListbox.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
+#======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
     """
     This function will add a master pod
@@ -128,17 +153,29 @@ def findMasterPods(directory):
         log.report("No mp files found in directory")
         return None
 
+def goHome():
+	"""
+	This procedure will return to the home
+	screen depending on what screen is currently
+	loaded
+	"""
+	#Go to pod home
+	if screen.lastScreen in screen.protectedScreens:
+		pass
+	else:
+		splashScreen.show()
 
 
+
+#====================Button commands====================
 
 #====================Bindings====================
-
-
+recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #====================Testing Area====================
 
 #====================Initial Loaders====================
 
-openScreen.show()
+splashScreen.show()
 findMasterPods(getWorkingDirectory())
 #====================END====================
 window.mainloop()

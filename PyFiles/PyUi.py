@@ -229,7 +229,7 @@ class mainButton(mainFrame):
 		#Store the command
 		self.command=None
 		#Store button state
-		self.state=False
+		self.state=True
 		self.hoverOn=False
 		self.pressing=False
 		#Fonts
@@ -258,7 +258,7 @@ class mainButton(mainFrame):
 		self.updateButton(**kwargs)
 
 		#Initiate Button state
-		self.changeState(True)
+		#self.changeState(True)
 
 	def updateButton(self,**kwargs):
 		"""
@@ -272,6 +272,7 @@ class mainButton(mainFrame):
 		self.textVar=kwargs.get("textvariable",self.textVar)
 		self.command=kwargs.get("command",self.command)
 		self.textLabel.config(width=kwargs.get("width",self.labelWidth))
+		self.state=kwargs.get("state",self.state)
 		#Colour kwargs
 		self.enabledColour=kwargs.get("enabledColour",self.enabledColour)
 		self.enabledFG=kwargs.get("enabledFG",self.enabledFG)
@@ -286,6 +287,9 @@ class mainButton(mainFrame):
 		#Only update colour if mouse is not over button
 		if self.state == True and self.hoverOn == False and self.pressing == False:
 			self.changeButtonColour(self.enabledColour)
+		#Update state
+		self.changeState(self.state)
+
 
 	def changeButtonColour(self,bg,**kwargs):
 		"""
@@ -375,6 +379,7 @@ class mainButton(mainFrame):
 			self.state=False
 			#Change colours
 			self.changeButtonColour(self.disabledColour)
+			self.textLabel.update(fg="#1BF293")
 
 class mainLabel(Label):
 	"""
@@ -392,7 +397,6 @@ class mainLabel(Label):
 		self.textVar.set("Label")
 		#Store look of the label
 		self.fg=None
-
 		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
 		#Initiate update
@@ -408,7 +412,6 @@ class mainLabel(Label):
 		self.font=kwargs.get("font",self.font)
 		self.fg=kwargs.get("fg",self.fg)
 		self.colourVar=kwargs.get("colour",self.colourVar)
-
 		#Update
 		self.config(textvariable=self.textVar,font=self.font)
 		if self.fg == None:
@@ -432,19 +435,30 @@ class advancedListbox(Listbox):
 	but adds more customization and adds a scroll
 	bar
 	"""
-	def __init__(self,parent):
-		Listbox.__init__(self,parent,font="Avenir 22")
+	def __init__(self,parent,**kwargs):
+		Listbox.__init__(self,parent)
 
 		#Add a scrollbar
 		self.scrollBar=Scrollbar(self)
 		self.scrollBar.pack(side=RIGHT,fill=Y)
 		self.scrollBar.config(command=self.yview)
 		self.config(yscrollcommand=self.scrollBar.set)
+		#Store ui
+		self.font="Avenir 20"
 		#Store objects
 		self.data={}
 		#Store names and colours
 		self.colourData={}
-
+		#Update
+		self.updateListbox(**kwargs)
+	def updateListbox(self,**kwargs):
+		"""
+		The update method to update
+		any features of the listbox
+		"""
+		self.font=kwargs.get("font",self.font)
+		#Update
+		self.config(font=self.font)
 	def addObject(self,displayName,object,**kwargs):
 		"""
 		This method will allow an object
@@ -626,6 +640,15 @@ class contextBar(mainFrame):
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(font=self.font)
+
+	def updateButton(self,index,**kwargs):
+		"""
+		This method will allow a
+		certain button on the bar
+		to be changed
+		"""
+		if index+1 <= len(self.buttonArray) and index >= 0:
+			self.buttonArray[index].updateButton(**kwargs)
 
 	def addPlaceholder(self):
 		"""
