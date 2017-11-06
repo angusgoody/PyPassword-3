@@ -576,24 +576,36 @@ class screen(mainFrame):
 			#Set as last screen
 			screen.lastScreen=self
 
-			#Update the contexts
-			if type(self.context) == contextBar:
-				numberOfButtons=len(self.contextInfo)
-				if numberOfButtons > 0:
-					#Set context to correct number of places
-					self.context.setPlaceholders(numberOfButtons)
-					#Add the context buttons
-					for position in self.contextInfo:
-						self.context.addButton(position,**self.contextInfo[position])
-				else:
-					self.context.resetBar()
+			#Update context bar
+			self.runContext()
 
-			else:
-				print("Not given a context bar")
 
 	def addContextInfo(self,position,**kwargs):
 		self.contextInfo[position]=kwargs
 
+	def updateCommand(self,position,**kwargs):
+		self.contextInfo[position] = {**self.contextInfo[position], **kwargs}
+
+	def runContext(self):
+		"""
+		This is the method to update
+		the context bar with the preset 
+		commands that the screen stores
+		"""
+		#Update the contexts
+		if type(self.context) == contextBar:
+			numberOfButtons=len(self.contextInfo)
+			if numberOfButtons > 0:
+				#Set context to correct number of places
+				self.context.setPlaceholders(numberOfButtons)
+				#Add the context buttons
+				for position in self.contextInfo:
+					self.context.addButton(position,**self.contextInfo[position])
+			else:
+				self.context.resetBar()
+
+		else:
+			print("Not given a context bar")
 class contextBar(mainFrame):
 	"""
 	The contextBar class will be a class

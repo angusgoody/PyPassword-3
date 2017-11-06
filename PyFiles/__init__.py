@@ -57,13 +57,13 @@ splashScreen=screen(window,"PyPassword")
 splashScreen.context=context
 #Go to pods
 splashScreen.addContextInfo(0,text="Go to pods",enabledColour="#17F388",
-                            hoverColour="#92EE9C",clickedColour="#89FBB8")
+                            hoverColour="#13C770",clickedColour="#41F59D")
 #View Log
-splashScreen.addContextInfo(1,text="View Log",enabledColour="#A9F955",
-                            hoverColour="#DB8C35",clickedColour="#DBC770")
+splashScreen.addContextInfo(1,text="View Log",enabledColour="#A5F413",
+                            hoverColour="#7CCE32",clickedColour="#B5F426")
 #Exit
 splashScreen.addContextInfo(2,text="Exit",enabledColour="#FFA500",
-                            hoverColour="#F89DB8",clickedColour="#F86975")
+                            hoverColour="#E89600",clickedColour="#FFB52E")
 
 #Create centered frame for logo
 splashCenter=mainFrame(splashScreen)
@@ -175,7 +175,7 @@ def goHome():
 
 
 #====================Button commands====================
-
+splashScreen.updateCommand(0,command=lambda: openScreen.show())
 #====================Bindings====================
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #====================Testing Area====================
