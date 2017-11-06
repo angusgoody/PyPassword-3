@@ -290,7 +290,6 @@ class mainButton(mainFrame):
 		#Update state
 		self.changeState(self.state)
 
-
 	def changeButtonColour(self,bg,**kwargs):
 		"""
 		This method is used to change the buttons colour
@@ -329,12 +328,8 @@ class mainButton(mainFrame):
 		self.pressBind(True)
 		#Check the button has a command
 		if self.command and self.state:
-
-			#Run the command
-			try:
-				self.command()
-			except:
-				log.report("Error executing button command",tag="Error")
+			#Run the command using the external function
+			runCommand(self.command,name="MainButton")
 
 	def hover(self,inOut):
 		"""
@@ -548,10 +543,11 @@ class screen(mainFrame):
 		self.contextInfo={}
 		#Does screen show sensitive info?
 		self.protected=False
+		#Store any commands that need to run when screen loaded
+		self.screenCommands=[]
 
 		#Update from kwargs
 		self.protected=kwargs.get("protected",self.protected)
-
 		#Update
 		if self.protected:
 			screen.protectedScreens.append(self)
@@ -579,11 +575,25 @@ class screen(mainFrame):
 			#Update context bar
 			self.runContext()
 
+			#Run any commands the screen has saved
+			for command in self.screenCommands:
+				runCommand(command,name="Screen Class")
+
 
 	def addContextInfo(self,position,**kwargs):
+		"""
+		This function allows a screen
+		to be configured to load certain context
+		items when it is shown on screen
+		"""
 		self.contextInfo[position]=kwargs
 
 	def updateCommand(self,position,**kwargs):
+		"""
+		This function updates any context bar 
+		information stored in the screen class
+		"""
+		#Update the dictionary, the dictionary on right takes priority
 		self.contextInfo[position] = {**self.contextInfo[position], **kwargs}
 
 	def runContext(self):
@@ -606,6 +616,15 @@ class screen(mainFrame):
 
 		else:
 			print("Not given a context bar")
+
+	def addScreenCommand(self,command):
+		"""
+		This method will allow a command
+		to be run when the screen is loaded
+		"""
+		if command not in self.screenCommands:
+			self.screenCommands.append(command)
+
 class contextBar(mainFrame):
 	"""
 	The contextBar class will be a class

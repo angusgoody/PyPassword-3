@@ -182,8 +182,8 @@ recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 
 #====================Initial Loaders====================
 
-splashScreen.show()
-findMasterPods(getWorkingDirectory())
+runCommand(splashScreen.show())
+runCommand(findMasterPods(getWorkingDirectory()))
 #====================END====================
 window.mainloop()
 
