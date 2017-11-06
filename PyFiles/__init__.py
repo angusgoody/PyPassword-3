@@ -34,32 +34,37 @@ window.geometry("570x450")
 #====================User Interface====================
 
 #======Status and context======
-#region status
+#region status/context
+
+#Status variables
 statusVar=StringVar()
 statusVar.set("Home")
 #Set screen variable up
 screen.statusVar=statusVar
+#Create the label for status
 statusBar=mainLabel(window,textvariable=statusVar,font="Avenir_Bold 15")
+#Display the bar
 statusBar.colour("#24544C")
 statusBar.pack(side=BOTTOM,fill=X)
 
+#Initiate the context bar for the whole program
 context=contextBar(window)
 context.pack(side=BOTTOM,fill=X)
 
 #endregion
-
 #======Splash Screen======
 #region splash
 
 #Create screen using screen class
 splashScreen=screen(window,"PyPassword")
+
 #Setup Context bar
 splashScreen.context=context
 #Go to pods
-splashScreen.addContextInfo(0,text="Go to pods",enabledColour="#17F388",
+splashScreen.addContextInfo(0,text="View Log",enabledColour="#17F388",
                             hoverColour="#13C770",clickedColour="#41F59D")
 #View Log
-splashScreen.addContextInfo(1,text="View Log",enabledColour="#A5F413",
+splashScreen.addContextInfo(1,text="Go to pods",enabledColour="#A5F413",
                             hoverColour="#7CCE32",clickedColour="#B5F426")
 #Exit
 splashScreen.addContextInfo(2,text="Exit",enabledColour="#FFA500",
@@ -73,11 +78,14 @@ splashCenter.pack(expand=True)
 splashImage=getPicture("PyPassword 3 logo.gif")
 splashLabel=Label(splashCenter,image=splashImage)
 splashLabel.pack()
+
 #Create the title
 splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#FFFFFF")
 splashTitle.pack()
+
 #Colour the splash screen
 splashScreen.colour("#24544C")
+
 #endregion
 #======Login Screen======
 #region Login
@@ -85,17 +93,30 @@ loginScreen=screen(window,"Login")
 
 #Context
 loginScreen.context=context
+loginScreen.addContextInfo(0,text="Back")
+loginScreen.addContextInfo(1,text="Unlock")
+loginScreen.addContextInfo(2,text="Show Hint")
 
 #Center
 loginSub=mainFrame(loginScreen)
 loginSub.pack(expand=True,fill=X,padx=20)
 
+
+#Label for current file
+loginFileVar=StringVar()
+loginFileVar.set("No file loaded")
+loginFileLabel=mainLabel(loginSub,textvariable=loginFileVar,font="Avenir 30")
+loginFileLabel.pack(pady=10)
+
+#Entry to enter password
 loginEntry=Entry(loginSub,font="Avenir 20",show="•",justify=CENTER)
 loginEntry.pack(fill=X)
 
-loginVar=StringVar()
-loginLabel=mainLabel(loginSub,textvariable=loginVar,font="Avenir 18")
-loginLabel.pack(pady=10)
+
+#Label for telling user if password is correct etc
+loginAttemptVar=StringVar()
+loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 18")
+loginAttemptLabel.pack(pady=10)
 
 #endregion
 #======Open Screen======
@@ -121,6 +142,7 @@ openListbox.pack(expand=True,fill=BOTH)
 
 #endregion
 #====================Functions====================
+
 
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
@@ -172,10 +194,16 @@ def goHome():
 	else:
 		splashScreen.show()
 
+#======Open Screen========
+
 
 
 #====================Button commands====================
-splashScreen.updateCommand(0,command=lambda: openScreen.show())
+
+#Splash Screen
+splashScreen.updateCommand(1,command=lambda: openScreen.show())
+#Login Screen
+loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #====================Bindings====================
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #====================Testing Area====================

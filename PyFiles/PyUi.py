@@ -577,6 +577,7 @@ class screen(mainFrame):
 
 			#Run any commands the screen has saved
 			for command in self.screenCommands:
+				print(command)
 				runCommand(command,name="Screen Class")
 
 
