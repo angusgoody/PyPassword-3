@@ -40,7 +40,7 @@ statusVar.set("Home")
 #Set screen variable up
 screen.statusVar=statusVar
 statusBar=mainLabel(window,textvariable=statusVar,font="Avenir_Bold 15")
-statusBar.colour("#55617C")
+statusBar.colour("#24544C")
 statusBar.pack(side=BOTTOM,fill=X)
 
 context=contextBar(window)
@@ -49,29 +49,36 @@ context.pack(side=BOTTOM,fill=X)
 #endregion
 
 #======Splash Screen======
-splashScreen=screen(window,"PyPassword")
+#region splash
 
+#Create screen using screen class
+splashScreen=screen(window,"PyPassword")
 #Setup Context bar
 splashScreen.context=context
-splashScreen.addContextInfo(0,text="Go to pods",enabledColour="#1BF293",
+#Go to pods
+splashScreen.addContextInfo(0,text="Go to pods",enabledColour="#17F388",
                             hoverColour="#92EE9C",clickedColour="#89FBB8")
-splashScreen.addContextInfo(1,text="Exit",enabledColour="#F87FB2",
+#View Log
+splashScreen.addContextInfo(1,text="View Log",enabledColour="#A9F955",
+                            hoverColour="#DB8C35",clickedColour="#DBC770")
+#Exit
+splashScreen.addContextInfo(2,text="Exit",enabledColour="#FFA500",
                             hoverColour="#F89DB8",clickedColour="#F86975")
 
 #Create centered frame for logo
 splashCenter=mainFrame(splashScreen)
 splashCenter.pack(expand=True)
 
-#Get the logo for PyPassword
+#Get the logo for PyPassword and create image label
 splashImage=getPicture("PyPassword 3 logo.gif")
-
 splashLabel=Label(splashCenter,image=splashImage)
 splashLabel.pack()
-
-mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#FFFFFF").pack()
-
-splashScreen.colour("#5D5D8B")
-
+#Create the title
+splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#FFFFFF")
+splashTitle.pack()
+#Colour the splash screen
+splashScreen.colour("#24544C")
+#endregion
 #======Login Screen======
 #region Login
 loginScreen=screen(window,"Login")
