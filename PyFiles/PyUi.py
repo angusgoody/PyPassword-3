@@ -518,10 +518,12 @@ class advancedEntry(Entry):
 		Entry.__init__(self,parent,**kwargs)
 
 		#Store Colour info
+		self.placeHolder=placeHolder
 		self.placeHolderColour="#BEC0B8"
 		self.defaultColour="#000000"
 
 		#Set up the placeholder
+		self.placeHolderActive=True
 		self.insert(END,placeHolder)
 		self.config(fg=self.placeHolderColour)
 
@@ -529,11 +531,24 @@ class advancedEntry(Entry):
 		self.data=StringVar()
 
 		#Add bindings
-		self.bind("<KeyRelease>",lambda event: self.checkPlaceholder(event))
+		self.bind("<Button-1>",lambda event: self.updatePlaceHolder())
 
-	def checkPlaceholder(self,key):
-		pass
-
+	def updatePlaceHolder(self):
+		"""
+		This method is called
+		when the entry is clicked
+		so the placeholder is removed
+		and the settings are reset
+		"""
+		if self.placeHolderActive:
+			#Remove content
+			self.delete(0,END)
+			#Change FG
+			self.config(fg=self.defaultColour)
+			#Change show
+			self.config(show="•")
+			#Update Variable
+			self.placeHolderActive=False
 
 #====================Secondary Classes====================
 """
