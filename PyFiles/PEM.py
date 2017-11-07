@@ -15,7 +15,7 @@ import pickle
 from datetime import datetime
 import os
 from random import choice
-from tkinter import PhotoImage
+from tkinter import PhotoImage,messagebox
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
@@ -110,6 +110,7 @@ These functions are used for generating passwords,
 and also encrypting and decrypting data.
 """
 
+#Utility functions
 def runCommand(command,**kwargs):
 	"""
 	This function will safley run
@@ -129,6 +130,15 @@ def runCommand(command,**kwargs):
 		log.report("Command executing success",identifier,tag="System")
 		return content
 
+def showMessage(pre,message):
+	"""
+	Function to show a tkinter
+	message using messagebox
+	"""
+	try:
+		messagebox.showinfo(pre,message)
+	except:
+		print(message)
 #Folder and Directory functions
 def getWorkingDirectory():
 	"""
@@ -386,7 +396,7 @@ class masterPod:
 
 #====================Core Functions====================
 
-def loadMasterPod(fileName):
+def loadMasterPodFromFile(fileName):
 	"""
 	Load a master pod from directory
 	and create a class instance 

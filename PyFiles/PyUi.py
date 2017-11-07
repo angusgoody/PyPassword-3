@@ -446,6 +446,7 @@ class advancedListbox(Listbox):
 		self.colourData={}
 		#Update
 		self.updateListbox(**kwargs)
+
 	def updateListbox(self,**kwargs):
 		"""
 		The update method to update
@@ -454,6 +455,7 @@ class advancedListbox(Listbox):
 		self.font=kwargs.get("font",self.font)
 		#Update
 		self.config(font=self.font)
+
 	def addObject(self,displayName,object,**kwargs):
 		"""
 		This method will allow an object
@@ -480,6 +482,32 @@ class advancedListbox(Listbox):
 		if name in self.data:
 			self.data[name]=newObject
 
+	def getSelection(self,**kwargs):
+		"""
+		This method will return the item
+		that is selected in the listbox,
+		if the "basic" parameter is sent
+		then the text it displays is returned
+		else the object is returned
+		"""
+		#Basic is variable for if only text is returned
+		basic=False
+		basic=kwargs.get("basic",basic)
+
+		#Attempt to get the current selection index
+		currentSelectionIndex=self.curselection()
+		#Find matching text using index
+		try:
+			currentSelection=self.get(currentSelectionIndex)
+		except:
+			log.report("Error getting selection",tag="Error")
+		else:
+			#If only the text needs to be returned
+			if basic:
+				return currentSelection
+			#If the object in dictionary needs to be returned
+			else:
+				return self.data[currentSelection]
 
 
 

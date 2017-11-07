@@ -10,8 +10,6 @@ This is the main file for PyPassword
 PyPassword 3
 """
 
-
-
 #====================Imports====================
 from tkinter import *
 from tkinter import messagebox
@@ -27,9 +25,6 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
-
-
-
 
 #====================User Interface====================
 
@@ -131,7 +126,7 @@ openTopLabel.pack(side=TOP,fill=X)
 #Context
 openScreen.context=context
 openScreen.addContextInfo(0,text="Create New")
-openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697",command=lambda: loginScreen.show())
+openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697")
 openScreen.addContextInfo(2,text="Open Other")
 
 
@@ -143,6 +138,17 @@ openListbox.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
+#======Splash Screen========
+def exit():
+	"""
+	This procedure is the
+	exit command and is run when
+	the program needs to end. Any
+	saves etc are done here
+	"""
+
+	#Destroy the window
+	window.destroy()
 
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
@@ -174,7 +180,7 @@ def findMasterPods(directory):
             #Get master pod name
             displayName=getRootName(file)
             #Create instance
-            masterPodInstance=loadMasterPod(file)
+            masterPodInstance=loadMasterPodFromFile(file)
             #Add to listbox
             addMasterPodToScreen(masterPodInstance)
 
@@ -194,7 +200,33 @@ def goHome():
 	else:
 		splashScreen.show()
 
-#======Open Screen========
+def loadMasterPodToLogin():
+	"""
+	This function will
+	load a master pod from 
+	the open screen and send
+	it to the login screen
+	"""
+	print("Start")
+	#Get from listbox
+	currentSelection=openListbox.getSelection()
+	print("HERE",currentSelection)
+	#Check if there is something selected that is valid
+	if type(currentSelection) == masterPod:
+
+		#Set the selected pod variable to the selected object
+		masterPod.currentMasterPod=currentSelection
+
+		#Show the screen
+		loginScreen.show()
+	else:
+		print("HSF")
+		showMessage("Select Pod","Please select a master pod")
+
+
+
+
+#======Login Screen========
 
 
 
@@ -202,10 +234,18 @@ def goHome():
 
 #Splash Screen
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
+splashScreen.updateCommand(2,command=lambda: exit())
+#Open Screen
+openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
+
+#====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #====================Bindings====================
+#Status
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
+#Open Screen
+recursiveBind(openListbox,"<Double-Button-1>",lambda event: loadMasterPodToLogin())
 #====================Testing Area====================
 
 #====================Initial Loaders====================
