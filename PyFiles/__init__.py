@@ -104,7 +104,7 @@ loginFileLabel=mainLabel(loginSub,textvariable=loginFileVar,font="Avenir 30")
 loginFileLabel.pack(pady=10)
 
 #Entry to enter password
-loginEntry=Entry(loginSub,font="Avenir 20",show="•",justify=CENTER)
+loginEntry=advancedEntry(loginSub,"Enter Password",font="Avenir 20",justify=CENTER)
 loginEntry.pack(fill=X)
 
 

@@ -509,7 +509,30 @@ class advancedListbox(Listbox):
 			else:
 				return self.data[currentSelection]
 
+class advancedEntry(Entry):
+	"""
+	Modified entry that can
+	contain placeholders and more
+	"""
+	def __init__(self,parent,placeHolder,**kwargs):
+		Entry.__init__(self,parent,**kwargs)
 
+		#Store Colour info
+		self.placeHolderColour="#BEC0B8"
+		self.defaultColour="#000000"
+
+		#Set up the placeholder
+		self.insert(END,placeHolder)
+		self.config(fg=self.placeHolderColour)
+
+		#Store the data
+		self.data=StringVar()
+
+		#Add bindings
+		self.bind("<KeyRelease>",lambda event: self.checkPlaceholder(event))
+
+	def checkPlaceholder(self,key):
+		pass
 
 
 #====================Secondary Classes====================
