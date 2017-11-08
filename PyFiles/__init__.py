@@ -113,7 +113,7 @@ loginEntry.pack(fill=X)
 #Label for telling user if password is correct etc
 loginAttemptVar=StringVar()
 loginAttemptNumberVar=IntVar()
-loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 15")
+loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 17")
 loginAttemptLabel.pack(pady=10)
 
 #endregion
@@ -252,6 +252,7 @@ def attemptMasterPodUnlock():
 		if unlockAttempt:
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
+			#Colour the screen a green for correct
 			loginScreen.colour(correctColour)
 			#Reset the attempt var
 			loginAttemptNumberVar.set(0)
@@ -260,6 +261,7 @@ def attemptMasterPodUnlock():
 			loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
 			#The password was incorrect
 			loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
+			#Colour the screen incorrect colour
 			loginScreen.colour(incorrectColour)
 
 	else:
@@ -278,6 +280,7 @@ loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
+loginScreen.addScreenCommand(lambda: loginEntry.resetEntry())
 loginScreen.addScreenCommand(lambda: loginScreen.colour(mainFrame.windowColour))
 loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))

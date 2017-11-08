@@ -19,8 +19,8 @@ from random import randint
 log=logClass("User Interface")
 log.saveLog()
 #====================Preset variables====================
-incorrectColour="#F69BAB"
-correctColour="#AFF6AA"
+incorrectColour="#E4747D"
+correctColour="#64D999"
 #====================LOG====================
 
 class log:
@@ -573,6 +573,22 @@ class advancedEntry(Entry):
 			else:
 				return None
 
+	def resetEntry(self):
+		"""
+		Reset the entry and 
+		add the placeholder back
+		to the entry
+		"""
+		#Clear Entry
+		self.delete(0,END)
+		#Change colour
+		self.config(fg=self.placeHolderColour)
+		#Change show
+		self.config(show="")
+		#Add placeholder
+		self.insert(END,self.placeHolder)
+		#Reset the variable
+		self.placeHolderActive=True
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
