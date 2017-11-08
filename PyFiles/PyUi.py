@@ -496,18 +496,22 @@ class advancedListbox(Listbox):
 
 		#Attempt to get the current selection index
 		currentSelectionIndex=self.curselection()
-		#Find matching text using index
-		try:
-			currentSelection=self.get(currentSelectionIndex)
-		except:
-			log.report("Error getting selection",tag="Error")
-		else:
-			#If only the text needs to be returned
-			if basic:
-				return currentSelection
-			#If the object in dictionary needs to be returned
+
+		if len(currentSelectionIndex) > 0:
+			#Find matching text using index
+			try:
+				currentSelection=self.get(currentSelectionIndex[0])
+			except:
+				log.report("Error getting selection",tag="Error")
 			else:
-				return self.data[currentSelection]
+				#If only the text needs to be returned
+				if basic:
+					return currentSelection
+				#If the object in dictionary needs to be returned
+				else:
+					return self.data[currentSelection]
+		else:
+			return None
 
 class advancedEntry(Entry):
 	"""
@@ -583,7 +587,6 @@ class topLabel(mainFrame):
 		#Get Text Variable
 		self.textVar.set(kwargs.get("text",self.textVar.get()))
 		self.textVar=kwargs.get("text",self.textVar)
-
 		#Update
 		self.textLabel.update(textvaribale=self.textVar)
 

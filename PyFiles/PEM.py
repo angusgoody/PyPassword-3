@@ -363,6 +363,8 @@ class masterPod:
 		self.baseName=self.masterName+".mp"
 		#Store the key
 		self.key=None
+		#Store the hint
+		self.hint="No Hint Available"
 		#Where the pods are stored
 		self.peas={}
 		#The master key used for encryption

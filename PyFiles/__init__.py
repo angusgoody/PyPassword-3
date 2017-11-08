@@ -88,7 +88,7 @@ loginScreen=screen(window,"Login")
 #Context
 loginScreen.context=context
 loginScreen.addContextInfo(0,text="Back")
-loginScreen.addContextInfo(1,text="Unlock")
+loginScreen.addContextInfo(1,text="Unlock",enabledColour="#B1F62D")
 loginScreen.addContextInfo(2,text="Show Hint")
 
 #Center
@@ -148,7 +148,6 @@ def exit():
 
 	#Destroy the window
 	window.destroy()
-
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
     """
@@ -217,12 +216,9 @@ def loadMasterPodToLogin():
 		#Show the screen
 		loginScreen.show()
 	else:
-		print("HSF")
 		showMessage("Select Pod","Please select a master pod")
 
 #======Login Screen========
-
-
 
 #====================Button commands====================
 
