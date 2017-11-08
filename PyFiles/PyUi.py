@@ -272,7 +272,6 @@ class mainButton(mainFrame):
 		self.textVar=kwargs.get("textvariable",self.textVar)
 		self.command=kwargs.get("command",self.command)
 		self.textLabel.config(width=kwargs.get("width",self.labelWidth))
-		self.state=kwargs.get("state",self.state)
 		#Colour kwargs
 		self.enabledColour=kwargs.get("enabledColour",self.enabledColour)
 		self.enabledFG=kwargs.get("enabledFG",self.enabledFG)
@@ -281,14 +280,15 @@ class mainButton(mainFrame):
 		self.disabledColour=kwargs.get("disabledColour",self.disabledColour)
 		self.disabledFG=kwargs.get("disabledFG",self.disabledFG)
 
+		#Update state
+		self.state=kwargs.get("state",self.state)
+
 		#Update the widgets etc
 		self.textLabel.config(font=self.font)
 		self.textLabel.config(textvariable=self.textVar)
 		#Only update colour if mouse is not over button
-		if self.state == True and self.hoverOn == False and self.pressing == False:
+		if self.state:
 			self.changeButtonColour(self.enabledColour)
-		#Update state
-		self.changeState(self.state)
 
 	def changeButtonColour(self,bg,**kwargs):
 		"""
@@ -739,7 +739,7 @@ class contextBar(mainFrame):
 		for button in self.buttonArray:
 			button.updateButton(font=self.font)
 
-	def updateButton(self,index,**kwargs):
+	def updateContextButton(self, index, **kwargs):
 		"""
 		This method will allow a
 		certain button on the bar
@@ -793,8 +793,14 @@ class contextBar(mainFrame):
 		to the context bar
 		"""
 		if index+1 <= len(self.buttonArray) and index >= 0:
+
+			#Ensures a disabled button doesn't stay disabled when used again
+			butState=True
+			butState=kwargs.get("state",butState)
+			newKwargs={**kwargs,**{"state":butState}}
+			#Rest the button and add new kwargs
 			self.resetButton(index)
-			self.buttonArray[index].updateButton(**kwargs)
+			self.buttonArray[index].updateButton(**newKwargs)
 
 	def setPlaceholders(self,numberOfPlaceHolders):
 		"""
@@ -830,10 +836,10 @@ class contextBar(mainFrame):
 		"""
 		if index+1 <= len(self.buttonArray) and index >= 0:
 			self.buttonArray[index].updateButton(enabledColour=self.enabledColour,
-			                                     hoverColour=self.hoverColour,
-			                                     clickedColour=self.clickedColour,
-			                                     text=self.defaultText,
-			                                     command=None)
+			                                            hoverColour=self.hoverColour,
+			                                            clickedColour=self.clickedColour,
+			                                            text=self.defaultText,
+			                                            command=None)
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 

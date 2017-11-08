@@ -12,7 +12,6 @@ PyPassword 3
 
 #====================Imports====================
 from tkinter import *
-from tkinter import messagebox
 from PyUi import *
 from PEM import *
 
@@ -207,10 +206,8 @@ def loadMasterPodToLogin():
 	the open screen and send
 	it to the login screen
 	"""
-	print("Start")
 	#Get from listbox
 	currentSelection=openListbox.getSelection()
-	print("HERE",currentSelection)
 	#Check if there is something selected that is valid
 	if type(currentSelection) == masterPod:
 
@@ -222,9 +219,6 @@ def loadMasterPodToLogin():
 	else:
 		print("HSF")
 		showMessage("Select Pod","Please select a master pod")
-
-
-
 
 #======Login Screen========
 
@@ -246,6 +240,8 @@ loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #Open Screen
 recursiveBind(openListbox,"<Double-Button-1>",lambda event: loadMasterPodToLogin())
+recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,state=True))
+
 #====================Testing Area====================
 
 #====================Initial Loaders====================
