@@ -16,6 +16,8 @@ from datetime import datetime
 import os
 from random import choice
 from tkinter import PhotoImage,messagebox
+from Crypto.Cipher import AES
+
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
@@ -111,8 +113,6 @@ and also encrypting and decrypting data.
 """
 
 #Utility functions
-
-
 
 def runCommand(command,**kwargs):
 	"""
@@ -264,22 +264,48 @@ def savePickle(content,fileName):
 	log.report("Save complete exported to", fileName, tag="File")
 
 #Encryption functions
-def encrypt(plainText,key):
+def pad(text):
 	"""
-	The encrypt function will
-	take the inputs of plain text,
-	encrypt it using the key and 
-	return the result
+	For AES encryption keys and data must
+	be in multiples of 16 so the pad function
+	adds padding to make it the right length
 	"""
+	return text +((16-len(text) % 16)*"\n")
 
-def decrypt(plainText,key):
+def encrypt(plainText, key):
 	"""
-	The decrypt function will
-	take the inputs of plain text,
-	decrypt it using the key and 
-	return the result
+	This is the encrypt function 
+	which will encrypt plain text
+	using AES encryption
 	"""
-	pass
+	#Pad the key to ensure its multiple of 16
+	key=AES.new(pad(key))
+	#Pad the plain text to ensure multiple of 16
+	text=pad(str(plainText))
+	#Encrypt using module
+	encrypted=key.encrypt(text)
+	return encrypted
+
+def decrypt(data, key):
+	"""
+	The decrypt function
+	will decrypt any plain text 
+	data and return the result.
+	"""
+	try:
+		#Pad the key
+		key=AES.new(pad(key))
+		#Use module to decrypt data
+		data=key.decrypt(data).rstrip()
+		try:
+			data=data.decode("utf-8")
+		except:
+			return None
+		else:
+			return data
+	except:
+		log.report("An error occurred when attempting to decrypt","(Decrypt)",tag="Error")
+		return None
 
 #====================Core Classes====================
 """
@@ -388,6 +414,9 @@ class masterPod:
 			if pod.vaultState != "Locked":
 				pod.unlockVault("Lock")
 
+		#Encrypt the key
+		self.key=encrypt(self.key,self.key)
+
 		#First check location is valid
 		if checkLocation(self.location) is False:
 			#If not create a new file in the correct place
@@ -415,11 +444,20 @@ def loadMasterPodFromFile(fileName):
 			#Return the master pod
 			return contents
 
+def checkMasterPodPassword(masterPodInstance,attempt):
+	"""
+	Will check the password attempt of a certain
+	master pod.
+	Returns true if the password is correct
+	Return false is the password is incorrect
+	"""
+	if type(masterPodInstance) == masterPod:
+		print(masterPodInstance.key)
 
 #====================Testing area====================
 
 """
-names={"Angus":"Angy","Sam":"gay","Bob":"Bob"}
+names={"Simon":"Angy","Sam":"gay","Bob":"Bob"}
 
 hints=["A secret hint","Ahahhah me","Never guess me password"]
 for item in names:

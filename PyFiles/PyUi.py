@@ -198,6 +198,8 @@ class mainFrame(Frame):
 
 		#Should colour be changed during recursion
 		self.preserveColour=False
+		#Store the default window colour
+		self.windowColour="#FFFFFF"
 
 	def colour(self,chosenColour,**kwargs):
 		"""
@@ -554,6 +556,22 @@ class advancedEntry(Entry):
 			#Update Variable
 			self.placeHolderActive=False
 
+	def getData(self):
+		"""
+		The method to return data from 
+		the entry it ensures the placeholder
+		is not returned
+		"""
+		if self.placeHolderActive:
+			return None
+		else:
+			#Get the data
+			data=self.get()
+			if len(data.split()) > 0:
+				return data
+			else:
+				return None
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
@@ -646,9 +664,7 @@ class screen(mainFrame):
 
 			#Run any commands the screen has saved
 			for command in self.screenCommands:
-				print(command)
 				runCommand(command,name="Screen Class")
-
 
 	def addContextInfo(self,position,**kwargs):
 		"""

@@ -25,6 +25,9 @@ window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
 
+#====================Variables====================
+mainFrame.windowColour=window.cget("bg")
+
 #====================User Interface====================
 
 #======Status and context======
@@ -109,7 +112,7 @@ loginEntry.pack(fill=X)
 
 #Label for telling user if password is correct etc
 loginAttemptVar=StringVar()
-loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 18")
+loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 15")
 loginAttemptLabel.pack(pady=10)
 
 #endregion
@@ -232,6 +235,22 @@ def showHint():
 	hint=currentMasterPod.hint
 	#Update the control variable
 	loginAttemptVar.set(hint)
+
+def attemptMasterPodUnlock():
+	"""
+	This function gets the user input
+	from the entry and attempts to unlock 
+	the currently loaded master pod.
+	"""
+	#Get the data from the entry
+	attempt=loginEntry.getData()
+	#Check the user entered something
+	if attempt:
+		#Check the password
+		unlockAttempt=checkMasterPodPassword(masterPod.currentMasterPod,attempt)
+
+	else:
+		showMessage("Enter","Please enter password")
 #====================Button commands====================
 
 #Splash Screen
@@ -240,9 +259,12 @@ splashScreen.updateCommand(2,command=lambda: exit())
 #Open Screen
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 #Login Screen
+loginScreen.updateCommand(0,command=lambda: openScreen.show())
 loginScreen.updateCommand(2,command=lambda: showHint())
+loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #====================Screen commands====================
 #Login Screen
+loginScreen.addScreenCommand(lambda: loginScreen.colour(mainFrame.windowColour))
 loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #====================Bindings====================
