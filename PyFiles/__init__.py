@@ -112,6 +112,7 @@ loginEntry.pack(fill=X)
 
 #Label for telling user if password is correct etc
 loginAttemptVar=StringVar()
+loginAttemptNumberVar=IntVar()
 loginAttemptLabel=mainLabel(loginSub, textvariable=loginAttemptVar, font="Avenir 15")
 loginAttemptLabel.pack(pady=10)
 
@@ -248,6 +249,18 @@ def attemptMasterPodUnlock():
 	if attempt:
 		#Check the password
 		unlockAttempt=checkMasterPodPassword(masterPod.currentMasterPod,attempt)
+		if unlockAttempt:
+			#Password was correct
+			loginAttemptVar.set("Access Granted")
+			loginScreen.colour(correctColour)
+			#Reset the attempt var
+			loginAttemptNumberVar.set(0)
+		else:
+			#Add one to the attempt counter
+			loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+			#The password was incorrect
+			loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
+			loginScreen.colour(incorrectColour)
 
 	else:
 		showMessage("Enter","Please enter password")
@@ -264,6 +277,7 @@ loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #====================Screen commands====================
 #Login Screen
+loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
 loginScreen.addScreenCommand(lambda: loginScreen.colour(mainFrame.windowColour))
 loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
@@ -273,7 +287,8 @@ recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #Open Screen
 recursiveBind(openListbox,"<Double-Button-1>",lambda event: loadMasterPodToLogin())
 recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,state=True))
-
+#Login Screen
+recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #====================Testing Area====================
 
 #====================Initial Loaders====================

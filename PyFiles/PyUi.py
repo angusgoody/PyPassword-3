@@ -19,7 +19,8 @@ from random import randint
 log=logClass("User Interface")
 log.saveLog()
 #====================Preset variables====================
-
+incorrectColour="#F69BAB"
+correctColour="#AFF6AA"
 #====================LOG====================
 
 class log:
@@ -75,7 +76,7 @@ def recursiveColour(parent, colour, **kwargs):
 	recursively
 	"""
 	#Items to exclude
-	excludeItems=[Entry]
+	excludeItems=[Entry,advancedEntry]
 
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:

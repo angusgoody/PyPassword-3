@@ -452,7 +452,13 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	Return false is the password is incorrect
 	"""
 	if type(masterPodInstance) == masterPod:
-		print(masterPodInstance.key)
+		#Decrypt the key
+		decryptResult=decrypt(masterPodInstance.key,attempt)
+		#If the result is not None then it was correct
+		if decryptResult:
+			return True
+		else:
+			return None
 
 #====================Testing area====================
 
