@@ -212,7 +212,6 @@ def loadMasterPodToLogin():
 
 		#Set the selected pod variable to the selected object
 		masterPod.currentMasterPod=currentSelection
-
 		#Show the screen
 		loginScreen.show()
 	else:
@@ -220,6 +219,19 @@ def loadMasterPodToLogin():
 
 #======Login Screen========
 
+def showHint():
+	"""
+	This function will display
+	the hint of the currently loaded
+	master pod and show it on the label
+	underneath the entry
+	"""
+	#First get the master pod
+	currentMasterPod=masterPod.currentMasterPod
+	#Get the hint
+	hint=currentMasterPod.hint
+	#Update the control variable
+	loginAttemptVar.set(hint)
 #====================Button commands====================
 
 #Splash Screen
@@ -227,9 +239,11 @@ splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: exit())
 #Open Screen
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
-
+#Login Screen
+loginScreen.updateCommand(2,command=lambda: showHint())
 #====================Screen commands====================
 #Login Screen
+loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #====================Bindings====================
 #Status

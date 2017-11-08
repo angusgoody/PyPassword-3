@@ -418,3 +418,14 @@ def loadMasterPodFromFile(fileName):
 
 #====================Testing area====================
 
+"""
+names={"Angus":"Angy","Sam":"gay","Bob":"Bob"}
+
+hints=["A secret hint","Ahahhah me","Never guess me password"]
+for item in names:
+	newPod=masterPod(item)
+	newPod.key=names[item]
+	newPod.hint=hints.pop()
+	newPod.save()
+
+"""
