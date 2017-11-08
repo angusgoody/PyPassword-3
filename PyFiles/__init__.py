@@ -77,11 +77,11 @@ splashLabel=Label(splashCenter,image=splashImage)
 splashLabel.pack()
 
 #Create the title
-splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#FFFFFF")
+splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#43D4A0")
 splashTitle.pack()
 
 #Colour the splash screen
-splashScreen.colour("#24544C")
+#splashScreen.colour("#24544C")
 
 #endregion
 #======Login Screen======
@@ -132,10 +132,8 @@ openScreen.addContextInfo(0,text="Create New")
 openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697")
 openScreen.addContextInfo(2,text="Open Other")
 
-
-
 #Listbox
-openListbox=advancedListbox(openScreen)
+openListbox=advancedListbox(openScreen,font="Avenir 37")
 openListbox.pack(expand=True,fill=BOTH)
 
 #endregion
