@@ -149,6 +149,15 @@ podTopVar=StringVar()
 podTopVar.set("Select a pod")
 podTopLabel=topLabel(podScreen,textvariable=podTopVar)
 podTopLabel.pack(side=TOP,fill=X)
+
+#Create the listbox
+podListbox=advancedListbox(podScreen)
+podListbox.pack(expand=True,fill=BOTH)
+
+#Create the context buttons
+podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
+podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
+
 #endregion
 #====================Functions====================
 
@@ -274,7 +283,7 @@ def attemptMasterPodUnlock():
 			podScreen.show()
 			#Update the variable
 			podTopVar.set(masterPod.currentMasterPod.masterName+" Accounts")
-			
+
 		else:
 			#Add one to the attempt counter
 			loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
