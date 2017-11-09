@@ -392,7 +392,7 @@ class mainLabel(Label):
 		self.parent=parent
 		#Store text data
 		self.textVar=StringVar()
-		self.textVar.set("Label")
+		self.textVar.set("mainLabel")
 		#Store look of the label
 		self.fg=None
 		self.colourVar="#FFFFFF"
@@ -609,7 +609,7 @@ class topLabel(mainFrame):
 		self.centerFrame.pack(expand=True)
 		#Create Label
 		self.textVar=StringVar()
-		self.textVar.set("Label")
+		self.textVar.set("topLabel")
 		self.textLabel=mainLabel(self.centerFrame,font="Avenir 20",textvariable=self.textVar)
 		self.textLabel.pack(expand=True,fill=X)
 		#Update
@@ -619,11 +619,11 @@ class topLabel(mainFrame):
 		"""
 		Update the strip with kwargs
 		"""
-		#Get Text Variable
+		#Get Text
 		self.textVar.set(kwargs.get("text",self.textVar.get()))
-		self.textVar=kwargs.get("text",self.textVar)
+		self.textVar=kwargs.get("textvariable",self.textVar)
 		#Update
-		self.textLabel.update(textvaribale=self.textVar)
+		self.textLabel.update(textvariable=self.textVar)
 
 class screen(mainFrame):
 	"""

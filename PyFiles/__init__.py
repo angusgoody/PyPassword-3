@@ -123,7 +123,7 @@ openScreen=screen(window,"Open")
 openScreen.colour("#ADDCFC")
 
 #Top label
-openTopLabel=topLabel(openScreen,text="Select Pod")
+openTopLabel=topLabel(openScreen,text="Select Master Pod")
 openTopLabel.pack(side=TOP,fill=X)
 
 #Context
@@ -136,6 +136,19 @@ openScreen.addContextInfo(2,text="Open Other")
 openListbox=advancedListbox(openScreen,font="Avenir 37")
 openListbox.pack(expand=True,fill=BOTH)
 
+#endregion
+#======Pod Screen======
+#region podScreen
+
+#Initiate screen
+podScreen=screen(window,"View Pods",protected=True)
+podScreen.context=context
+
+#Create a label along top of screen
+podTopVar=StringVar()
+podTopVar.set("Select a pod")
+podTopLabel=topLabel(podScreen,textvariable=podTopVar)
+podTopLabel.pack(side=TOP,fill=X)
 #endregion
 #====================Functions====================
 
@@ -196,7 +209,7 @@ def goHome():
 	"""
 	#Go to pod home
 	if screen.lastScreen in screen.protectedScreens:
-		pass
+		podScreen.show()
 	else:
 		splashScreen.show()
 
@@ -254,6 +267,14 @@ def attemptMasterPodUnlock():
 			loginScreen.colour(correctColour)
 			#Reset the attempt var
 			loginAttemptNumberVar.set(0)
+
+			#----Any view pod setup here---
+
+			#Take user to the pod screen
+			podScreen.show()
+			#Update the variable
+			podTopVar.set(masterPod.currentMasterPod.masterName+" Accounts")
+			
 		else:
 			#Add one to the attempt counter
 			loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
