@@ -516,6 +516,17 @@ class advancedListbox(Listbox):
 		else:
 			return None
 
+	def secureClear(self):
+		"""
+		This method securely erases
+		the data stored in the listbox
+		and removes all text
+		"""
+		#Delte dicrionary keys
+		self.data.clear()
+		#Clear screen
+		self.delete(0,END)
+
 class advancedEntry(Entry):
 	"""
 	Modified entry that can

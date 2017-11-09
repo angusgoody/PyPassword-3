@@ -278,13 +278,16 @@ def encrypt(plainText, key):
 	which will encrypt plain text
 	using AES encryption
 	"""
-	#Pad the key to ensure its multiple of 16
-	key=AES.new(pad(key))
-	#Pad the plain text to ensure multiple of 16
-	text=pad(str(plainText))
-	#Encrypt using module
-	encrypted=key.encrypt(text)
-	return encrypted
+	if plainText:
+		#Pad the key to ensure its multiple of 16
+		key=AES.new(pad(key))
+		#Pad the plain text to ensure multiple of 16
+		text=pad(str(plainText))
+		#Encrypt using module
+		encrypted=key.encrypt(text)
+		return encrypted
+	else:
+		return plainText
 
 def decrypt(data, key):
 	"""
@@ -320,6 +323,10 @@ class peaPod:
 	for each account stored in PyPasssword.
 	It will securely store data using
 	encryption
+	
+	Vault state
+	True = Unlocked
+	False = Locked
 	"""
 	def __init__(self,master,peaName):
 		#Store the parent master peaPod
@@ -331,7 +338,7 @@ class peaPod:
 		#Store template type
 		self.templateType="Login"
 		#Store Vault state
-		self.vaultState="Unlocked"
+		self.vaultState=True
 
 	def unlockVault(self,unlockOrLock):
 		"""
@@ -343,16 +350,17 @@ class peaPod:
 		#Check the vault is in the correct state
 		valid=False
 		if unlockOrLock == "Lock":
-			if self.vaultState == "Unlocked":
+			if self.vaultState == True:
 				valid=True
 		else:
-			if self.vaultState == "Locked":
+			if self.vaultState == False:
 				valid=True
 
 		if valid:
 			#Get the key to encrypt with
-			encryptionKey=self.master.masterKey
+			encryptionKey=self.master.key
 			#Iterate through peaPod
+			newVault={}
 			for item in self.vault:
 
 				#Encrypt data
@@ -365,14 +373,27 @@ class peaPod:
 					secureName=decrypt(item,encryptionKey)
 					secureData=decrypt(self.vault[item],encryptionKey)
 
-				#Add to the vault
-				self.vault[secureName]=secureData
-				#Remove old data
-				del (self.vault,item)
+				#Add to the new vault
+				newVault[secureName]=secureData
+
+			#Update the vault to the new secure vault
+			self.vault=newVault
 
 			log.report(unlockOrLock,"peaPod vault",self.peaName)
 		else:
 			log.report("Attempted to encrypt locked vault")
+
+	def addSensitiveData(self,dataName,data):
+		"""
+		This is where the data is added
+		to the pea. the data name refers
+		to what the data is "Password" etc and
+		the data is the actual password
+		"""
+		if self.vaultState:
+			self.vault[dataName]=data
+		else:
+			log.report("Could not save data to pod because currently locked")
 
 class masterPod:
 	"""
@@ -410,8 +431,9 @@ class masterPod:
 		is invalid
 		"""
 		#Ensure all pods are secure
-		for pod in self.peas:
-			if pod.vaultState != "Locked":
+		for podName in self.peas:
+			pod=self.peas[podName]
+			if pod.vaultState != False:
 				pod.unlockVault("Lock")
 
 		#Encrypt the key
@@ -428,6 +450,29 @@ class masterPod:
 		#Save self to pickle
 		savePickle(self,fileName)
 
+	def addPeaPod(self,podName):
+		"""
+		This method allows a pea
+		to be saved to the master pod.
+		"""
+		#Create a new pod
+		newPod=peaPod(self,podName)
+		#Add to the dictionary
+		self.peas[podName]=newPod
+		#Return the peaPod
+		return newPod
+
+	def addPeaPodData(self,peaPodName,dataName,data):
+		"""
+		This method allows sensitive information
+		to be added to a peaPod.
+		"""
+		#Check pea exists
+		if peaPodName in self.peas:
+			#Get the peaPod
+			peaInstance=self.peas[peaPodName]
+			#Add the data to vault
+			peaInstance.addSensitiveData(dataName,data)
 #====================Core Functions====================
 
 def loadMasterPodFromFile(fileName):
@@ -465,11 +510,18 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 """
 names={"Simon":"Angy","Sam":"gay","Bob":"Bob"}
 
+pods=["Amazon","Google","Spotify","Souncloud","PyCharm","Wix","Argos","King Edwards"]
+
 hints=["A secret hint","Ahahhah me","Never guess me password"]
 for item in names:
 	newPod=masterPod(item)
 	newPod.key=names[item]
 	newPod.hint=hints.pop()
+
+	podName=pods.pop()
+	newPod.addPeaPod(podName)
+
+	newPod.addPeaPodData(podName,"Password","Secret")
 	newPod.save()
 
 """

@@ -151,12 +151,13 @@ podTopLabel=topLabel(podScreen,textvariable=podTopVar)
 podTopLabel.pack(side=TOP,fill=X)
 
 #Create the listbox
-podListbox=advancedListbox(podScreen)
+podListbox=advancedListbox(podScreen,font="Avenir 25")
 podListbox.pack(expand=True,fill=BOTH)
 
 #Create the context buttons
 podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
 podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
+podScreen.addContextInfo(2,text="Exit Pod",enabledColour="#D17E8D")
 
 #endregion
 #====================Functions====================
@@ -294,6 +295,24 @@ def attemptMasterPodUnlock():
 
 	else:
 		showMessage("Enter","Please enter password")
+
+#======Pod Screen========
+
+def loadPodsToScreen():
+	"""
+	This function will load the pods in
+	the master pod to the screen.
+	"""
+	#Get current master pod
+	currentMasterPod=masterPod.currentMasterPod
+	#Clear the listboz
+	podListbox.secureClear()
+	#Add to listbox
+	for pod in currentMasterPod.peas:
+		#todo add pod colour templates
+		podListbox.addObject(pod,currentMasterPod.peas[pod])
+
+
 #====================Button commands====================
 
 #Splash Screen
@@ -305,6 +324,8 @@ openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 loginScreen.updateCommand(0,command=lambda: openScreen.show())
 loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
+#Pod screen
+podScreen.updateCommand(2,command=lambda: openScreen.show())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -312,6 +333,8 @@ loginScreen.addScreenCommand(lambda: loginEntry.resetEntry())
 loginScreen.addScreenCommand(lambda: loginScreen.colour(mainFrame.windowColour))
 loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
+#Pod Screen
+podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #====================Bindings====================
 #Status
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
