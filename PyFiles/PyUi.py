@@ -21,25 +21,54 @@ log.saveLog()
 #====================Preset variables====================
 incorrectColour="#E4747D"
 correctColour="#64D999"
-#====================LOG====================
 
-class log:
-	"""
-	The Log class stores logged
-	events in the program, errors
-	etc.
-	"""
-	def __init__(self,logName):
-		self.logName=logName
-		self.logData={}
-		self.systemData={}
 
 #====================Functions====================
 """
 This section is for functions that aid with the user
 interface elements of PyPassword
 """
+#Utility functions
 
+def runCommand(command,**kwargs):
+	"""
+	This function will safeley run
+	a command and handle any errors
+	and report to log while returning
+	results
+	"""
+	#Collect idetifier from KWARGS
+	identifier="No Data Available"
+	identifier=kwargs.get("name",identifier)
+	#Run the command
+	try:
+		content=command()
+	except:
+		print("Error running command",identifier,command)
+		log.report("Error executing command through function",command,tag="Error")
+	else:
+		log.report("Command executing success",identifier,tag="System")
+		return content
+
+def showMessage(pre,message):
+	"""
+	Function to show a tkinter
+	message using messagebox
+	"""
+	try:
+		messagebox.showinfo(pre,message)
+	except:
+		print(message)
+
+def insertEntry(entry,message):
+	"""
+	This function is used
+	for adding data to widgets 
+	"""
+	entry.delete(0,END)
+	entry.insert(END,message)
+
+#Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
 	This function will bind a function
@@ -890,32 +919,13 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
-class multiView(mainFrame):
+class selectionBar(mainFrame):
 	"""
-	The multi view is a class
-	which allows multiple frames
-	to be displayed in one place
-	and swapped around.
+	This class will be a bar
+	that can have one value selected
+	at a time. It will be a row of buttons
+	and the selected value will have a different
+	colour to the others.
 	"""
-	def __init__(self,parent):
-		mainFrame.__init__(self,parent)
-		#Store the view info
-		self.views={}
-		self.currentView=None
 
-	def addView(self,frameToDisplay,name):
-		"""
-		This method will allow a frame
-		to be added to the multi view 
-		"""
-		self.views[name]=frameToDisplay
-
-	def showView(self,frameName):
-		"""
-		This method will load a frame
-		to dislpay on the multiview
-		"""
-		#Check valid parameter
-		if frameName in self.views:
-			pass
 

@@ -112,36 +112,7 @@ These functions are used for generating passwords,
 and also encrypting and decrypting data.
 """
 
-#Utility functions
 
-def runCommand(command,**kwargs):
-	"""
-	This function will safley run
-	a command and handle any errors
-	and report to log while returning
-	results
-	"""
-	#Collect idetifier from KWARGS
-	identifier="No Data Available"
-	identifier=kwargs.get("name",identifier)
-	#Run the command
-	try:
-		content=command()
-	except:
-		log.report("Error executing command through function",identifier,tag="Error")
-	else:
-		log.report("Command executing success",identifier,tag="System")
-		return content
-
-def showMessage(pre,message):
-	"""
-	Function to show a tkinter
-	message using messagebox
-	"""
-	try:
-		messagebox.showinfo(pre,message)
-	except:
-		print(message)
 #Folder and Directory functions
 def getWorkingDirectory():
 	"""

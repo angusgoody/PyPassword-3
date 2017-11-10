@@ -347,8 +347,8 @@ recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 
 #====================Initial Loaders====================
 
-runCommand(splashScreen.show())
-runCommand(findMasterPods(getWorkingDirectory()))
+runCommand(lambda: splashScreen.show(),name="Splash loader")
+runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 #====================END====================
 window.mainloop()
 
