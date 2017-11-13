@@ -299,7 +299,8 @@ class peaPod:
 	True = Unlocked
 	False = Locked
 	"""
-	def __init__(self,master,peaName):
+	
+	def __init__(self,master,peaName,**kwargs):
 		#Store the parent master peaPod
 		self.master=master
 		#Name of the peaPod
@@ -310,6 +311,15 @@ class peaPod:
 		self.templateType="Login"
 		#Store Vault state
 		self.vaultState=True
+
+		#Update
+		self.update(**kwargs)
+
+	def update(self,**kwargs):
+		"""
+		The update method for peaPod.
+		"""
+		self.templateType=kwargs.get("template",self.templateType)
 
 	def unlockVault(self,unlockOrLock):
 		"""
@@ -421,13 +431,13 @@ class masterPod:
 		#Save self to pickle
 		savePickle(self,fileName)
 
-	def addPeaPod(self,podName):
+	def addPeaPod(self,podName,**kwargs):
 		"""
 		This method allows a pea
 		to be saved to the master pod.
 		"""
 		#Create a new pod
-		newPod=peaPod(self,podName)
+		newPod=peaPod(self,podName,**kwargs)
 		#Add to the dictionary
 		self.peas[podName]=newPod
 		#Return the peaPod
@@ -479,9 +489,11 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 #====================Testing area====================
 
 """
+pods=["Amazon","Google","Spotify","Souncloud","PyCharm","Wix","Argos","King Edwards"]
+
+
 names={"Simon":"Angy","Sam":"gay","Bob":"Bob"}
 
-pods=["Amazon","Google","Spotify","Souncloud","PyCharm","Wix","Argos","King Edwards"]
 
 hints=["A secret hint","Ahahhah me","Never guess me password"]
 for item in names:
@@ -495,4 +507,15 @@ for item in names:
 	newPod.addPeaPodData(podName,"Password","Secret")
 	newPod.save()
 
+
+
+newPod=masterPod("Toby")
+newPod.key="toby123"
+newPod.hint="ABC is easy"
+
+for item in pods:
+	newPod.addPeaPod(item)
+	newPod.addPeaPodData(item,"Password","Secret")
+
+newPod.save()
 """

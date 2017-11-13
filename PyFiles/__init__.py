@@ -309,8 +309,21 @@ def loadPodsToScreen():
 	podListbox.secureClear()
 	#Add to listbox
 	for pod in currentMasterPod.peas:
-		#todo add pod colour templates
-		podListbox.addObject(pod,currentMasterPod.peas[pod])
+
+		#Get the actual pod
+		podInstance=currentMasterPod.peas[pod]
+
+		#Get the right colour for the pod
+		podColour=generateHexColour()
+
+		#Get the template for the pod
+		podTemplateType=podInstance.templateType
+
+		if podTemplateType in podTemplate.templateColours:
+			podColour=podTemplate.templateColours[podTemplateType]
+			
+		#Add to listbox
+		podListbox.addObject(pod,podInstance,colour=podColour)
 
 
 #====================Button commands====================

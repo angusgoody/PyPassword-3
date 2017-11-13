@@ -928,4 +928,72 @@ class selectionBar(mainFrame):
 	colour to the others.
 	"""
 
+#====================Non UI Classes====================
+"""
+The non ui classes are classes that are not based on 
+tkinter widgets.
+"""
+
+class podTemplate:
+	"""
+	The pod template 
+	is a class which can be used
+	to represent what kind of data
+	is stored in a pod.
+	"""
+	#Store the templates and corresponding colours
+	templateColours={}
+
+	def __init__(self,templateName,templateColour):
+		#Name and Colour of template
+		self.templateName=templateName
+		self.templateColour=templateColour
+
+		#Store valid data types
+		self.validDataTypes=[Entry,advancedEntry,Text,OptionMenu]
+
+		#Store the tabs
+		self.tabs={}
+
+		#Add to dict
+		podTemplate.templateColours[self.templateName]=self.templateColour
+
+
+
+	def addTab(self,tabName):
+		"""
+		This method allows a tab to be
+		easily added to the template which is
+		an area to store data.
+		"""
+		#Initiate an empty dictionary in the tab dictionary
+		self.tabs[tabName]={}
+
+	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
+		"""
+		This method allows a section of data to be added to the template.
+		For example a section for "Password" or "Email" 
+		"""
+		if tabName in self.tabs:
+			#Get section colour
+			sectionColour="#FFFFFF"
+			sectionColour=kwargs.get("colour",sectionColour)
+			#Check if dataType is valid
+			if dataType not in self.validDataTypes:
+				dataType=Entry
+				log.report("Changed data type for",sectionName)
+			#Add the data to list
+			dataArray=[sectionName,dataType,buttonList,sectionColour]
+			#Add list to dictionary
+			self.tabs[tabName]=dataArray
+
+
+#====================Create the pod templates====================
+
+loginTemplate=podTemplate("Login","#3CE995")
+
+
+
+
+
 
