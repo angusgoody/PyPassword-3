@@ -33,6 +33,7 @@ mainFrame.windowColour=window.cget("bg")
 #======Status and context======
 #region status/context
 
+
 #Status variables
 statusVar=StringVar()
 statusVar.set("Home")
@@ -159,6 +160,21 @@ podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
 podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
 podScreen.addContextInfo(2,text="Exit Pod",enabledColour="#D17E8D")
 
+#endregion
+#======View Pod Screen======
+#region viewPod
+viewPodScreen=screen(window,"View Pod",protected=True)
+viewPodScreen.context=context
+
+#Top Label
+viewPodLabelVar=StringVar()
+viewPodLabelVar.set("Pod")
+viewPodLabel=topLabel(viewPodScreen,textvariable=viewPodLabelVar)
+viewPodLabel.pack(side=TOP,fill=X)
+
+#Notebook
+viewPodNotebook=advancedNotebook(viewPodScreen)
+viewPodNotebook.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
@@ -305,7 +321,7 @@ def loadPodsToScreen():
 	"""
 	#Get current master pod
 	currentMasterPod=masterPod.currentMasterPod
-	#Clear the listboz
+	#Clear the listbox
 	podListbox.secureClear()
 	#Add to listbox
 	for pod in currentMasterPod.peas:
@@ -313,18 +329,30 @@ def loadPodsToScreen():
 		#Get the actual pod
 		podInstance=currentMasterPod.peas[pod]
 
-		#Get the right colour for the pod
+		#Generate a colour in case no colour is found
 		podColour=generateHexColour()
 
 		#Get the template for the pod
 		podTemplateType=podInstance.templateType
 
+		#Attempt to find the template colour
 		if podTemplateType in podTemplate.templateColours:
 			podColour=podTemplate.templateColours[podTemplateType]
-			
+
 		#Add to listbox
 		podListbox.addObject(pod,podInstance,colour=podColour)
 
+def openPod():
+	"""
+	This function is run
+	when user double clicks
+	on a pod in the listbox
+	"""
+	selectedPod=podListbox.getSelection()
+	#Check something was selected
+	if selectedPod:
+		#Load the view pod screen
+		viewPodScreen.show()
 
 #====================Button commands====================
 
@@ -348,6 +376,7 @@ loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #Pod Screen
 podScreen.addScreenCommand(lambda: loadPodsToScreen())
+
 #====================Bindings====================
 #Status
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
@@ -356,6 +385,8 @@ recursiveBind(openListbox,"<Double-Button-1>",lambda event: loadMasterPodToLogin
 recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,state=True))
 #Login Screen
 recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
+#Pod screen
+recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 #====================Testing Area====================
 
 #====================Initial Loaders====================
@@ -363,5 +394,7 @@ recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 #====================END====================
+
+
 window.mainloop()
 

@@ -43,8 +43,8 @@ def runCommand(command,**kwargs):
 	#Run the command
 	try:
 		content=command()
-	except:
-		print("Error running command",identifier,command)
+	except Exception as e:
+		print("Error running command",identifier,e,command)
 		log.report("Error executing command through function",command,tag="Error")
 	else:
 		log.report("Command executing success",identifier,tag="System")
@@ -665,6 +665,16 @@ class topLabel(mainFrame):
 		#Update
 		self.textLabel.update(textvariable=self.textVar)
 
+class masterScreen:
+	"""
+	The master screen class
+	is a class which is a parent
+	for a screen it will store the 
+	children and screen info.
+	"""
+	def __init__(self):
+		self.lastScreen=None
+
 class screen(mainFrame):
 	"""
 	The screenclass is a class
@@ -707,6 +717,7 @@ class screen(mainFrame):
 			#Hide last screen
 			if "pack_forget" in dir(screen.lastScreen):
 				screen.lastScreen.pack_forget()
+
 			#Show current screen
 			self.pack(expand=True,fill=BOTH)
 			#Update the status var
@@ -928,6 +939,48 @@ class selectionBar(mainFrame):
 	colour to the others.
 	"""
 
+class advancedNotebook(mainFrame):
+	"""
+	The advanced notebook class
+	is a class used to display
+	multiple tabs and allow the user
+	to navigate using tabs.
+	"""
+	def __init__(self,parent):
+		mainFrame.__init__(self,parent)
+
+		#The tab
+		self.tabFrame=mainFrame(self)
+		self.tabFrame.pack(side=TOP,fill=X)
+
+		#Context bar
+		self.contextBar=contextBar(self.tabFrame,places=3)
+		self.contextBar.pack(expand=True)
+
+		#The content area
+		self.contentArea=mainFrame(self)
+		self.contentArea.pack(fill=BOTH,expand=True)
+
+		#Store a dictionary of tabs and frames
+		self.pages={}
+		self.pageList=[]
+
+	def addPage(self, tabName, pageFrame):
+		"""
+		This method will add a tab
+		to the advanced notebook.
+		It will display a certain
+		screen when displayed
+		"""
+		#Add the page to the dictionary
+		self.pages[tabName]=pageFrame
+		if tabName not in self.pageList:
+			self.pageList.append(tabName)
+			#Add a bar to the self
+
+
+
+
 #====================Non UI Classes====================
 """
 The non ui classes are classes that are not based on 
@@ -957,8 +1010,6 @@ class podTemplate:
 
 		#Add to dict
 		podTemplate.templateColours[self.templateName]=self.templateColour
-
-
 
 	def addTab(self,tabName):
 		"""
@@ -990,7 +1041,16 @@ class podTemplate:
 
 #====================Create the pod templates====================
 
+
+#=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
+loginTemplate.addTab("Login")
+loginTemplate.addTab("Advanced")
+
+#loginTemplate.addTemplateSection("Login","Username",Entry)
+
+#=====Secure Note======
+secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
 
 
 
