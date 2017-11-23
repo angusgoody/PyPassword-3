@@ -930,15 +930,6 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
-class selectionBar(mainFrame):
-	"""
-	This class will be a bar
-	that can have one value selected
-	at a time. It will be a row of buttons
-	and the selected value will have a different
-	colour to the others.
-	"""
-
 class advancedNotebook(mainFrame):
 	"""
 	The advanced notebook class
@@ -953,9 +944,13 @@ class advancedNotebook(mainFrame):
 		self.tabFrame=mainFrame(self)
 		self.tabFrame.pack(side=TOP,fill=X)
 
-		#Context bar
-		self.contextBar=contextBar(self.tabFrame,places=3)
-		self.contextBar.pack(expand=True)
+		#Selection bar
+		self.selectionBar=selectionBar(self.tabFrame)
+		self.selectionBar.pack(expand=True)
+
+		def test():
+			print("JKBSJH")
+		self.selectionBar.addTab(0,"Test",lambda :test())
 
 		#The content area
 		self.contentArea=mainFrame(self)
@@ -977,6 +972,64 @@ class advancedNotebook(mainFrame):
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
+
+class selectionBar(mainFrame):
+	"""
+	The selection bar
+	is a bar that allows a single 
+	selection. This can be used
+	to naivgate etc.
+	"""
+	def __init__(self,parent,**kwargs):
+		mainFrame.__init__(self,parent,**kwargs)
+
+		#Store colours
+		self.selectedTabColour="#1BF293"
+		self.notselectedTabColour="#DFEDEA"
+
+		#Store the tabs
+		self.tabCommandDict={}
+		self.tabList=[]
+
+		#Add places
+		self.addPlace()
+
+	def addPlace(self):
+		"""
+		This method will allow a tab
+		to be added to the frame
+		"""
+		#Create Button
+		newButton=mainButton(self)
+		newButton.pack(fill=BOTH,expand=True)
+		#Add to list
+		self.tabList.append(newButton)
+
+	def addTab(self,index,tabName,command):
+		"""
+		This method allows a tab to
+		be added to the selection bar
+		"""
+		#Add reference
+		self.tabCommandDict[tabName]=command
+
+		if index+1 <= len(self.tabList) and index >= 0:
+			#Get the correct button
+			button=self.tabList[index]
+			#Update the button to correct info
+			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
+
+	def runTabCommand(self,tabName):
+
+		#Get the correct command for that name
+		buttonCommand=self.tabCommandDict[tabName]
+
+		#Run the commmand
+		print("Done it boi")
+		buttonCommand()
+
+
+
 
 
 
