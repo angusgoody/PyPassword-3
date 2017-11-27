@@ -937,7 +937,7 @@ class advancedNotebook(mainFrame):
 	multiple tabs and allow the user
 	to navigate using tabs.
 	"""
-	def __init__(self,parent):
+	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent)
 
 		#The tab
@@ -945,12 +945,8 @@ class advancedNotebook(mainFrame):
 		self.tabFrame.pack(side=TOP,fill=X)
 
 		#Selection bar
-		self.selectionBar=selectionBar(self.tabFrame)
+		self.selectionBar=selectionBar(self.tabFrame,places=3)
 		self.selectionBar.pack(expand=True)
-
-		def test():
-			print("JKBSJH")
-		self.selectionBar.addTab(0,"Test",lambda :test())
 
 		#The content area
 		self.contentArea=mainFrame(self)
@@ -959,6 +955,12 @@ class advancedNotebook(mainFrame):
 		#Store a dictionary of tabs and frames
 		self.pages={}
 		self.pageList=[]
+
+		#Store tab counter
+		self.tabCounter=0
+
+		#Store currently loaded frame
+		self.currentFrame=None
 
 	def addPage(self, tabName, pageFrame):
 		"""
@@ -972,6 +974,22 @@ class advancedNotebook(mainFrame):
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
+			self.selectionBar.addTab(self.tabCounter,tabName,lambda: self.loadFrame(tabName))
+
+	def loadFrame(self,tabName):
+		"""
+		Load frames function
+		"""
+		#Get the correct frame to load
+		frameToLoad=self.pages[tabName]
+
+		#Hide the current frame
+		if self.currentFrame:
+			self.currentFrame.pack_forget()
+
+		#Show the new frame
+		frameToLoad.pack(expand=True,fill=BOTH)
+
 
 class selectionBar(mainFrame):
 	"""
@@ -987,12 +1005,19 @@ class selectionBar(mainFrame):
 		self.selectedTabColour="#1BF293"
 		self.notselectedTabColour="#DFEDEA"
 
+		#Store current tab
+		self.currentTab=None
+
 		#Store the tabs
 		self.tabCommandDict={}
 		self.tabList=[]
 
-		#Add places
-		self.addPlace()
+		#How many placeholders are setup initially
+		self.initialPlaces=0
+		self.initialPlaces=kwargs.get("places",self.initialPlaces)
+
+		for x in range(self.initialPlaces):
+			self.addPlace()
 
 	def addPlace(self):
 		"""
@@ -1001,7 +1026,7 @@ class selectionBar(mainFrame):
 		"""
 		#Create Button
 		newButton=mainButton(self)
-		newButton.pack(fill=BOTH,expand=True)
+		newButton.pack(fill=BOTH,expand=True,side=LEFT)
 		#Add to list
 		self.tabList.append(newButton)
 
@@ -1013,20 +1038,33 @@ class selectionBar(mainFrame):
 		#Add reference
 		self.tabCommandDict[tabName]=command
 
-		if index+1 <= len(self.tabList) and index >= 0:
+		if index+1 > len(self.tabList):
+			self.addPlace()
+		if index >= 0:
 			#Get the correct button
 			button=self.tabList[index]
 			#Update the button to correct info
 			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
 
 	def runTabCommand(self,tabName):
+		"""
+		This function overrides the commands
+		of all the tabs so it can handle things
+		such as colour change etc. 
+		"""
 
-		#Get the correct command for that name
-		buttonCommand=self.tabCommandDict[tabName]
+		if tabName != self.currentTab:
+			#Get the correct command for that name
+			buttonCommand=self.tabCommandDict[tabName]
 
-		#Run the commmand
-		print("Done it boi")
-		buttonCommand()
+			#Run the commmand
+			buttonCommand()
+
+			#Get the index
+			self.tabList.index()
+			#Update colour
+
+
 
 
 

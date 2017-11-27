@@ -169,6 +169,7 @@ viewPodScreen.context=context
 #Top Label
 viewPodLabelVar=StringVar()
 viewPodLabelVar.set("Pod")
+
 viewPodLabel=topLabel(viewPodScreen,textvariable=viewPodLabelVar)
 viewPodLabel.pack(side=TOP,fill=X)
 
