@@ -961,7 +961,7 @@ class advancedNotebook(mainFrame):
 		#Store currently loaded frame
 		self.currentFrame=None
 
-	def addPage(self, tabName, pageFrame):
+	def addPage(self,tabName,pageFrame,**kwargs):
 		"""
 		This method will add a tab
 		to the advanced notebook.
@@ -972,10 +972,13 @@ class advancedNotebook(mainFrame):
 		self.pages[tabName]=pageFrame
 		#Increase counter by one
 		self.tabCounter+=1
+		index=self.tabCounter
+		index=kwargs.get("index",index)
+
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
-			self.selectionBar.addTab(self.tabCounter,tabName,lambda tab=tabName: self.loadFrame(tab))
+			self.selectionBar.addTab(index,tabName,lambda tab=tabName: self.loadFrame(tab))
 
 	def loadFrame(self,tabName):
 		"""
