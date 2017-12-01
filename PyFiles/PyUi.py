@@ -951,13 +951,12 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-
 		#Store a dictionary of tabs and frames
 		self.pages={}
 		self.pageList=[]
 
 		#Store tab counter
-		self.tabCounter=0
+		self.tabCounter=-1
 
 		#Store currently loaded frame
 		self.currentFrame=None
@@ -971,10 +970,13 @@ class advancedNotebook(mainFrame):
 		"""
 		#Add the page to the dictionary
 		self.pages[tabName]=pageFrame
+		#Increase counter by one
+		self.tabCounter+=1
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
 			self.selectionBar.addTab(self.tabCounter,tabName,lambda tab=tabName: self.loadFrame(tab))
+
 	def loadFrame(self,tabName):
 		"""
 		Load frames function
@@ -988,6 +990,8 @@ class advancedNotebook(mainFrame):
 
 		#Show the new frame
 		frameToLoad.pack(expand=True,fill=BOTH)
+		#Set as current
+		self.currentFrame=frameToLoad
 
 
 class selectionBar(mainFrame):
