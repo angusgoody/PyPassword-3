@@ -22,7 +22,8 @@ log.saveLog()
 incorrectColour="#E4747D"
 correctColour="#64D999"
 
-
+def test():
+	print("test function")
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -944,13 +945,12 @@ class advancedNotebook(mainFrame):
 		self.tabFrame=mainFrame(self)
 		self.tabFrame.pack(side=TOP,fill=X)
 
+		self.tabFrame.colour("#BDC7C5")
+
 		#Selection bar
-		self.selectionBar=selectionBar(self.tabFrame,places=3)
+		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-		#The content area
-		self.contentArea=mainFrame(self)
-		self.contentArea.pack(fill=BOTH,expand=True)
 
 		#Store a dictionary of tabs and frames
 		self.pages={}
@@ -974,8 +974,7 @@ class advancedNotebook(mainFrame):
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
-			self.selectionBar.addTab(self.tabCounter,tabName,lambda: self.loadFrame(tabName))
-
+			self.selectionBar.addTab(self.tabCounter,tabName,lambda tab=tabName: self.loadFrame(tab))
 	def loadFrame(self,tabName):
 		"""
 		Load frames function
@@ -1037,7 +1036,6 @@ class selectionBar(mainFrame):
 		"""
 		#Add reference
 		self.tabCommandDict[tabName]=command
-
 		if index+1 > len(self.tabList):
 			self.addPlace()
 		if index >= 0:
@@ -1059,10 +1057,6 @@ class selectionBar(mainFrame):
 
 			#Run the commmand
 			buttonCommand()
-
-			#Get the index
-			self.tabList.index()
-			#Update colour
 
 
 

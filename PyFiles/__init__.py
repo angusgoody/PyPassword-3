@@ -176,6 +176,11 @@ viewPodLabel.pack(side=TOP,fill=X)
 #Notebook
 viewPodNotebook=advancedNotebook(viewPodScreen)
 viewPodNotebook.pack(expand=True,fill=BOTH)
+
+testFrame=Frame(viewPodNotebook)
+testFrame.config(bg="#76E071")
+
+viewPodNotebook.addPage("Test",testFrame)
 #endregion
 #====================Functions====================
 
