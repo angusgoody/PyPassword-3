@@ -190,6 +190,7 @@ viewPodNotebook.addPage("Third",thirdScreen)
 
 viewPodNotebook.addPage("Steal",tempScreen,index=1)
 viewPodNotebook.selectionBar.removePlace(1)
+viewPodNotebook.addPage("Steal #2",tempScreen)
 #endregion
 #====================Functions====================
 

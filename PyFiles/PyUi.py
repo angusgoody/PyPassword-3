@@ -972,13 +972,13 @@ class advancedNotebook(mainFrame):
 		self.pages[tabName]=pageFrame
 		#Increase counter by one
 		self.tabCounter+=1
-		index=self.tabCounter
+		#Get the index
+		index=None
 		index=kwargs.get("index",index)
-
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
-			self.selectionBar.addTab(index,tabName,lambda tab=tabName: self.loadFrame(tab))
+			self.selectionBar.addTab(tabName,lambda tab=tabName: self.loadFrame(tab),index=index)
 
 	def loadFrame(self,tabName):
 		"""
@@ -1039,6 +1039,7 @@ class selectionBar(mainFrame):
 		self.tabCommandDict={}
 		self.tabDict={}
 		self.tabList=[]
+		self.tabCount=0
 
 		#How many placeholders are setup initially
 		self.initialPlaces=0
@@ -1057,12 +1058,21 @@ class selectionBar(mainFrame):
 		newButton.pack(fill=BOTH,expand=True,side=LEFT)
 		#Add to list
 		self.tabList.append(newButton)
+		#Add to counter
+		self.tabCount+=1
 
-	def addTab(self,index,tabName,command):
+	def addTab(self,tabName,command,**kwargs):
 		"""
 		This method allows a tab to
 		be added to the selection bar
 		"""
+		#Collects the index
+		index=self.tabCount
+		index=kwargs.get("index",self.tabCount)
+		#Check if a valid index is passed
+		if index == None:
+			index=self.tabCount
+		print(index)
 		#Add reference
 		self.tabCommandDict[tabName]=command
 		if index+1 > len(self.tabList):
@@ -1121,6 +1131,9 @@ class selectionBar(mainFrame):
 					break
 			#Remove the widget
 			place.pack_forget()
+			#Remove one from the counter
+			self.tabCount=self.tabCount-1
+
 
 
 
