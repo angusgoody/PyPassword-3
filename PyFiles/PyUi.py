@@ -1009,6 +1009,13 @@ class podNotebook(advancedNotebook):
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
 
+	def loadTemplate(self,templateName):
+		"""
+		This function will load a 
+		certain pod template to the notebook
+		so its ready to show a users data
+		"""
+		print("Ready to load template",templateName)
 
 class selectionBar(mainFrame):
 	"""
@@ -1067,7 +1074,9 @@ class selectionBar(mainFrame):
 			self.tabDict[tabName]=button
 			#Update the button to correct info
 			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
-
+			#If this is the first tab run it so the notebook is showing something
+			if index == 0:
+				self.runTabCommand(tabName)
 	def runTabCommand(self,tabName):
 		"""
 		This function overrides the commands
@@ -1084,12 +1093,14 @@ class selectionBar(mainFrame):
 			#Change other colours
 			if self.currentTab:
 				self.tabDict[self.currentTab].updateButton(enabledColour=self.notselectedTabColour,
-				                                           hoverColour=self.hoverColour)
+				                                           hoverColour=self.hoverColour,
+				                                           clickedColour=self.notselectedTabColour)
 
 			##Change the colour
 			selectButton=self.tabDict[tabName]
 			selectButton.updateButton(enabledColour=self.selectedTabColour,
-			                          hoverColour=self.selectedTabColour)
+			                          hoverColour=self.selectedTabColour,
+			                          clickedColour=self.selectedTabColour)
 			#Update the current tab
 			self.currentTab=tabName
 

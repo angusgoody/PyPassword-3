@@ -366,8 +366,12 @@ def openPod():
 	selectedPod=podListbox.getSelection()
 	#Check something was selected
 	if selectedPod:
+		#Get the template type of the pod
+		podType=selectedPod.templateType
 		#Load the view pod screen
 		viewPodScreen.show()
+		#Load the notebook with a template type
+		viewPodNotebook.loadTemplate(podType)
 
 #====================Button commands====================
 
