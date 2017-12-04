@@ -174,9 +174,21 @@ viewPodLabel=topLabel(viewPodScreen,textvariable=viewPodLabelVar)
 viewPodLabel.pack(side=TOP,fill=X)
 
 #Notebook
-viewPodNotebook=advancedNotebook(viewPodScreen)
+viewPodNotebook=podNotebook(viewPodScreen)
 viewPodNotebook.pack(expand=True,fill=BOTH)
 
+tempScreen=Frame(viewPodNotebook)
+tempScreen.config(bg="#76E071")
+secScreen=Frame(viewPodNotebook)
+secScreen.config(bg="#F951A3")
+thirdScreen=Frame(viewPodNotebook)
+thirdScreen.config(bg="#E66170")
+
+viewPodNotebook.addPage("First",tempScreen)
+viewPodNotebook.addPage("Second",secScreen)
+viewPodNotebook.addPage("Third",thirdScreen)
+
+viewPodNotebook.addPage("Steal",tempScreen,index=1)
 
 #endregion
 #====================Functions====================

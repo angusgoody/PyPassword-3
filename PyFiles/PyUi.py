@@ -958,7 +958,7 @@ class advancedNotebook(mainFrame):
 		#Store tab counter
 		self.tabCounter=-1
 
-		#Store currently loaded frame
+		#Store currently loaded frame and button
 		self.currentFrame=None
 
 	def addPage(self,tabName,pageFrame,**kwargs):
@@ -997,6 +997,19 @@ class advancedNotebook(mainFrame):
 		self.currentFrame=frameToLoad
 
 
+
+
+class podNotebook(advancedNotebook):
+	"""
+	The pod notebook is a special
+	notebook for viewing pod 
+	information. It handles loading and 
+	displaying pod data
+	"""
+	def __init__(self,parent,**kwargs):
+		advancedNotebook.__init__(self,parent,**kwargs)
+
+
 class selectionBar(mainFrame):
 	"""
 	The selection bar
@@ -1010,12 +1023,14 @@ class selectionBar(mainFrame):
 		#Store colours
 		self.selectedTabColour="#1BF293"
 		self.notselectedTabColour="#DFEDEA"
+		self.hoverColour="#F9FFFC"
 
 		#Store current tab
 		self.currentTab=None
 
 		#Store the tabs
 		self.tabCommandDict={}
+		self.tabDict={}
 		self.tabList=[]
 
 		#How many placeholders are setup initially
@@ -1048,6 +1063,8 @@ class selectionBar(mainFrame):
 		if index >= 0:
 			#Get the correct button
 			button=self.tabList[index]
+			#Add a reference
+			self.tabDict[tabName]=button
 			#Update the button to correct info
 			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
 
@@ -1057,13 +1074,24 @@ class selectionBar(mainFrame):
 		of all the tabs so it can handle things
 		such as colour change etc. 
 		"""
-
 		if tabName != self.currentTab:
 			#Get the correct command for that name
 			buttonCommand=self.tabCommandDict[tabName]
 
 			#Run the commmand
 			buttonCommand()
+
+			#Change other colours
+			if self.currentTab:
+				self.tabDict[self.currentTab].updateButton(enabledColour=self.notselectedTabColour,
+				                                           hoverColour=self.hoverColour)
+
+			##Change the colour
+			selectButton=self.tabDict[tabName]
+			selectButton.updateButton(enabledColour=self.selectedTabColour,
+			                          hoverColour=self.selectedTabColour)
+			#Update the current tab
+			self.currentTab=tabName
 
 
 
