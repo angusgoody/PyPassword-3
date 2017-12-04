@@ -1104,6 +1104,24 @@ class selectionBar(mainFrame):
 			#Update the current tab
 			self.currentTab=tabName
 
+	def removePlace(self,index):
+		"""
+		This function will allow
+		a tab to be removed from the bar
+		"""
+		#Find correct index in the list
+		if index <= len(self.tabList)-1:
+			place=self.tabList[index]
+			#Remove from array
+			self.tabList.remove(place)
+			#Remove from the dictionary
+			for item in self.tabDict:
+				if self.tabDict[item] == place:
+					del self.tabDict[item]
+					break
+			#Remove the widget
+			place.pack_forget()
+
 
 
 
