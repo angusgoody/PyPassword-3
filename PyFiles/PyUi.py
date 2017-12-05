@@ -1029,6 +1029,8 @@ class podNotebook(advancedNotebook):
 			templateDict=correctTemplate.tabs
 
 			#todo Remove all the tabs
+			for tab in self.selectionBar.tabDict:
+				print(tab)
 			#Generate tabs
 			for tab in templateDict:
 				newFrame=mainFrame(self)
@@ -1126,7 +1128,6 @@ class selectionBar(mainFrame):
 
 			##Change the colour
 			selectButton=self.tabDict[tabName]
-			print("Not selected colour is",self.notselectedTabColour)
 			selectButton.updateButton(enabledColour=self.selectedTabColour,
 			                          hoverColour=self.selectedTabColour,
 			                          clickedColour=self.selectedTabColour)
