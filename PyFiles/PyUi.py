@@ -22,6 +22,9 @@ log.saveLog()
 incorrectColour="#E4747D"
 correctColour="#64D999"
 
+mainRedColour="#ED8C8E"
+mainGreenColour="#96FF8D"
+
 def test():
 	print("test function")
 #====================Functions====================

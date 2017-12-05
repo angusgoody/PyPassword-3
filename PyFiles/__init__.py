@@ -28,6 +28,7 @@ window.geometry("570x450")
 #====================Variables====================
 mainFrame.windowColour=window.cget("bg")
 
+
 #====================User Interface====================
 
 #======Status and context======
@@ -158,13 +159,18 @@ podListbox.pack(expand=True,fill=BOTH)
 #Create the context buttons
 podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
 podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
-podScreen.addContextInfo(2,text="Exit Pod",enabledColour="#D17E8D")
+podScreen.addContextInfo(2,text="Exit Pod",enabledColour=mainRedColour)
 
 #endregion
 #======View Pod Screen======
 #region viewPod
 viewPodScreen=screen(window,"View Pod",protected=True)
 viewPodScreen.context=context
+
+#Create the context buttons
+viewPodScreen.addContextInfo(0,text="Delete")
+viewPodScreen.addContextInfo(1,text="Edit",enabledColour="#37EDB8")
+viewPodScreen.addContextInfo(2,text="Back")
 
 #Top Label
 viewPodLabelVar=StringVar()
@@ -184,13 +190,16 @@ secScreen.config(bg="#F951A3")
 thirdScreen=Frame(viewPodNotebook)
 thirdScreen.config(bg="#E66170")
 
+secretScreen=Frame(viewPodNotebook)
+secretScreen.config(bg="#FF67F9")
+
 viewPodNotebook.addPage("First",tempScreen)
 viewPodNotebook.addPage("Second",secScreen)
 viewPodNotebook.addPage("Third",thirdScreen)
 
 viewPodNotebook.addPage("Steal",tempScreen,index=1)
 viewPodNotebook.selectionBar.removePlace(1)
-viewPodNotebook.addPage("Steal #2",tempScreen)
+viewPodNotebook.addPage("Steal #2",secretScreen)
 #endregion
 #====================Functions====================
 
@@ -373,6 +382,10 @@ def openPod():
 		viewPodScreen.show()
 		#Load the notebook with a template type
 		viewPodNotebook.loadTemplate(podType)
+		#Update the variable
+		masterPod.currentPeaPod=selectedPod
+		#Update the top bar on the view pod screen
+		viewPodLabelVar.set(selectedPod.peaName)
 
 #====================Button commands====================
 
@@ -387,6 +400,8 @@ loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(2,command=lambda: openScreen.show())
+#View Pod screen
+viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))

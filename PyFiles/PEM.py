@@ -395,6 +395,8 @@ class masterPod:
 		self.hint="No Hint Available"
 		#Where the pods are stored
 		self.peas={}
+		#Store currently loaded pea pod
+		self.currentPeaPod=None
 		#The master key used for encryption
 		self.masterKey=None
 		#Where the master peaPod is saved
