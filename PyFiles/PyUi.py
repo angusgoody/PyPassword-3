@@ -1011,6 +1011,8 @@ class podNotebook(advancedNotebook):
 	"""
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
+		#Store templates that have already been generated
+		self.savedTemplates={}
 
 	def loadTemplate(self,templateName):
 		"""
@@ -1018,7 +1020,16 @@ class podNotebook(advancedNotebook):
 		certain pod template to the notebook
 		so its ready to show a users data
 		"""
-		print("Ready to load template",templateName)
+		#Get the correct template
+		correctTemplate=podTemplate.templates[templateName]
+		log.report("Loading template",correctTemplate)
+		#Check the template hasn't been generated already
+		if templateName not in self.savedTemplates:
+			#Collect the data from the class dictionary
+			templateDict=correctTemplate.tabs
+			print(templateDict)
+
+
 
 class selectionBar(mainFrame):
 	"""
@@ -1161,7 +1172,8 @@ class podTemplate:
 	"""
 	#Store the templates and corresponding colours
 	templateColours={}
-
+	#Store a reference
+	templates={}
 	def __init__(self,templateName,templateColour):
 		#Name and Colour of template
 		self.templateName=templateName
@@ -1175,6 +1187,7 @@ class podTemplate:
 
 		#Add to dict
 		podTemplate.templateColours[self.templateName]=self.templateColour
+		podTemplate.templates[self.templateName]=self
 
 	def addTab(self,tabName):
 		"""
