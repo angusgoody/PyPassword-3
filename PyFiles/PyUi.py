@@ -1027,7 +1027,12 @@ class podNotebook(advancedNotebook):
 		if templateName not in self.savedTemplates:
 			#Collect the data from the class dictionary
 			templateDict=correctTemplate.tabs
-			print(templateDict)
+
+			#todo Remove all the tabs
+			#Generate tabs
+			for tab in templateDict:
+				newFrame=mainFrame(self)
+				self.addPage(tab,newFrame)
 
 
 
@@ -1068,7 +1073,7 @@ class selectionBar(mainFrame):
 		to be added to the frame
 		"""
 		#Create Button
-		newButton=mainButton(self)
+		newButton=mainButton(self,enabledColour=self.notselectedTabColour)
 		newButton.pack(fill=BOTH,expand=True,side=LEFT)
 		#Add to list
 		self.tabList.append(newButton)
@@ -1086,7 +1091,6 @@ class selectionBar(mainFrame):
 		#Check if a valid index is passed
 		if index == None:
 			index=self.tabCount
-		print(index)
 		#Add reference
 		self.tabCommandDict[tabName]=command
 		if index+1 > len(self.tabList):
@@ -1122,6 +1126,7 @@ class selectionBar(mainFrame):
 
 			##Change the colour
 			selectButton=self.tabDict[tabName]
+			print("Not selected colour is",self.notselectedTabColour)
 			selectButton.updateButton(enabledColour=self.selectedTabColour,
 			                          hoverColour=self.selectedTabColour,
 			                          clickedColour=self.selectedTabColour)
