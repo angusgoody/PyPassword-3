@@ -24,10 +24,22 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
+#====================Menus====================
 
+#Menu when locked
+publicMenu=Menu(window)
+
+#Menu inside the program
+privateMenu=Menu(window)
+
+#Update the screen class menus
+screen.publicMenu=publicMenu
+screen.privateMenu=privateMenu
+
+#====================Log====================
+log=logClass("Main")
 #====================Variables====================
 mainFrame.windowColour=window.cget("bg")
-
 
 #====================User Interface====================
 
@@ -186,17 +198,32 @@ viewPodNotebook.pack(expand=True,fill=BOTH)
 #endregion
 #====================Functions====================
 
-#======Splash Screen========
-def exit():
-	"""
-	This procedure is the
-	exit command and is run when
-	the program needs to end. Any
-	saves etc are done here
-	"""
 
-	#Destroy the window
+#======System functions========
+
+def saveLogs():
+	"""
+	This function will save the log files
+	to the correct location before
+	exiting the program
+	"""
+	print("Saving logs...")
+	for log in logClass.logs:
+		logClass.logs[log].saveLog()
+		print("Saved:",log)
+
+def closeProgram():
+	"""
+	This is the function that is called
+	when the user clicks to exit the 
+	program
+	"""
+	#Save logs
+	saveLogs()
+	#Exit the program
 	window.destroy()
+#======Splash Screen========
+
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
     """
@@ -374,7 +401,7 @@ def openPod():
 
 #Splash Screen
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
-splashScreen.updateCommand(2,command=lambda: exit())
+splashScreen.updateCommand(2,command=lambda: closeProgram())
 #Open Screen
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 #Login Screen
@@ -397,7 +424,9 @@ loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod
 podScreen.addScreenCommand(lambda: loadPodsToScreen())
 
 #====================Bindings====================
-#Status
+#System
+window.protocol('WM_DELETE_WINDOW', lambda: closeProgram())
+
 recursiveBind(statusBar,"<Double-Button-1>",lambda event: goHome())
 #Open Screen
 recursiveBind(openListbox,"<Double-Button-1>",lambda event: loadMasterPodToLogin())
@@ -413,7 +442,6 @@ recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 #====================END====================
-
 
 window.mainloop()
 

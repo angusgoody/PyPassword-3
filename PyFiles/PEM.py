@@ -481,6 +481,7 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	"""
 	if type(masterPodInstance) == masterPod:
 		#Decrypt the key
+		print("Attempting to decrypt",masterPodInstance.key)
 		decryptResult=decrypt(masterPodInstance.key,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:

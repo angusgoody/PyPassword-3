@@ -17,7 +17,6 @@ from random import randint
 #====================Log====================
 
 log=logClass("User Interface")
-log.saveLog()
 #====================Preset variables====================
 incorrectColour="#E4747D"
 correctColour="#64D999"
@@ -49,7 +48,7 @@ def runCommand(command,**kwargs):
 		content=command()
 	except Exception as e:
 		print("Error running command",identifier,e,command)
-		log.report("Error executing command through function",command,tag="Error")
+		log.report("Error executing command through function",e,command,tag="Error")
 	else:
 		log.report("Command executing success",identifier,tag="System")
 		return content
@@ -90,8 +89,8 @@ def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	else:
 		try:
 			parent.bind(bindButton,bindFunction)
-		except:
-			log.report("Could not bind function to",type(parent))
+		except Exception as e:
+			log.report("Could not bind function to",e,type(parent),tag="Error")
 
 def basicChangeColour(widget,colour):
 	#Items who's highlight background is changed
@@ -537,8 +536,8 @@ class advancedListbox(Listbox):
 			#Find matching text using index
 			try:
 				currentSelection=self.get(currentSelectionIndex[0])
-			except:
-				log.report("Error getting selection",tag="Error")
+			except Exception as e:
+				log.report("Error getting selection",e,tag="Error")
 			else:
 				#If only the text needs to be returned
 				if basic:
@@ -693,9 +692,15 @@ class screen(mainFrame):
 	statusVar=None
 	#Store protected screens
 	protectedScreens=[]
+
+	#Store the menus to load
+	publicMenu=None
+	privateMenu=None
+
 	def __init__(self,parent,screenName,**kwargs):
 		mainFrame.__init__(self,parent)
 		self.screenName=screenName
+		self.parent=parent
 		#Store the context bar information
 		self.context=None
 		self.contextInfo={}
@@ -737,6 +742,17 @@ class screen(mainFrame):
 			#Run any commands the screen has saved
 			for command in self.screenCommands:
 				runCommand(command,name="Screen Class")
+
+			#Update the menu
+			if self.protected == True:
+				#Load the private menu
+				if self.privateMenu:
+					self.parent.config(menu=self.privateMenu)
+			else:
+				if self.publicMenu:
+					self.parent.config(menu=self.publicMenu)
+
+
 
 	def addContextInfo(self,position,**kwargs):
 		"""
@@ -955,18 +971,28 @@ class privateSection(mainFrame):
 
 		#Widget frame
 		self.widgetFrame=mainFrame(self.centerFrame)
-		self.widgetFrame.grid(row=0,column=1,padx=5)
+		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
 
 		#Button Context
 		self.buttonContext=contextBar(self.centerFrame)
-		self.buttonContext.grid(row=0,column=2,padx=5)
+		self.buttonContext.grid(row=0,column=4,padx=5)
 
 		#Store the name of the section
 		self.sectionTitle="Data"
 
+		#--Widget--
+
+		#Store the currently loaded widget
+		self.currentWidget=None
+
+		#Store data for widget
+		self.widgetVar=StringVar()
+		self.widgetVar.set("Widget")
+
 		#Store the type of widget used
 		self.savedWidgets={}
 		self.widgetType=Entry
+
 		#Load the default widget
 		self.loadWidget(self.widgetType)
 
@@ -976,19 +1002,28 @@ class privateSection(mainFrame):
 		for the section. A widget is where
 		the data is stored.
 		"""
+		#Remove the current widget
+		if self.currentWidget:
+			self.currentWidget.pack_forget()
+
 		#If the widget has been loaded then load it again
 		if widgetName in self.savedWidgets:
 			self.savedWidgets[widgetName].pack(fill=X)
 		else:
 			#Create a new widget
-			newWidget=widgetName(self.widgetFrame)
-			newWidget.pack(fill=X)
+
+			#Entry
+
+			if widgetName == OptionMenu:
+				newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
+				newWidget.pack(fill=X)
+			else:
+				newWidget=Entry(self.widgetFrame)
+				newWidget.pack(fill=X)
 			#Add to the dict
 			self.savedWidgets[widgetName]=newWidget
-
-
-
-
+		#Set as current
+		self.currentWidget=newWidget
 
 
 
@@ -1043,7 +1078,9 @@ class advancedNotebook(mainFrame):
 
 	def loadFrame(self,tabName):
 		"""
-		Load frames function
+		This function will load a frame.
+		The parameter tabName indicates the 
+		correct frame that should be displayed
 		"""
 		#Get the correct frame to load
 		frameToLoad=self.pages[tabName]
