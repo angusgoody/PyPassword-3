@@ -848,7 +848,7 @@ class contextBar(mainFrame):
 			att=kwargs.get(self.mainAttributes[att],att)
 		#Update
 		for button in self.buttonArray:
-			button.updateButton(font=self.font)
+			button.updateButton(**kwargs)
 
 	def updateContextButton(self, index, **kwargs):
 		"""
@@ -978,7 +978,7 @@ class privateSection(mainFrame):
 		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
 
 		#Button Context
-		self.buttonContext=contextBar(self.centerFrame)
+		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#9EEED1")
 		self.buttonContext.grid(row=0,column=4,padx=5)
 
 		#Store the name of the section
@@ -1022,7 +1022,7 @@ class privateSection(mainFrame):
 				newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				newWidget.pack(fill=X)
 			else:
-				newWidget=Entry(self.widgetFrame)
+				newWidget=Entry(self.widgetFrame,font="Avenir 15",width=25)
 				newWidget.pack(fill=X)
 			#Add to the dict
 			self.savedWidgets[widgetName]=newWidget
@@ -1137,12 +1137,14 @@ class podNotebook(advancedNotebook):
 
 				#Collect the dict with widgets
 				tabWidgets=correctTemplate.tabs[tab]
-				print(tabWidgets)
+				#Store counter for number of sections
+				sectionCount=0
 				for widget in tabWidgets:
+					sectionCount+=1
 					#Create each section
 					newPrivateSection=privateSection(newFrame)
-					print("HERE\n\n\n")
-					newPrivateSection.colour(generateHexColour())
+					if sectionCount % 2 == 0:
+						newPrivateSection.colour("#EAE9EB")
 					newPrivateSection.pack(expand=True,fill=BOTH)
 
 			#Add to saved templates

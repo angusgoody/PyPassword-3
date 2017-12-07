@@ -271,6 +271,8 @@ def decrypt(data, key):
 		key=AES.new(pad(key))
 		#Use module to decrypt data
 		data=key.decrypt(data).rstrip()
+		#Report
+		log.report("Data decrypted")
 		try:
 			data=data.decode("utf-8")
 		except:
@@ -481,7 +483,6 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	"""
 	if type(masterPodInstance) == masterPod:
 		#Decrypt the key
-		print("Attempting to decrypt",masterPodInstance.key)
 		decryptResult=decrypt(masterPodInstance.key,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:
