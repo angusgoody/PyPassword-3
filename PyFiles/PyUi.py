@@ -94,10 +94,14 @@ def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 
 def basicChangeColour(widget,colour):
 	#Items who's highlight background is changed
-	highlightItems=["Entry", "Button", "Text", "Listbox", "OptionMenu", "Menu"]
+	highlightItems=[Entry,advancedEntry,Button,Text,Listbox,OptionMenu]
+	labelItems=[Label,mainLabel]
 	#Change colour
 	if type(widget) in highlightItems:
 		widget.config(highlightbackground=colour)
+	elif type(widget) in labelItems:
+		widget.config(bg=colour)
+		widget.config(fg=getColourForBackground(colour))
 	else:
 		widget.config(bg=colour)
 
@@ -108,7 +112,7 @@ def recursiveColour(parent, colour, **kwargs):
 	recursively
 	"""
 	#Items to exclude
-	excludeItems=[Entry,advancedEntry]
+	excludeItems=[]
 
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:
@@ -1137,6 +1141,8 @@ class podNotebook(advancedNotebook):
 				for widget in tabWidgets:
 					#Create each section
 					newPrivateSection=privateSection(newFrame)
+					print("HERE\n\n\n")
+					newPrivateSection.colour(generateHexColour())
 					newPrivateSection.pack(expand=True,fill=BOTH)
 
 			#Add to saved templates
