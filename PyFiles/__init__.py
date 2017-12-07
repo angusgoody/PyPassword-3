@@ -183,23 +183,6 @@ viewPodLabel.pack(side=TOP,fill=X)
 viewPodNotebook=podNotebook(viewPodScreen)
 viewPodNotebook.pack(expand=True,fill=BOTH)
 
-tempScreen=Frame(viewPodNotebook)
-tempScreen.config(bg="#76E071")
-secScreen=Frame(viewPodNotebook)
-secScreen.config(bg="#F951A3")
-thirdScreen=Frame(viewPodNotebook)
-thirdScreen.config(bg="#E66170")
-
-secretScreen=Frame(viewPodNotebook)
-secretScreen.config(bg="#FF67F9")
-
-viewPodNotebook.addPage("First",tempScreen)
-viewPodNotebook.addPage("Second",secScreen)
-viewPodNotebook.addPage("Third",thirdScreen)
-
-viewPodNotebook.addPage("Steal",tempScreen,index=1)
-viewPodNotebook.selectionBar.removePlace(1)
-viewPodNotebook.addPage("Steal #2",secretScreen)
 #endregion
 #====================Functions====================
 
@@ -400,6 +383,7 @@ loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(2,command=lambda: openScreen.show())
+podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 #====================Screen commands====================

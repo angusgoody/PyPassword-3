@@ -934,6 +934,64 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
+class privateSection(mainFrame):
+	"""
+	The private section is a frame
+	which will hold a section
+	of users data. It will have a label which
+	indicates the name of the data and then have ways
+	for the user to interact with the data.
+	"""
+	def __init__(self,parent):
+		mainFrame.__init__(self,parent)
+
+		#Center frame
+		self.centerFrame=mainFrame(self)
+		self.centerFrame.pack(expand=True)
+
+		#Label
+		self.titleLabel=mainLabel(self.centerFrame)
+		self.titleLabel.grid(row=0,column=0,padx=5)
+
+		#Widget frame
+		self.widgetFrame=mainFrame(self.centerFrame)
+		self.widgetFrame.grid(row=0,column=1,padx=5)
+
+		#Button Context
+		self.buttonContext=contextBar(self.centerFrame)
+		self.buttonContext.grid(row=0,column=2,padx=5)
+
+		#Store the name of the section
+		self.sectionTitle="Data"
+
+		#Store the type of widget used
+		self.savedWidgets={}
+		self.widgetType=Entry
+		#Load the default widget
+		self.loadWidget(self.widgetType)
+
+	def loadWidget(self,widgetName):
+		"""
+		This function will load a widget
+		for the section. A widget is where
+		the data is stored.
+		"""
+		#If the widget has been loaded then load it again
+		if widgetName in self.savedWidgets:
+			self.savedWidgets[widgetName].pack(fill=X)
+		else:
+			#Create a new widget
+			newWidget=widgetName(self.widgetFrame)
+			newWidget.pack(fill=X)
+			#Add to the dict
+			self.savedWidgets[widgetName]=newWidget
+
+
+
+
+
+
+
 class advancedNotebook(mainFrame):
 	"""
 	The advanced notebook class
@@ -999,9 +1057,6 @@ class advancedNotebook(mainFrame):
 		#Set as current
 		self.currentFrame=frameToLoad
 
-
-
-
 class podNotebook(advancedNotebook):
 	"""
 	The pod notebook is a special
@@ -1013,6 +1068,8 @@ class podNotebook(advancedNotebook):
 		advancedNotebook.__init__(self,parent,**kwargs)
 		#Store templates that have already been generated
 		self.savedTemplates={}
+		#Store current template
+		self.currentTemplate=None
 
 	def loadTemplate(self,templateName):
 		"""
@@ -1025,18 +1082,33 @@ class podNotebook(advancedNotebook):
 		log.report("Loading template",correctTemplate)
 		#Check the template hasn't been generated already
 		if templateName not in self.savedTemplates:
-			#Collect the data from the class dictionary
-			templateDict=correctTemplate.tabs
+			#Get the tabs to add
+			tabOrder=correctTemplate.tabOrder
 
-			#todo Remove all the tabs
-			for tab in self.selectionBar.tabDict:
-				print(tab)
+			#Remove the old tabs
+			self.selectionBar.clearBar()
+
 			#Generate tabs
-			for tab in templateDict:
+			for tab in tabOrder:
 				newFrame=mainFrame(self)
 				self.addPage(tab,newFrame)
+				#Add the widgets to the tabs
 
+				#Collect the dict with widgets
+				tabWidgets=correctTemplate.tabs[tab]
+				print(tabWidgets)
+				for widget in tabWidgets:
+					#Create each section
+					newPrivateSection=privateSection(newFrame)
+					newPrivateSection.pack(expand=True,fill=BOTH)
 
+			#Add to saved templates
+			self.savedTemplates[templateName]=""
+
+		else:
+			#If the template has been loaded before it does not need to be generated
+			if templateName != self.currentTemplate:
+				pass
 
 class selectionBar(mainFrame):
 	"""
@@ -1059,6 +1131,7 @@ class selectionBar(mainFrame):
 		#Store the tabs
 		self.tabCommandDict={}
 		self.tabDict={}
+		self.tabIndexDict={}
 		self.tabList=[]
 		self.tabCount=0
 
@@ -1102,11 +1175,13 @@ class selectionBar(mainFrame):
 			button=self.tabList[index]
 			#Add a reference
 			self.tabDict[tabName]=button
+			self.tabIndexDict[tabName]=index
 			#Update the button to correct info
 			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
 			#If this is the first tab run it so the notebook is showing something
 			if index == 0:
 				self.runTabCommand(tabName)
+
 	def runTabCommand(self,tabName):
 		"""
 		This function overrides the commands
@@ -1134,11 +1209,26 @@ class selectionBar(mainFrame):
 			#Update the current tab
 			self.currentTab=tabName
 
-	def removePlace(self,index):
+	def clearBar(self):
+		"""
+		This method will clear the selection
+		bar so fresh tabs can be added
+		"""
+		for name in self.tabIndexDict:
+			print("Removing",name)
+			self.removePlace(self.tabIndexDict[name])
+
+
+	def removePlace(self,index,**kwargs):
 		"""
 		This function will allow
 		a tab to be removed from the bar
 		"""
+		removeName=None
+		removeName=kwargs.get("name",removeName)
+		if removeName:
+			match=self.tabDict[removeName]
+			index=self.tabList.index(match)
 		#Find correct index in the list
 		if index <= len(self.tabList)-1:
 			place=self.tabList[index]
@@ -1147,6 +1237,9 @@ class selectionBar(mainFrame):
 			#Remove from the dictionary
 			for item in self.tabDict:
 				if self.tabDict[item] == place:
+					#Ensures the current tab is not still active
+					if item == self.currentTab:
+						self.currentTab=None
 					del self.tabDict[item]
 					break
 			#Remove the widget
@@ -1190,6 +1283,7 @@ class podTemplate:
 
 		#Store the tabs
 		self.tabs={}
+		self.tabOrder=[]
 
 		#Add to dict
 		podTemplate.templateColours[self.templateName]=self.templateColour
@@ -1203,6 +1297,7 @@ class podTemplate:
 		"""
 		#Initiate an empty dictionary in the tab dictionary
 		self.tabs[tabName]={}
+		self.tabOrder.append(tabName)
 
 	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
 		"""
@@ -1229,6 +1324,7 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
+loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
 loginTemplate.addTab("Advanced")
 
 #loginTemplate.addTemplateSection("Login","Username",Entry)
