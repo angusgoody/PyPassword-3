@@ -948,7 +948,7 @@ class contextBar(mainFrame):
 		if index+1 <= len(self.buttonArray) and index >= 0:
 			self.buttonArray[index].updateButton(enabledColour=self.enabledColour,
 			                                            hoverColour=self.hoverColour,
-			                                            clickedColour=self.clickedColour,
+			                                             clickedColour=self.clickedColour,
 			                                            text=self.defaultText,
 			                                            command=None)
 			#Ensures the button isn't still being pressed when context changes
@@ -970,7 +970,8 @@ class privateSection(mainFrame):
 		self.centerFrame.pack(expand=True)
 
 		#Label
-		self.titleLabel=mainLabel(self.centerFrame)
+		self.titleVar=StringVar()
+		self.titleLabel=mainLabel(self.centerFrame,textvariable=self.titleVar)
 		self.titleLabel.grid(row=0,column=0,padx=5)
 
 		#Widget frame
@@ -978,7 +979,7 @@ class privateSection(mainFrame):
 		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
 
 		#Button Context
-		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#9EEED1")
+		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#CDCED0")
 		self.buttonContext.grid(row=0,column=4,padx=5)
 
 		#Store the name of the section
@@ -1029,6 +1030,14 @@ class privateSection(mainFrame):
 		#Set as current
 		self.currentWidget=newWidget
 
+	def addData(self,data):
+		"""
+		This method allows data to be added to the 
+		widget.
+		"""
+		#Collect the entry widget and insert data
+		if self.widgetType == Entry:
+			insertEntry(self.savedWidgets[Entry],data)
 
 
 class advancedNotebook(mainFrame):
@@ -1112,6 +1121,14 @@ class podNotebook(advancedNotebook):
 		#Store current template
 		self.currentTemplate=None
 
+		#Store the sections key1 = tab key2 =
+		self.sectionDict={}
+
+	def addPage(self,tabName,pageFrame,**kwargs):
+		#Add to section dict
+		self.sectionDict[tabName]={}
+		return super(podNotebook, self).addPage(tabName,pageFrame,**kwargs)
+
 	def loadTemplate(self,templateName):
 		"""
 		This function will load a 
@@ -1123,6 +1140,9 @@ class podNotebook(advancedNotebook):
 		log.report("Loading template",correctTemplate)
 		#Check the template hasn't been generated already
 		if templateName not in self.savedTemplates:
+
+			#Update the current
+			self.currentTemplate=templateName
 			#Get the tabs to add
 			tabOrder=correctTemplate.tabOrder
 
@@ -1130,22 +1150,27 @@ class podNotebook(advancedNotebook):
 			self.selectionBar.clearBar()
 
 			#Generate tabs
-			for tab in tabOrder:
+			for tabName in tabOrder:
 				newFrame=mainFrame(self)
-				self.addPage(tab,newFrame)
+				self.addPage(tabName, newFrame)
 				#Add the widgets to the tabs
 
 				#Collect the dict with widgets
-				tabWidgets=correctTemplate.tabs[tab]
+				tabWidgets=correctTemplate.tabs[tabName]
 				#Store counter for number of sections
 				sectionCount=0
 				for widget in tabWidgets:
 					sectionCount+=1
 					#Create each section
 					newPrivateSection=privateSection(newFrame)
+					#Update the label of the new section
+					newPrivateSection.titleVar.set(widget[0])
+					#Makes the striped colours
 					if sectionCount % 2 == 0:
 						newPrivateSection.colour("#EAE9EB")
 					newPrivateSection.pack(expand=True,fill=BOTH)
+					#Add the section to the dict
+					self.sectionDict[tabName][widget[0]]=newPrivateSection
 
 			#Add to saved templates
 			self.savedTemplates[templateName]=""
@@ -1154,6 +1179,29 @@ class podNotebook(advancedNotebook):
 			#If the template has been loaded before it does not need to be generated
 			if templateName != self.currentTemplate:
 				pass
+
+	def addPodData(self,podInstance):
+		"""
+		This method will take a pod
+		and add the data to the notebook
+		view.
+		"""
+		if type(podInstance) is peaPod:
+			#Get the vault with data in
+			if podInstance.vaultState == True:
+				podInstance.unlockVault("Unlock")
+
+			#Go through the template sections
+			for tabName in podTemplate.templates[self.currentTemplate].tabs:
+				#Go through each section looking for matches in pod vault
+				for widget in podTemplate.templates[self.currentTemplate].tabs[tabName]:
+					sectionName=widget[0]
+					if sectionName in podInstance.vault:
+						#Add the data to the screen
+						dataSection=self.sectionDict[tabName][sectionName]
+						dataSection.addData(podInstance.vault[sectionName])
+
+
 
 class selectionBar(mainFrame):
 	"""
@@ -1328,6 +1376,7 @@ class podTemplate:
 
 		#Store the tabs
 		self.tabs={}
+		#Stores the tab names in their order
 		self.tabOrder=[]
 
 		#Add to dict
@@ -1341,7 +1390,7 @@ class podTemplate:
 		an area to store data.
 		"""
 		#Initiate an empty dictionary in the tab dictionary
-		self.tabs[tabName]={}
+		self.tabs[tabName]=[]
 		self.tabOrder.append(tabName)
 
 	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
@@ -1360,7 +1409,7 @@ class podTemplate:
 			#Add the data to list
 			dataArray=[sectionName,dataType,buttonList,sectionColour]
 			#Add list to dictionary
-			self.tabs[tabName]=dataArray
+			self.tabs[tabName].append(dataArray)
 
 
 #====================Create the pod templates====================
@@ -1370,7 +1419,10 @@ class podTemplate:
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
+
 loginTemplate.addTab("Advanced")
+loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
 
 #loginTemplate.addTemplateSection("Login","Username",Entry)
 

@@ -311,8 +311,8 @@ class peaPod:
 		self.vault={}
 		#Store template type
 		self.templateType="Login"
-		#Store Vault state
-		self.vaultState=True
+		#Store Vault state True = Locked False = Unlocked
+		self.vaultState=False
 
 		#Update
 		self.update(**kwargs)
@@ -332,16 +332,17 @@ class peaPod:
 		"""
 		#Check the vault is in the correct state
 		valid=False
+
 		if unlockOrLock == "Lock":
-			if self.vaultState == True:
-				valid=True
-		else:
 			if self.vaultState == False:
 				valid=True
-
+		else:
+			if self.vaultState == True:
+				valid=True
+		print("The current state of the vault is",self.vaultState)
 		if valid:
 			#Get the key to encrypt with
-			encryptionKey=self.master.key
+			encryptionKey=self.master.rawKey
 			#Iterate through peaPod
 			newVault={}
 			for item in self.vault:
@@ -360,7 +361,7 @@ class peaPod:
 				newVault[secureName]=secureData
 
 			#Update the vault to the new secure vault
-			self.vault=newVault
+			self.vault=dict(newVault)
 
 			log.report(unlockOrLock,"peaPod vault",self.peaName)
 		else:
@@ -393,6 +394,8 @@ class masterPod:
 		self.baseName=self.masterName+".mp"
 		#Store the key
 		self.key=None
+		#Store the unencrypted key for use during runtime
+		self.rawKey=None
 		#Store the hint
 		self.hint="No Hint Available"
 		#Where the pods are stored
@@ -415,14 +418,8 @@ class masterPod:
 		auto saved in the correct place if the directory
 		is invalid
 		"""
-		#Ensure all pods are secure
-		for podName in self.peas:
-			pod=self.peas[podName]
-			if pod.vaultState != False:
-				pod.unlockVault("Lock")
-
-		#Encrypt the key
-		self.key=encrypt(self.key,self.key)
+		#Close the pod
+		self.close()
 
 		#First check location is valid
 		if checkLocation(self.location) is False:
@@ -458,6 +455,23 @@ class masterPod:
 			peaInstance=self.peas[peaPodName]
 			#Add the data to vault
 			peaInstance.addSensitiveData(dataName,data)
+
+	def close(self):
+		"""
+		This function will close the master pod
+		and secure the data
+		"""
+		#Ensure all pods are secure
+		for podName in self.peas:
+			pod=self.peas[podName]
+			if pod.vaultState == False:
+				pod.unlockVault("Lock")
+
+		#Encrypt the key
+		self.key=encrypt(self.key,self.key)
+		#Remove the rawKey to secure the password
+		self.rawKey=None
+
 #====================Core Functions====================
 
 def loadMasterPodFromFile(fileName):
@@ -486,6 +500,8 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 		decryptResult=decrypt(masterPodInstance.key,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:
+			#Update the raw key for use later on
+			masterPodInstance.rawKey=attempt
 			return True
 		else:
 			return None
@@ -522,4 +538,16 @@ for item in pods:
 	newPod.addPeaPodData(item,"Password","Secret")
 
 newPod.save()
+
+
+newPod2=masterPod("Modern")
+newPod2.key="modern123"
+newPod2.hint="Modern 123 lower one word"
+for item in pods:
+	newPod2.addPeaPod(item)
+	newPod2.addPeaPodData(item,"Username","Angus")
+	newPod2.addPeaPodData(item,"Password","Angus123Rulz")
+	newPod2.addPeaPodData(item,"Website","angus.goody@gmail.com")
+
+newPod2.save()
 """
