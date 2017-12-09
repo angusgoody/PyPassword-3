@@ -339,10 +339,10 @@ class peaPod:
 		else:
 			if self.vaultState == True:
 				valid=True
-		print("The current state of the vault is",self.vaultState)
+
 		if valid:
 			#Get the key to encrypt with
-			encryptionKey=self.master.rawKey
+			encryptionKey=self.master.key
 			#Iterate through peaPod
 			newVault={}
 			for item in self.vault:
@@ -351,7 +351,6 @@ class peaPod:
 				if unlockOrLock == "Lock":
 					secureName=encrypt(item,encryptionKey)
 					secureData=encrypt(self.vault[item],encryptionKey)
-					#Update the var
 
 				#Decrypt data
 				else:
@@ -379,7 +378,7 @@ class peaPod:
 		to what the data is "Password" etc and
 		the data is the actual password
 		"""
-		if self.vaultState:
+		if self.vaultState == False:
 			self.vault[dataName]=data
 		else:
 			log.report("Could not save data to pod because currently locked")
@@ -397,10 +396,8 @@ class masterPod:
 		self.masterName=name
 		self.masterColour=choice(masterPodColours)
 		self.baseName=self.masterName+".mp"
-		#Store the key
+		#Store the key used during runtime
 		self.key=None
-		#Store the unencrypted key for use during runtime
-		self.rawKey=None
 		#Store the hint
 		self.hint="No Hint Available"
 		#Where the pods are stored
@@ -423,7 +420,7 @@ class masterPod:
 		auto saved in the correct place if the directory
 		is invalid
 		"""
-		#Close the pod
+		#Close the pod (Encrypt etc)
 		self.close()
 
 		#First check location is valid
@@ -466,16 +463,16 @@ class masterPod:
 		This function will close the master pod
 		and secure the data
 		"""
+		print("Closing")
 		#Ensure all pods are secure
 		for podName in self.peas:
 			pod=self.peas[podName]
 			if pod.vaultState == False:
 				pod.unlockVault("Lock")
 
-		#Encrypt the key
-		self.key=encrypt(self.key,self.key)
-		#Remove the rawKey to secure the password
-		self.rawKey=None
+		#Encrypt the key to a vaule which can only be decrypted with current key
+		self.key=encrypt("key",self.key)
+
 
 #====================Core Functions====================
 
@@ -505,8 +502,8 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 		decryptResult=decrypt(masterPodInstance.key,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:
-			#Update the raw key for use later on
-			masterPodInstance.rawKey=attempt
+			#Add key to master pod for use later on
+			masterPodInstance.key=attempt
 			return True
 		else:
 			return None
@@ -549,5 +546,5 @@ newMasterPod.addPeaPodData("Github","Password","angy123")
 newMasterPod.addPeaPodData("Github","Website","github.com")
 
 newMasterPod.save()
-"""
 
+"""

@@ -396,7 +396,6 @@ def openPod():
 		masterPod.currentPeaPod=selectedPod
 		#Update the top bar on the view pod screen
 		viewPodLabelVar.set(selectedPod.peaName)
-
 		#Add the pod data to screen
 		viewPodNotebook.addPodData(selectedPod)
 

@@ -1143,7 +1143,7 @@ class podNotebook(advancedNotebook):
 
 	def loadTemplate(self,templateName):
 		"""
-		This function will load a 
+		This function will load a
 		certain pod template to the notebook
 		so its ready to show a users data
 		"""
@@ -1193,7 +1193,6 @@ class podNotebook(advancedNotebook):
 		else:
 			#If the template has been loaded before it does not need to be generated
 			if templateName != self.currentTemplate:
-				print("Ready to load template that has been generated",templateName,self.savedTemplates)
 				#Get the list of generated frames
 				generatedFrames=self.savedTemplates[templateName]
 				#Remove the old tabs
@@ -1205,6 +1204,7 @@ class podNotebook(advancedNotebook):
 				#Make the current template
 				self.currentTemplate=templateName
 
+
 	def addPodData(self,podInstance):
 		"""
 		This method will take a pod
@@ -1212,19 +1212,23 @@ class podNotebook(advancedNotebook):
 		view.
 		"""
 		if type(podInstance) is peaPod:
-			#Get the vault with data in
-			if podInstance.vaultState == True:
+			#If the vault is locked unlock it
+			if podInstance.vaultState:
 				podInstance.unlockVault("Unlock")
 
-			#Go through the template sections
-			for tabName in podTemplate.templates[self.currentTemplate].tabs:
-				#Go through each section looking for matches in pod vault
-				for widget in podTemplate.templates[self.currentTemplate].tabs[tabName]:
-					sectionName=widget[0]
+			#Get the data for the current template
+			currentTemp=podTemplate.templates[self.currentTemplate]
+			#Iterate through
+			for tabName in currentTemp.tabs:
+				#Iterate through sections
+				for section in currentTemp.tabs[tabName]:
+					#Get name of section
+					sectionName=section[0]
 					if sectionName in podInstance.vault:
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
+
 
 
 
@@ -1451,9 +1455,7 @@ loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
 secureNoteTemplate.addTab("Note")
-secureNoteTemplate.addTemplateSection("Note","Title",Entry,["Copy"])
 secureNoteTemplate.addTemplateSection("Note","Note",Text,["Copy"])
-
 
 
 
