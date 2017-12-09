@@ -586,6 +586,7 @@ class advancedEntry(Entry):
 
 		#Add bindings
 		self.bind("<Button-1>",lambda event: self.updatePlaceHolder())
+		self.bind("<FocusOut>",lambda event: self.clickOff())
 
 	def updatePlaceHolder(self):
 		"""
@@ -636,6 +637,16 @@ class advancedEntry(Entry):
 		self.insert(END,self.placeHolder)
 		#Reset the variable
 		self.placeHolderActive=True
+
+	def clickOff(self):
+		"""
+		When the user clicks off the entry
+		will put placeholder back if the content
+		of the entry is empty
+		"""
+		if len(self.get().split()) < 1:
+			self.resetEntry()
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
@@ -1125,8 +1136,9 @@ class podNotebook(advancedNotebook):
 		self.sectionDict={}
 
 	def addPage(self,tabName,pageFrame,**kwargs):
-		#Add to section dict
-		self.sectionDict[tabName]={}
+		if tabName not in self.sectionDict:
+			#Add to section dict
+			self.sectionDict[tabName]={}
 		return super(podNotebook, self).addPage(tabName,pageFrame,**kwargs)
 
 	def loadTemplate(self,templateName):
@@ -1148,6 +1160,9 @@ class podNotebook(advancedNotebook):
 
 			#Remove the old tabs
 			self.selectionBar.clearBar()
+
+			#Add to saved templates
+			self.savedTemplates[templateName]={}
 
 			#Generate tabs
 			for tabName in tabOrder:
@@ -1172,13 +1187,23 @@ class podNotebook(advancedNotebook):
 					#Add the section to the dict
 					self.sectionDict[tabName][widget[0]]=newPrivateSection
 
-			#Add to saved templates
-			self.savedTemplates[templateName]=""
+				#Adds the page for later use
+				self.savedTemplates[templateName][tabName]=newFrame
 
 		else:
 			#If the template has been loaded before it does not need to be generated
 			if templateName != self.currentTemplate:
-				pass
+				print("Ready to load template that has been generated",templateName,self.savedTemplates)
+				#Get the list of generated frames
+				generatedFrames=self.savedTemplates[templateName]
+				#Remove the old tabs
+				self.selectionBar.clearBar()
+				for tab in correctTemplate.tabOrder:
+					#Remove from the list to avoid duplication warning
+					self.pageList.remove(tab)
+					self.addPage(tab,generatedFrames[tab])
+				#Make the current template
+				self.currentTemplate=templateName
 
 	def addPodData(self,podInstance):
 		"""
@@ -1308,7 +1333,6 @@ class selectionBar(mainFrame):
 		bar so fresh tabs can be added
 		"""
 		for name in self.tabIndexDict:
-			print("Removing",name)
 			self.removePlace(self.tabIndexDict[name])
 
 
@@ -1424,10 +1448,11 @@ loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
 loginTemplate.addTab("Advanced")
 loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
 
-#loginTemplate.addTemplateSection("Login","Username",Entry)
-
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
+secureNoteTemplate.addTab("Note")
+secureNoteTemplate.addTemplateSection("Note","Title",Entry,["Copy"])
+secureNoteTemplate.addTemplateSection("Note","Note",Text,["Copy"])
 
 
 

@@ -533,26 +533,21 @@ for item in names:
 	newPod.save()
 
 
+#""
 
-newPod=masterPod("Toby")
-newPod.key="toby123"
-newPod.hint="ABC is easy"
+newMasterPod=masterPod("NewBoi")
+newMasterPod.key="boi123"
+newMasterPod.hint="Boi with 123"
 
-for item in pods:
-	newPod.addPeaPod(item)
-	newPod.addPeaPodData(item,"Password","Secret")
+newMasterPod.addPeaPod("my notes",template="SecureNote")
+newMasterPod.addPeaPodData("my notes","Title","My note")
+newMasterPod.addPeaPodData("my notes","Note","The content of my note")
 
-newPod.save()
+newMasterPod.addPeaPod("Github")
+newMasterPod.addPeaPodData("Github","Username","Angusgoody")
+newMasterPod.addPeaPodData("Github","Password","angy123")
+newMasterPod.addPeaPodData("Github","Website","github.com")
 
+newMasterPod.save()
+"""
 
-newPod2=masterPod("Modern")
-newPod2.key="modern123"
-newPod2.hint="Modern 123 lower one word"
-for item in pods:
-	newPod2.addPeaPod(item)
-	newPod2.addPeaPodData(item,"Username","Angus")
-	newPod2.addPeaPodData(item,"Password","Angus123Rulz")
-	newPod2.addPeaPodData(item,"Website","angus.goody@gmail.com")
-
-newPod2.save()
-#"""
