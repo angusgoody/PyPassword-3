@@ -398,6 +398,8 @@ class masterPod:
 		self.baseName=self.masterName+".mp"
 		#Store the key used during runtime
 		self.key=None
+		#Key used for checking master key
+		self.checkKey="key"
 		#Store the hint
 		self.hint="No Hint Available"
 		#Where the pods are stored
@@ -471,7 +473,8 @@ class masterPod:
 				pod.unlockVault("Lock")
 
 		#Encrypt the key to a vaule which can only be decrypted with current key
-		self.key=encrypt("key",self.key)
+		self.checkKey=encrypt("key",self.key)
+		self.key=None
 
 
 #====================Core Functions====================
@@ -499,7 +502,7 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	"""
 	if type(masterPodInstance) == masterPod:
 		#Decrypt the key
-		decryptResult=decrypt(masterPodInstance.key,attempt)
+		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:
 			#Add key to master pod for use later on
