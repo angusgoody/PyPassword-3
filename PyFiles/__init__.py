@@ -399,7 +399,16 @@ def openPod():
 		#Add the pod data to screen
 		viewPodNotebook.addPodData(selectedPod)
 
-
+def exitPod():
+	"""
+	This is called when the
+	user wants to exit a pod.
+	The pod is secured and saved
+	"""
+	#Save
+	masterPod.currentMasterPod.save()
+	#Show the correct frame
+	openScreen.show()
 
 #====================Button commands====================
 
@@ -413,7 +422,7 @@ loginScreen.updateCommand(0,command=lambda: openScreen.show())
 loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
-podScreen.updateCommand(2,command=lambda: openScreen.show())
+podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
