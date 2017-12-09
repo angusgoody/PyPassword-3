@@ -351,6 +351,7 @@ class peaPod:
 				if unlockOrLock == "Lock":
 					secureName=encrypt(item,encryptionKey)
 					secureData=encrypt(self.vault[item],encryptionKey)
+					#Update the var
 
 				#Decrypt data
 				else:
@@ -362,7 +363,11 @@ class peaPod:
 
 			#Update the vault to the new secure vault
 			self.vault=dict(newVault)
-
+			#Update the variable
+			if unlockOrLock == "Lock":
+				self.vaultState=True
+			else:
+				self.vaultState=False
 			log.report(unlockOrLock,"peaPod vault",self.peaName)
 		else:
 			log.report("Attempted to encrypt locked vault")
@@ -550,4 +555,4 @@ for item in pods:
 	newPod2.addPeaPodData(item,"Website","angus.goody@gmail.com")
 
 newPod2.save()
-"""
+#"""
