@@ -1155,6 +1155,7 @@ class podNotebook(advancedNotebook):
 
 			#Update the current
 			self.currentTemplate=templateName
+
 			#Get the tabs to add
 			tabOrder=correctTemplate.tabOrder
 
