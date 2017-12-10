@@ -989,7 +989,7 @@ class privateSection(mainFrame):
 
 		#Button Context
 		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0")
-		self.buttonContext.pack(fill=X,expand=True)
+		self.buttonContext.pack(expand=True)
 
 		#Store the name of the section
 		self.sectionTitle="Data"
@@ -1025,16 +1025,13 @@ class privateSection(mainFrame):
 		#Organise container
 		if widgetType == Text:
 			self.container.pack(expand=True,fill=BOTH)
-			self.container.colour("#8883E3")
-			self.labelFrame.grid(row=0,column=0,sticky=EW,pady=5)
-			self.dataFrame.grid(row=1,column=0,rowspan=1,sticky=NSEW,padx=0)
-			self.buttonFrame.grid(row=3,column=0,sticky=EW)
-			self.buttonFrame.colour("#D864E3")
+			self.labelFrame.grid(row=0,column=0,sticky=EW,pady=2)
+			self.dataFrame.grid(row=2,column=0,sticky=NSEW,padx=0)
+			self.buttonFrame.grid(row=1,column=0,sticky=EW,pady=5)
 
 			#Grid configure
 			self.container.columnconfigure(0,weight=1)
-			self.container.rowconfigure(1,weight=1)
-
+			self.container.rowconfigure(2,weight=1)
 			#Display text widget
 			widget.pack(fill=BOTH,expand=True)
 		else:
@@ -1069,7 +1066,7 @@ class privateSection(mainFrame):
 				newWidget=OptionMenu(self.dataFrame,self.widgetVar,self.widgetVar.get())
 
 			elif widgetName == Text:
-				newWidget=Text(self.dataFrame,height=10)
+				newWidget=Text(self.dataFrame,height=12)
 
 			else:
 				newWidget=Entry(self.dataFrame,font="Avenir 15",width=25)
@@ -1524,6 +1521,7 @@ loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
 loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Advanced","Notes",Text,["Copy"])
 
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
