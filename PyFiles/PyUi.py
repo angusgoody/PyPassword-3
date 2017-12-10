@@ -1050,6 +1050,14 @@ class privateSection(mainFrame):
 		if self.widgetType == Entry:
 			insertEntry(self.savedWidgets[Entry],data)
 
+	def clearData(self):
+		"""
+		Used to clear data from the widget
+		and remove any variable data
+		"""
+		self.addData("")
+		#Remove any variables below here
+		log.report("Data securely removed from widget")
 
 class advancedNotebook(mainFrame):
 	"""
@@ -1213,6 +1221,9 @@ class podNotebook(advancedNotebook):
 		view.
 		"""
 		if type(podInstance) is peaPod:
+			#First Remove all the data on screen
+			self.clearData()
+
 			#If the vault is locked unlock it
 			if podInstance.vaultState:
 				podInstance.unlockVault("Unlock")
@@ -1229,6 +1240,23 @@ class podNotebook(advancedNotebook):
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
+
+	def clearData(self):
+		"""
+		This method allows data
+		to be removed from the notebook
+		"""
+		#Remove data from every single widget stored
+		for tabName in self.sectionDict:
+			#Get the screen with all the sections in
+			currentScreen=self.sectionDict[tabName]
+			#Go through each sectio
+			for sectionName in currentScreen:
+				currentSection=currentScreen[sectionName]
+				currentSection.clearData()
+
+
+
 
 
 
