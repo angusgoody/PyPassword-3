@@ -976,22 +976,20 @@ class privateSection(mainFrame):
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
-		#Center frame
-		self.centerFrame=mainFrame(self)
-		self.centerFrame.pack(expand=True)
+		#Containers
+		self.container=mainFrame(self)
+		self.labelFrame=mainFrame(self.container)
+		self.dataFrame=mainFrame(self.container)
+		self.buttonFrame=mainFrame(self.container)
 
 		#Label
 		self.titleVar=StringVar()
-		self.titleLabel=mainLabel(self.centerFrame,textvariable=self.titleVar)
-		self.titleLabel.grid(row=0,column=0,padx=5)
-
-		#Widget frame
-		self.widgetFrame=mainFrame(self.centerFrame)
-		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
+		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar)
+		self.titleLabel.pack(expand=True)
 
 		#Button Context
-		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#CDCED0")
-		self.buttonContext.grid(row=0,column=4,padx=5)
+		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0")
+		self.buttonContext.pack(fill=X,expand=True)
 
 		#Store the name of the section
 		self.sectionTitle="Data"
@@ -1009,8 +1007,46 @@ class privateSection(mainFrame):
 		self.savedWidgets={}
 		self.widgetType=Entry
 
+		#Store the format of the containers
+		self.format=None
+
 		#Load the default widget
 		self.loadWidget(self.widgetType)
+
+
+	def displayWidget(self,widget):
+		"""
+		This is the function for
+		actually displaying the wifget
+		on screen and chanaging layout etc
+		"""
+		widgetType=type(widget)
+
+		#Organise container
+		if widgetType == Text:
+			self.container.pack(expand=True,fill=BOTH)
+			self.container.colour("#8883E3")
+			self.labelFrame.grid(row=0,column=0,sticky=EW,pady=5)
+			self.dataFrame.grid(row=1,column=0,rowspan=1,sticky=NSEW,padx=0)
+			self.buttonFrame.grid(row=3,column=0,sticky=EW)
+			self.buttonFrame.colour("#D864E3")
+
+			#Grid configure
+			self.container.columnconfigure(0,weight=1)
+			self.container.rowconfigure(1,weight=1)
+
+			#Display text widget
+			widget.pack(fill=BOTH,expand=True)
+		else:
+			self.container.pack(expand=True)
+			self.labelFrame.grid(row=0,column=0,padx=5)
+			self.dataFrame.grid(row=0,column=1,padx=5)
+			self.buttonFrame.grid(row=0,column=2)
+			#Display the other widget
+			widget.pack(fill=X)
+
+
+
 
 	def loadWidget(self,widgetName):
 		"""
@@ -1024,20 +1060,26 @@ class privateSection(mainFrame):
 
 		#If the widget has been loaded then load it again
 		if widgetName in self.savedWidgets:
-			self.savedWidgets[widgetName].pack(fill=X)
+			newWidget=self.savedWidgets[widgetName]
+			self.displayWidget(newWidget)
+
 		else:
 			#Create a new widget
-
-			#Entry
-
 			if widgetName == OptionMenu:
-				newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
-				newWidget.pack(fill=X)
+				newWidget=OptionMenu(self.dataFrame,self.widgetVar,self.widgetVar.get())
+
+			elif widgetName == Text:
+				newWidget=Text(self.dataFrame,height=10)
+
 			else:
-				newWidget=Entry(self.widgetFrame,font="Avenir 15",width=25)
-				newWidget.pack(fill=X)
+				newWidget=Entry(self.dataFrame,font="Avenir 15",width=25)
+
+			#Display on screen
+			self.displayWidget(newWidget)
+
 			#Add to the dict
 			self.savedWidgets[widgetName]=newWidget
+
 		#Set as current
 		self.currentWidget=newWidget
 
@@ -1187,6 +1229,7 @@ class podNotebook(advancedNotebook):
 					sectionCount+=1
 					#Create each section
 					newPrivateSection=privateSection(newFrame)
+					newPrivateSection.loadWidget(widget[1])
 					#Update the label of the new section
 					newPrivateSection.titleVar.set(widget[0])
 					#Makes the striped colours
