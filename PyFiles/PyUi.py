@@ -1338,6 +1338,7 @@ class selectionBar(mainFrame):
 		bar so fresh tabs can be added
 		"""
 		for name in self.tabIndexDict:
+			#print("Removing",name)
 			self.removePlace(self.tabIndexDict[name])
 
 
