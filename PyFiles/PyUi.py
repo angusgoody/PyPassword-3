@@ -1019,7 +1019,6 @@ class privateSection(mainFrame):
 		#Load the default widget
 		self.loadWidget(self.widgetType)
 
-
 	def displayWidget(self,widget):
 		"""
 		This is the function for
@@ -1047,9 +1046,6 @@ class privateSection(mainFrame):
 			self.buttonFrame.grid(row=0,column=2)
 			#Display the other widget
 			widget.pack(fill=X)
-
-
-
 
 	def loadWidget(self,widgetName):
 		"""
@@ -1103,6 +1099,29 @@ class privateSection(mainFrame):
 		self.addData("")
 		#Remove any variables below here
 		log.report("Data securely removed from widget")
+
+	def getData(self):
+		"""
+		Return the data in the widget
+		"""
+		currentWidget=self.currentWidget
+		if type(currentWidget) == Entry:
+			return self.currentWidget.get()
+
+	def testFunction(self):
+		print("Test func",self.getData())
+
+	def addContextCommand(self,index,buttonName,**kwargs):
+		"""
+		This function will add a command 
+		to the context bar with some pre set
+		command such as Copy and Launch websites etc
+		"""
+		if buttonName == "Copy":
+			self.buttonContext.addButton(index,text=buttonName,command=lambda :self.testFunction())
+		else:
+			self.buttonContext.addButton(index,text=buttonName)
+
 
 class advancedNotebook(mainFrame):
 	"""
@@ -1240,8 +1259,8 @@ class podNotebook(advancedNotebook):
 					for buttonName in widget[2]:
 						print(buttonName)
 						counter+=1
-						newPrivateSection.buttonContext.addButton(counter,text=buttonName)
-					#Set conttext length
+						newPrivateSection.addContextCommand(counter,buttonName)
+					#Set context length
 					newPrivateSection.buttonContext.setPlaceholders(len(widget[2]))
 					#Makes the striped colours
 					if sectionCount % 2 == 0:
