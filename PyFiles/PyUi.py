@@ -914,7 +914,10 @@ class contextBar(mainFrame):
 		This method allows a button to be added
 		to the context bar
 		"""
-		if index+1 <= len(self.buttonArray) and index >= 0:
+		if index+1 > len(self.buttonArray):
+			self.addPlaceholder()
+			index=len(self.buttonArray)-1
+		if index >= 0:
 
 			#Ensures a disabled button doesn't stay disabled when used again
 			butState=True
@@ -1229,6 +1232,14 @@ class podNotebook(advancedNotebook):
 					newPrivateSection.loadWidget(widget[1])
 					#Update the label of the new section
 					newPrivateSection.titleVar.set(widget[0])
+					#Add the context buttons
+					counter=-1
+					for buttonName in widget[2]:
+						print(buttonName)
+						counter+=1
+						newPrivateSection.buttonContext.addButton(counter,text=buttonName)
+					#Set conttext length
+					newPrivateSection.buttonContext.setPlaceholders(len(widget[2]))
 					#Makes the striped colours
 					if sectionCount % 2 == 0:
 						newPrivateSection.colour("#EAE9EB")
@@ -1280,6 +1291,7 @@ class podNotebook(advancedNotebook):
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
+
 
 	def clearData(self):
 		"""
@@ -1520,7 +1532,7 @@ loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
-loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide","Launch"])
 loginTemplate.addTemplateSection("Advanced","Notes",Text,["Copy"])
 
 #=====Secure Note======
