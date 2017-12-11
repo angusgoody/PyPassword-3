@@ -72,6 +72,22 @@ def insertEntry(entry,message):
 	entry.delete(0,END)
 	entry.insert(END,message)
 
+def getData(widget):
+	"""
+	A function that can get 
+	data from a wide range
+	of widget 
+	"""
+	widgetType=type(widget)
+	if widgetType == Entry:
+		return widget.get()
+	elif widgetType == Text:
+		data=widget.get("1.0",END)
+		if len(data.split()) > 0:
+			return data
+		else:
+			return ""
+
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
@@ -235,12 +251,12 @@ def copyDataFromEntry(entry):
 	to the clipboard
 	"""
 	data=getData(entry)
-	if data != None:
+	if data:
 		addDataToClipboard(data)
 		log.report("Added data to clipboard","(Copy)")
 
 	else:
-		askMessage("Empty","No data to copy")
+		showMessage("Empty","No data to copy")
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -1171,7 +1187,7 @@ class privateSection(mainFrame):
 		command such as Copy and Launch websites etc
 		"""
 		if buttonName == "Copy":
-			self.buttonContext.addButton(index,text=buttonName,command=lambda :addDataToClipboard(self.getData()))
+			self.buttonContext.addButton(index,text=buttonName,command=lambda :copyDataFromEntry(self.currentWidget))
 		elif buttonName == "Hide":
 			if type(self.currentWidget) == Entry:
 				self.buttonContext.addButton(index, text=buttonName, command=lambda :self.toggleHide())
