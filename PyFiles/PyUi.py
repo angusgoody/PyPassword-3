@@ -24,8 +24,9 @@ correctColour="#64D999"
 mainRedColour="#ED8C8E"
 mainGreenColour="#96FF8D"
 
-def test():
-	print("test function")
+#Store a tk window in the __init__ file
+mainWindows=[]
+
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -216,6 +217,30 @@ def generateHexColour():
 		hexLeng=len(hexValue)
 	return hexValue
 
+#Copy and Paste
+
+def addDataToClipboard(data):
+	mainWindow=mainWindows[0]
+	if mainWindow != None and data != None:
+		if len(data.split()) > 0:
+			mainWindow.clipboard_clear()
+			mainWindow.clipboard_append(data)
+			log.report("Added data to clipboard","(Func)")
+		else:
+			log.report("No data to copy to clipboard")
+
+def copyDataFromEntry(entry):
+	"""
+	This function will copy the password generated
+	to the clipboard
+	"""
+	data=getData(entry)
+	if data != None:
+		addDataToClipboard(data)
+		log.report("Added data to clipboard","(Copy)")
+
+	else:
+		askMessage("Empty","No data to copy")
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -1107,9 +1132,15 @@ class privateSection(mainFrame):
 		currentWidget=self.currentWidget
 		if type(currentWidget) == Entry:
 			return self.currentWidget.get()
+		elif type(currentWidget) == Text:
+			return self.currentWidget.get("1.0",END)
 
-	def testFunction(self):
-		print("Test func",self.getData())
+	def hideData(self):
+		"""
+		Will hide the content in the entry
+		"""
+		if type(self.currentWidget) == Entry:
+			self.currentWidget.config(show="•")
 
 	def addContextCommand(self,index,buttonName,**kwargs):
 		"""
@@ -1118,7 +1149,11 @@ class privateSection(mainFrame):
 		command such as Copy and Launch websites etc
 		"""
 		if buttonName == "Copy":
-			self.buttonContext.addButton(index,text=buttonName,command=lambda :self.testFunction())
+			self.buttonContext.addButton(index,text=buttonName,command=lambda :addDataToClipboard(self.getData()))
+		elif buttonName == "Hide":
+			if type(self.currentWidget) == Entry:
+				self.buttonContext.addButton(index,text=buttonName,command=lambda :self.hideData())
+
 		else:
 			self.buttonContext.addButton(index,text=buttonName)
 
@@ -1257,7 +1292,6 @@ class podNotebook(advancedNotebook):
 					#Add the context buttons
 					counter=-1
 					for buttonName in widget[2]:
-						print(buttonName)
 						counter+=1
 						newPrivateSection.addContextCommand(counter,buttonName)
 					#Set context length

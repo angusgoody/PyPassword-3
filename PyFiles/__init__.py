@@ -24,6 +24,7 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
+mainWindows.append(window)
 #====================Menus====================
 
 #Menu when locked
