@@ -996,6 +996,14 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
+	def getButtonIndex(self,buttonName):
+		"""
+		Return the index of a button by
+		the name passed
+		"""
+		for button in self.buttonArray:
+			if button.textVar.get() == buttonName:
+				return self.buttonArray.index(button)
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1043,6 +1051,9 @@ class privateSection(mainFrame):
 
 		#Load the default widget
 		self.loadWidget(self.widgetType)
+
+		#Hidden state
+		self.hidden=False
 
 	def displayWidget(self,widget):
 		"""
@@ -1135,12 +1146,23 @@ class privateSection(mainFrame):
 		elif type(currentWidget) == Text:
 			return self.currentWidget.get("1.0",END)
 
-	def hideData(self):
+	def toggleHide(self):
 		"""
 		Will hide the content in the entry
 		"""
 		if type(self.currentWidget) == Entry:
-			self.currentWidget.config(show="•")
+			if self.hidden == True:
+				self.currentWidget.config(show="")
+				self.hidden=False
+				#Update button
+				buttonIndex=self.buttonContext.getButtonIndex("Hide")
+				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Show")
+			else:
+				self.currentWidget.config(show="•")
+				self.hidden=True
+				#Update button
+				buttonIndex=self.buttonContext.getButtonIndex("Show")
+				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Hide")
 
 	def addContextCommand(self,index,buttonName,**kwargs):
 		"""
@@ -1152,7 +1174,7 @@ class privateSection(mainFrame):
 			self.buttonContext.addButton(index,text=buttonName,command=lambda :addDataToClipboard(self.getData()))
 		elif buttonName == "Hide":
 			if type(self.currentWidget) == Entry:
-				self.buttonContext.addButton(index,text=buttonName,command=lambda :self.hideData())
+				self.buttonContext.addButton(index, text=buttonName, command=lambda :self.toggleHide())
 
 		else:
 			self.buttonContext.addButton(index,text=buttonName)
