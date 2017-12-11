@@ -839,16 +839,18 @@ class contextBar(mainFrame):
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
 
+
+		#Update
+		self.storedKwargs=None
+		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
+		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
+		self.updateBar(**kwargs)
+
 		#Generate preset placeholders
 		self.presetPlaces=1
 		self.presetPlaces=kwargs.get("places",self.presetPlaces)
 		for x in range(self.presetPlaces):
 			self.addPlaceholder()
-
-		#Update
-		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
-		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
-		self.updateBar(**kwargs)
 
 	def updateBar(self,**kwargs):
 		"""
@@ -860,6 +862,8 @@ class contextBar(mainFrame):
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(**kwargs)
+		#Update store
+		self.storedKwargs=kwargs
 
 	def updateContextButton(self, index, **kwargs):
 		"""
@@ -878,8 +882,7 @@ class contextBar(mainFrame):
 		"""
 		self.sections+=1
 		#Create Button
-		newButton=mainButton(self,enabledColour=self.enabledColour,
-		                     hoverColour=self.hoverColour,text=self.defaultText)
+		newButton=mainButton(self,**self.storedKwargs)
 		#Add button to array
 		self.buttonArray.append(newButton)
 		#Show the button on the bar itself
@@ -987,11 +990,11 @@ class privateSection(mainFrame):
 
 		#Label
 		self.titleVar=StringVar()
-		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar)
+		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar,font="Avenir 15")
 		self.titleLabel.pack(expand=True)
 
 		#Button Context
-		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0")
+		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0",font="Avenir 10")
 		self.buttonContext.pack(expand=True)
 
 		#Store the name of the section
