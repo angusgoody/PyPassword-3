@@ -14,6 +14,7 @@ are created and used.
 from tkinter import *
 from PEM import *
 from random import randint
+import webbrowser
 #====================Log====================
 
 log=logClass("User Interface")
@@ -87,6 +88,36 @@ def getData(widget):
 			return data
 		else:
 			return ""
+
+def loadWebsite(address):
+	"""
+	Load a website with a certain address
+	"""
+
+	httpCheck=False
+	wwwCheck=False
+
+	#Check for a prefix
+	if "https://" in address or "http://" in address:
+		httpCheck=True
+	else:
+		if "www." in address:
+			wwwCheck=True
+
+	#Add if needed
+	if wwwCheck == False:
+		address="www."+str(address)
+	if httpCheck == False:
+		address="https://"+str(address)
+
+	#Add the www
+	try:
+		webbrowser.open_new(address)
+	except:
+		showMessage("Error","Could not open address")
+		log.report("Error opening address",tag="Error")
+	else:
+		log.report("Opened web page")
 
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
@@ -1017,9 +1048,12 @@ class contextBar(mainFrame):
 		Return the index of a button by
 		the name passed
 		"""
+		print(buttonName)
 		for button in self.buttonArray:
-			if button.textVar.get() == buttonName:
-				return self.buttonArray.index(button)
+			currentButtonName=button.textVar.get()
+			if buttonName == currentButtonName:
+				buttonIndex=self.buttonArray.index(button)
+				return buttonIndex
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1167,18 +1201,19 @@ class privateSection(mainFrame):
 		Will hide the content in the entry
 		"""
 		if type(self.currentWidget) == Entry:
+
 			if self.hidden == True:
 				self.currentWidget.config(show="")
 				self.hidden=False
 				#Update button
-				buttonIndex=self.buttonContext.getButtonIndex("Hide")
-				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Show")
+				buttonIndex=self.buttonContext.getButtonIndex("Show")
+				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Hide")
 			else:
 				self.currentWidget.config(show="•")
 				self.hidden=True
 				#Update button
-				buttonIndex=self.buttonContext.getButtonIndex("Show")
-				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Hide")
+				buttonIndex=self.buttonContext.getButtonIndex("Hide")
+				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Show")
 
 	def addContextCommand(self,index,buttonName,**kwargs):
 		"""
@@ -1187,11 +1222,15 @@ class privateSection(mainFrame):
 		command such as Copy and Launch websites etc
 		"""
 		if buttonName == "Copy":
+			#Copy to clipboard
 			self.buttonContext.addButton(index,text=buttonName,command=lambda :copyDataFromEntry(self.currentWidget))
 		elif buttonName == "Hide":
+			#Hide data in entry
 			if type(self.currentWidget) == Entry:
 				self.buttonContext.addButton(index, text=buttonName, command=lambda :self.toggleHide())
-
+		elif buttonName == "Launch":
+			#Load a website
+			self.buttonContext.addButton(index,text=buttonName,command=lambda :loadWebsite(getData(self.currentWidget)))
 		else:
 			self.buttonContext.addButton(index,text=buttonName)
 
