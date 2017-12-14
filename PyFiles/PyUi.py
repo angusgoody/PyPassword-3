@@ -1084,6 +1084,9 @@ class privateSection(mainFrame):
 		#Store the name of the section
 		self.sectionTitle="Data"
 
+		#Store the state False = Disabled
+		self.state=False
+
 		#--Widget--
 
 		#Store the currently loaded widget
@@ -1235,6 +1238,27 @@ class privateSection(mainFrame):
 		else:
 			self.buttonContext.addButton(index,text=buttonName)
 
+	def updateState(self,chosenState):
+		"""
+		Change the state of the private 
+		section. True = Enabled
+		False = Disabled
+		"""
+		valid=False
+		if chosenState:
+			if self.state == False:
+				#Enable the section
+				for widget in self.savedWidgets:
+					self.savedWidgets[widget].config(state=NORMAL)
+
+		else:
+			if self.state:
+				#Disable the section
+				for widget in self.savedWidgets:
+					self.savedWidgets[widget].config(state=DISABLED)
+				#Disable the copy hide button
+				for button in self.butt
+
 
 class advancedNotebook(mainFrame):
 	"""
@@ -1312,13 +1336,15 @@ class podNotebook(advancedNotebook):
 	"""
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
+
 		#Store templates that have already been generated
 		self.savedTemplates={}
 		#Store current template
 		self.currentTemplate=None
-
 		#Store the sections key1 = tab key2 =
 		self.sectionDict={}
+		#Store the state of the notebook False = Disabled
+		self.notebookState=False
 
 	def addPage(self,tabName,pageFrame,**kwargs):
 		if tabName not in self.sectionDict:
@@ -1398,7 +1424,6 @@ class podNotebook(advancedNotebook):
 				#Make the current template
 				self.currentTemplate=templateName
 
-
 	def addPodData(self,podInstance):
 		"""
 		This method will take a pod
@@ -1426,7 +1451,6 @@ class podNotebook(advancedNotebook):
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
 
-
 	def clearData(self):
 		"""
 		This method allows data
@@ -1441,6 +1465,22 @@ class podNotebook(advancedNotebook):
 				currentSection=currentScreen[sectionName]
 				currentSection.clearData()
 
+	def changeState(self,chosenState):
+		"""
+		This method will change the 
+		state of the pod notebook. False
+		will disabled the notebook and 
+		True will enable it 
+		"""
+		valid=False
+		if chosenState:
+			if self.notebookState == False:
+				valid=True
+		else:
+			if self.notebookState:
+				valid=True
+
+		#
 
 
 
