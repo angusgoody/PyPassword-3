@@ -70,8 +70,14 @@ def insertEntry(entry,message):
 	This function is used
 	for adding data to widgets 
 	"""
-	entry.delete(0,END)
-	entry.insert(END,message)
+	widgetType=type(entry)
+
+	if widgetType == Entry:
+		entry.delete(0,END)
+		entry.insert(END,message)
+	elif widgetType == Text:
+		entry.delete("1.0",END)
+		entry.insert("1.0",END)
 
 def getData(widget):
 	"""
@@ -1089,6 +1095,9 @@ class privateSection(mainFrame):
 
 		#--Widget--
 
+		#Store valid widgets
+		self.validWidgets=[Entry,Text,OptionMenu]
+
 		#Store the currently loaded widget
 		self.currentWidget=None
 
@@ -1178,8 +1187,8 @@ class privateSection(mainFrame):
 		widget.
 		"""
 		#Collect the entry widget and insert data
-		if self.widgetType == Entry:
-			insertEntry(self.savedWidgets[Entry],data)
+		if self.widgetType in self.validWidgets:
+			insertEntry(self.savedWidgets[self.widgetType],data)
 
 	def clearData(self):
 		"""
@@ -1257,7 +1266,7 @@ class privateSection(mainFrame):
 				for widget in self.savedWidgets:
 					self.savedWidgets[widget].config(state=DISABLED)
 				#Disable the copy hide button
-				for button in self.butt
+				#for button in self.butt
 
 
 class advancedNotebook(mainFrame):
@@ -1460,7 +1469,7 @@ class podNotebook(advancedNotebook):
 		for tabName in self.sectionDict:
 			#Get the screen with all the sections in
 			currentScreen=self.sectionDict[tabName]
-			#Go through each sectio
+			#Go through each section
 			for sectionName in currentScreen:
 				currentSection=currentScreen[sectionName]
 				currentSection.clearData()
