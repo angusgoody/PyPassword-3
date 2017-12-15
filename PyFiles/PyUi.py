@@ -25,9 +25,8 @@ correctColour="#64D999"
 mainRedColour="#ED8C8E"
 mainGreenColour="#96FF8D"
 
-#Store a tk window in the __init__ file
-mainWindows=[]
-
+#Store variables for all programs
+mainVars={}
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -274,7 +273,7 @@ def generateHexColour():
 #Copy and Paste
 
 def addDataToClipboard(data):
-	mainWindow=mainWindows[0]
+	mainWindow=mainVars["window"]
 	if mainWindow != None and data != None:
 		if len(data.split()) > 0:
 			mainWindow.clipboard_clear()
@@ -1260,10 +1259,10 @@ class privateSection(mainFrame):
 				#Enable the section
 				for widget in self.savedWidgets:
 					self.savedWidgets[widget].config(state=NORMAL)
-				#Enable the hide button
+				#Disable the hide button
 				for button in self.buttonContext.buttonArray:
 					if button.textVar.get() == "Hide":
-						button.changeState(True)
+						button.changeState(False)
 						break
 				#Update var
 				self.state=True
@@ -1273,10 +1272,10 @@ class privateSection(mainFrame):
 				#Disable the section
 				for widget in self.savedWidgets:
 					self.savedWidgets[widget].config(state=DISABLED)
-				#Disable the copy hide button
+				#Enable the copy hide button
 				for button in self.buttonContext.buttonArray:
 					if button.textVar.get() == "Hide":
-						button.changeState(False)
+						button.changeState(True)
 						break
 				#Update Var
 				self.state=False
@@ -1424,7 +1423,7 @@ class podNotebook(advancedNotebook):
 					newPrivateSection.buttonContext.setPlaceholders(len(widget[2]))
 					#Makes the striped colours
 					if sectionCount % 2 == 0:
-						newPrivateSection.colour("#EAE9EB")
+						newPrivateSection.colour("#C3C3C7")
 					newPrivateSection.pack(expand=True,fill=BOTH)
 					#Add the section to the dict
 					self.sectionDict[tabName][widget[0]]=newPrivateSection
@@ -1517,13 +1516,41 @@ class podNotebook(advancedNotebook):
 				tabDict=self.sectionDict[tab]
 				for section in tabDict:
 					tabDict[section].updateState(chosenState)
+
 			#Update state variable
 			if chosenState:
 				self.notebookState=True
 			else:
 				self.notebookState=False
 
+	def startEdit(self):
+		"""
+		This function allows 
+		a edit to be started on the pod
+		notebook. This is where the user 
+		edits the data
+		"""
+		self.changeState(True)
 
+		#Update the context
+		context=None
+		context=mainVars.get("context",context)
+		if context:
+			context.updateContextButton(0,text="Cancel",command=lambda: self.stopEdit())
+			context.updateContextButton(1,text="Save",command=None)
+			context.setPlaceholders(2)
+
+	def stopEdit(self):
+		"""
+		Stop the edit functions
+		"""
+		self.changeState(False)
+
+		#Update the context
+		context=None
+		context=mainVars.get("context",context)
+		if context:
+			screen.lastScreen.runContext()
 
 
 

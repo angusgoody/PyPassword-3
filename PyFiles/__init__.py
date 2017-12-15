@@ -24,7 +24,7 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
-mainWindows.append(window)
+mainVars["window"]=window
 #====================Menus====================
 
 #Menu when locked
@@ -64,6 +64,7 @@ statusBar.pack(side=BOTTOM,fill=X)
 
 #Initiate the context bar for the whole program
 context=contextBar(window)
+mainVars["context"]=context
 context.pack(side=BOTTOM,fill=X)
 
 #endregion
@@ -414,6 +415,8 @@ def exitPod():
 	#Show the correct frame
 	openScreen.show()
 
+#======View Pod Screen========
+
 #====================Button commands====================
 #Splash Screen
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
@@ -429,7 +432,7 @@ podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
-viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.changeState(True))
+viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
