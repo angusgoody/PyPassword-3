@@ -37,6 +37,9 @@ privateMenu=Menu(window)
 screen.publicMenu=publicMenu
 screen.privateMenu=privateMenu
 
+#Public Sub menus
+privateFileMenu=Menu(privateMenu)
+
 #====================Log====================
 log=logClass("Main")
 #====================Variables====================
@@ -412,7 +415,6 @@ def exitPod():
 	openScreen.show()
 
 #====================Button commands====================
-
 #Splash Screen
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: closeProgram())
@@ -449,6 +451,9 @@ recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,
 recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
+#====================Menus====================
+privateMenu.add_cascade(label="File",menu=privateFileMenu)
+
 #====================Testing Area====================
 
 #====================Initial Loaders====================

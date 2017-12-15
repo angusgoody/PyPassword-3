@@ -527,10 +527,10 @@ class mainLabel(Label):
 		self.colourVar=kwargs.get("colour",self.colourVar)
 		#Update
 		self.config(textvariable=self.textVar,font=self.font)
-		if self.fg == None:
-			self.colour(self.colourVar)
-		else:
+		if self.fg:
 			self.config(fg=self.fg)
+		else:
+			self.colour(self.colourVar)
 
 	def colour(self,background):
 		"""
@@ -838,7 +838,7 @@ class screen(mainFrame):
 				runCommand(command,name="Screen Class")
 
 			#Update the menu
-			if self.protected == True:
+			if self.protected:
 				#Load the private menu
 				if self.privateMenu:
 					self.parent.config(menu=self.privateMenu)
@@ -1091,7 +1091,7 @@ class privateSection(mainFrame):
 		self.sectionTitle="Data"
 
 		#Store the state False = Disabled
-		self.state=False
+		self.state=True
 
 		#--Widget--
 
@@ -1266,7 +1266,9 @@ class privateSection(mainFrame):
 				for widget in self.savedWidgets:
 					self.savedWidgets[widget].config(state=DISABLED)
 				#Disable the copy hide button
-				#for button in self.butt
+				for button in self.buttonContext.buttonArray:
+					if button.textVar.get() == "Hide":
+						button.changeState(False)
 
 
 class advancedNotebook(mainFrame):
@@ -1353,7 +1355,7 @@ class podNotebook(advancedNotebook):
 		#Store the sections key1 = tab key2 =
 		self.sectionDict={}
 		#Store the state of the notebook False = Disabled
-		self.notebookState=False
+		self.notebookState=True
 
 	def addPage(self,tabName,pageFrame,**kwargs):
 		if tabName not in self.sectionDict:
@@ -1460,6 +1462,8 @@ class podNotebook(advancedNotebook):
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
 
+			#Disable the notebook
+			self.changeState(False)
 	def clearData(self):
 		"""
 		This method allows data
@@ -1489,7 +1493,12 @@ class podNotebook(advancedNotebook):
 			if self.notebookState:
 				valid=True
 
-		#
+		if valid:
+			#Change the state of all the sections
+			for tab in self.sectionDict:
+				tabDict=self.sectionDict[tab]
+				for section in tabDict:
+					tabDict[section].updateState(chosenState)
 
 
 
