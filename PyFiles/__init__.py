@@ -429,6 +429,7 @@ podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
+viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.changeState(True))
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))

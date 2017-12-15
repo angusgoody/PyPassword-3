@@ -492,7 +492,8 @@ class mainButton(mainFrame):
 			self.state=False
 			#Change colours
 			self.changeButtonColour(self.disabledColour)
-			self.textLabel.update(fg="#1BF293")
+			#Change the foreground colour
+			self.textLabel.config(fg=self.disabledFG)
 
 class mainLabel(Label):
 	"""
@@ -1259,6 +1260,13 @@ class privateSection(mainFrame):
 				#Enable the section
 				for widget in self.savedWidgets:
 					self.savedWidgets[widget].config(state=NORMAL)
+				#Enable the hide button
+				for button in self.buttonContext.buttonArray:
+					if button.textVar.get() == "Hide":
+						button.changeState(True)
+						break
+				#Update var
+				self.state=True
 
 		else:
 			if self.state:
@@ -1269,6 +1277,9 @@ class privateSection(mainFrame):
 				for button in self.buttonContext.buttonArray:
 					if button.textVar.get() == "Hide":
 						button.changeState(False)
+						break
+				#Update Var
+				self.state=False
 
 
 class advancedNotebook(mainFrame):
@@ -1442,6 +1453,10 @@ class podNotebook(advancedNotebook):
 		view.
 		"""
 		if type(podInstance) is peaPod:
+
+			#Ensure the state is enabled
+			self.changeState(True)
+
 			#First Remove all the data on screen
 			self.clearData()
 
@@ -1464,6 +1479,7 @@ class podNotebook(advancedNotebook):
 
 			#Disable the notebook
 			self.changeState(False)
+
 	def clearData(self):
 		"""
 		This method allows data
@@ -1484,6 +1500,8 @@ class podNotebook(advancedNotebook):
 		state of the pod notebook. False
 		will disabled the notebook and 
 		True will enable it 
+		False = Disabled
+		True = Enabled
 		"""
 		valid=False
 		if chosenState:
@@ -1499,6 +1517,11 @@ class podNotebook(advancedNotebook):
 				tabDict=self.sectionDict[tab]
 				for section in tabDict:
 					tabDict[section].updateState(chosenState)
+			#Update state variable
+			if chosenState:
+				self.notebookState=True
+			else:
+				self.notebookState=False
 
 
 
