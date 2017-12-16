@@ -1209,21 +1209,37 @@ class privateSection(mainFrame):
 		elif type(currentWidget) == Text:
 			return self.currentWidget.get("1.0",END)
 
-	def toggleHide(self):
+	def toggleHide(self,**kwargs):
 		"""
 		Will hide the content in the entry
 		"""
 		if type(self.currentWidget) == Entry:
 
-			if self.hidden == True:
-				self.currentWidget.config(show="")
+			#Current function is what the function is going to do
+			currentFunction="hide"
+			if self.hidden:
+				currentFunction="show"
 				self.hidden=False
+			else:
+				currentFunction="hide"
+				self.hidden=True
+
+			#Force a hide or show
+			forced=None
+			forced=kwargs.get("forced",forced)
+			if forced:
+				if forced == "hide":
+					currentFunction="hide"
+				else:
+					currentFunction="show"
+
+			if currentFunction == "show":
+				self.currentWidget.config(show="")
 				#Update button
 				buttonIndex=self.buttonContext.getButtonIndex("Show")
 				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Hide")
 			else:
 				self.currentWidget.config(show="•")
-				self.hidden=True
 				#Update button
 				buttonIndex=self.buttonContext.getButtonIndex("Hide")
 				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Show")
@@ -1475,9 +1491,13 @@ class podNotebook(advancedNotebook):
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
+						if sectionName == "Password":
+							dataSection.toggleHide(forced="hide")
 
 			#Disable the notebook
 			self.changeState(False)
+
+			#Ensure the password field is hidden
 
 	def clearData(self):
 		"""
@@ -1551,8 +1571,6 @@ class podNotebook(advancedNotebook):
 		context=mainVars.get("context",context)
 		if context:
 			screen.lastScreen.runContext()
-
-
 
 
 class selectionBar(mainFrame):
