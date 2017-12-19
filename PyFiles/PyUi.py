@@ -19,11 +19,15 @@ import webbrowser
 
 log=logClass("User Interface")
 #====================Preset variables====================
-incorrectColour="#E4747D"
-correctColour="#64D999"
+mainRedColour="#EE687F"
+mainGreenColour="#A9F955"
+mainOrangeColour="#E7A136"
+mainBlueColour="#17F388"
 
-mainRedColour="#ED8C8E"
-mainGreenColour="#96FF8D"
+mainHoverOrangeColour="#D89633"
+mainHoverBlueColour="#13C770"
+mainHoverGreenColour="#7CCE32"
+mainHoverRedColour="#A25360"
 
 #Store variables for all programs
 mainVars={}
@@ -666,6 +670,7 @@ class advancedEntry(Entry):
 		#Add bindings
 		self.bind("<Button-1>",lambda event: self.updatePlaceHolder())
 		self.bind("<FocusOut>",lambda event: self.clickOff())
+		self.bind("<FocusIn>",lambda event: self.updatePlaceHolder())
 
 	def updatePlaceHolder(self):
 		"""
