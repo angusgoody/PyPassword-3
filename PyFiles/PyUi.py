@@ -1060,12 +1060,21 @@ class contextBar(mainFrame):
 		Return the index of a button by
 		the name passed
 		"""
-		print(buttonName)
 		for button in self.buttonArray:
 			currentButtonName=button.textVar.get()
 			if buttonName == currentButtonName:
 				buttonIndex=self.buttonArray.index(button)
 				return buttonIndex
+
+	def getButton(self,buttonName):
+		"""
+		This function will return the 
+		button widget itself
+		"""
+		for button in self.buttonArray:
+			if button.textVar.get() == buttonName:
+				return button
+
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1121,7 +1130,7 @@ class privateSection(mainFrame):
 		self.loadWidget(self.widgetType)
 
 		#Hidden state
-		self.hidden=False
+		self.hiddenState=False
 
 	def displayWidget(self,widget):
 		"""
@@ -1172,7 +1181,7 @@ class privateSection(mainFrame):
 				newWidget=OptionMenu(self.dataFrame,self.widgetVar,self.widgetVar.get())
 
 			elif widgetName == Text:
-				newWidget=Text(self.dataFrame,height=12)
+				newWidget=Text(self.dataFrame,height=12,font="Avenir 15")
 
 			else:
 				newWidget=Entry(self.dataFrame,font="Avenir 15",width=25)
@@ -1216,38 +1225,41 @@ class privateSection(mainFrame):
 
 	def toggleHide(self,**kwargs):
 		"""
-		Will hide the content in the entry
+		This function will
+		hide or show the contents
+		of the Entry
 		"""
-		if type(self.currentWidget) == Entry:
+		#Stores forced variable
+		forced=None
+		forced=kwargs.get("forced",forced)
 
-			#Current function is what the function is going to do
-			currentFunction="hide"
-			if self.hidden:
-				currentFunction="show"
-				self.hidden=False
+		#The function variable
+		currentFunction="Hide"
+
+		#Determine the current function
+		if forced:
+			currentFunction=forced
+		else:
+			if self.hiddenState:
+				currentFunction="Show"
 			else:
-				currentFunction="hide"
-				self.hidden=True
+				currentFunction="Hide"
 
-			#Force a hide or show
-			forced=None
-			forced=kwargs.get("forced",forced)
-			if forced:
-				if forced == "hide":
-					currentFunction="hide"
-				else:
-					currentFunction="show"
+		#Execute the function
+		if currentFunction == "Show":
+			self.currentWidget.config(show="")
+			button=self.buttonContext.getButton("Show")
+			button.textVar.set("Hide")
+			self.hiddenState=False
+		else:
+			self.currentWidget.config(show="•")
+			button=self.buttonContext.getButton("Hide")
+			button.textVar.set("Show")
+			self.hiddenState=True
+		#Report
+		log.report("Data section changed state",currentFunction)
 
-			if currentFunction == "show":
-				self.currentWidget.config(show="")
-				#Update button
-				buttonIndex=self.buttonContext.getButtonIndex("Show")
-				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Hide")
-			else:
-				self.currentWidget.config(show="•")
-				#Update button
-				buttonIndex=self.buttonContext.getButtonIndex("Hide")
-				self.buttonContext.buttonArray[buttonIndex].updateButton(text="Show")
+
 
 	def addContextCommand(self,index,buttonName,**kwargs):
 		"""
@@ -1496,14 +1508,9 @@ class podNotebook(advancedNotebook):
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
-						if sectionName == "Password":
-							dataSection.toggleHide(forced="hide")
 
 			#Disable the notebook
 			self.changeState(False)
-
-			#Ensure the password field is hidden
-
 	def clearData(self):
 		"""
 		This method allows data

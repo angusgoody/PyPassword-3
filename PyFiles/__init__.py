@@ -76,6 +76,16 @@ logScreen.context=context
 logScreen.addContextInfo(0,text="Export",enabledColour=mainBlueColour,hoverColour=mainHoverBlueColour)
 logScreen.addContextInfo(1,text="Back",enabledColour=mainOrangeColour,hoverColour=mainHoverOrangeColour)
 
+logTab=selectionBar(logScreen)
+logTab.pack(side=TOP,fill=X)
+
+#===Main====
+logMainScreen=mainFrame(logScreen)
+logEncScreen=mainFrame(logScreen)
+logUiScreen=mainFrame(logScreen)
+
+#====Tabs====
+
 
 #======Splash Screen======
 #region splash
@@ -118,9 +128,9 @@ loginScreen=screen(window,"Login")
 
 #Context
 loginScreen.context=context
-loginScreen.addContextInfo(0,text="Back")
+loginScreen.addContextInfo(0,text="Show Hint")
 loginScreen.addContextInfo(1,text="Unlock",enabledColour=mainGreenColour,hoverColour=mainHoverGreenColour)
-loginScreen.addContextInfo(2,text="Show Hint")
+loginScreen.addContextInfo(2,text="Back")
 
 #Center
 loginSub=mainFrame(loginScreen)
@@ -439,8 +449,8 @@ openScreen.updateCommand(2,command=lambda: loadMasterPodToLogin())
 openScreen.updateCommand(3,command=lambda: splashScreen.show())
 
 #Login Screen
-loginScreen.updateCommand(0,command=lambda: openScreen.show())
-loginScreen.updateCommand(2,command=lambda: showHint())
+loginScreen.updateCommand(2,command=lambda: openScreen.show())
+loginScreen.updateCommand(0,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(2,command=lambda: exitPod())
