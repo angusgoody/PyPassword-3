@@ -23,6 +23,8 @@ mainRedColour="#EE687F"
 mainGreenColour="#A9F955"
 mainOrangeColour="#E7A136"
 mainBlueColour="#17F388"
+mainGreyColour="#BEC0B8"
+mainBlackColour="#000000"
 
 mainHoverOrangeColour="#D89633"
 mainHoverBlueColour="#13C770"
@@ -142,6 +144,11 @@ def changeWidgetState(widget,state):
 	#Change the state
 	if widgetType in validWidgets:
 		widget.config(state=state)
+		if widgetType == Text:
+			if state == DISABLED:
+				widget.config(fg=mainGreyColour)
+			else:
+				widget.config(fg=mainBlackColour)
 
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
@@ -670,8 +677,8 @@ class advancedEntry(Entry):
 
 		#Store Colour info
 		self.placeHolder=placeHolder
-		self.placeHolderColour="#BEC0B8"
-		self.defaultColour="#000000"
+		self.placeHolderColour=mainGreyColour
+		self.defaultColour=mainBlackColour
 
 		#Set up the placeholder
 		self.placeHolderActive=True
@@ -1115,8 +1122,6 @@ class privateSection(mainFrame):
 		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0",font="Avenir 10")
 		self.buttonContext.pack(expand=True)
 
-		#Store the name of the section
-		self.sectionTitle="Data"
 
 		#Store the state False = Disabled
 		self.state=True
@@ -1135,6 +1140,10 @@ class privateSection(mainFrame):
 
 		#Store the type of widget used
 		self.savedWidgets={}
+		#Store the data in the widget key=widget type
+		self.savedWidgetData={}
+
+		#Store the type of the widget
 		self.widgetType=Entry
 
 		#Store the format of the containers
@@ -1575,17 +1584,19 @@ class podNotebook(advancedNotebook):
 		notebook. This is where the user 
 		edits the data
 		"""
+		
+		#Change the state of everything
 		self.changeState(True)
 
 		#Update the context
 		context=None
 		context=mainVars.get("context",context)
 		if context:
-			context.updateContextButton(0,text="Cancel",command=lambda: self.stopEdit())
+			context.updateContextButton(0, text="Cancel", command=lambda: self.cancelEdit())
 			context.updateContextButton(1,text="Save",command=None)
 			context.setPlaceholders(2)
 
-	def stopEdit(self):
+	def cancelEdit(self):
 		"""
 		Stop the edit functions
 		"""
@@ -1596,6 +1607,9 @@ class podNotebook(advancedNotebook):
 		context=mainVars.get("context",context)
 		if context:
 			screen.lastScreen.runContext()
+
+		#Restore the data
+		for
 
 
 class selectionBar(mainFrame):
