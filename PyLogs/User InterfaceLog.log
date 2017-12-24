@@ -523,3 +523,51 @@ Command executing success MainButton,2017-12-24 13:54:31,Default
 Command executing success Screen Class,2017-12-24 13:54:13,Default
 Data securely removed from widget,2017-12-24 13:54:16,Default
 Command executing success MainButton,2017-12-24 13:54:12,Default
+Data section changed state Hide,2017-12-24 14:43:55,Default
+Command executing success MainButton,2017-12-24 14:44:08,Default
+Command executing success MainButton,2017-12-24 14:45:20,Default
+Command executing success MainButton,2017-12-24 14:44:03,Default
+Command executing success MainButton,2017-12-24 14:45:23,Default
+Command executing success MainButton,2017-12-24 14:45:18,Default
+Data section changed state Hide,2017-12-24 14:44:25,Default
+Command executing success Screen Class,2017-12-24 14:43:54,Default
+Command executing success MainButton,2017-12-24 14:45:37,Default
+Command executing success MainButton,2017-12-24 14:45:21,Default
+Command executing success MainButton,2017-12-24 14:45:41,Default
+Command executing success MainButton,2017-12-24 14:44:23,Default
+Command executing success MainButton,2017-12-24 14:43:51,Default
+Command executing success MainButton,2017-12-24 14:45:19,Default
+Command executing success Screen Class,2017-12-24 14:43:52,Default
+Command executing success MainButton,2017-12-24 14:43:58,Default
+Command executing success MainButton,2017-12-24 14:45:36,Default
+Command executing success MainButton,2017-12-24 14:45:46,Default
+Command executing success MainButton,2017-12-24 14:44:10,Default
+Command executing success MainButton,2017-12-24 14:44:02,Default
+Command executing success Finding master pods,2017-12-24 14:43:49,Default
+Command executing success MainButton,2017-12-24 14:44:04,Default
+Command executing success Finding master pods,2017-12-24 14:46:37,Default
+Command executing success MainButton,2017-12-24 14:47:07,Default
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function podNotebook.startEdit.<locals>.<lambda> at 0x10f63e8c8>,2017-12-24 14:48:39,Default
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function podNotebook.startEdit.<locals>.<lambda> at 0x10f63e8c8>,2017-12-24 14:46:55,Default
+Command executing success MainButton,2017-12-24 14:46:47,Default
+Data section changed state Hide,2017-12-24 14:46:42,Default
+Command executing success MainButton,2017-12-24 14:48:38,Default
+Command executing success Screen Class,2017-12-24 14:46:41,Default
+Command executing success MainButton,2017-12-24 14:48:30,Default
+Command executing success MainButton,2017-12-24 14:46:45,Default
+Command executing success MainButton,2017-12-24 14:48:19,Default
+Command executing success MainButton,2017-12-24 14:47:04,Default
+Command executing success MainButton,2017-12-24 14:47:06,Default
+Command executing success MainButton,2017-12-24 14:47:09,Default
+Command executing success Screen Class,2017-12-24 14:46:39,Default
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function podNotebook.startEdit.<locals>.<lambda> at 0x10f63e8c8>,2017-12-24 14:50:00,Default
+Command executing success MainButton,2017-12-24 14:46:50,Default
+Command executing success MainButton,2017-12-24 14:46:38,Default
+Command executing success MainButton,2017-12-24 14:48:29,Default
+Command executing success MainButton,2017-12-24 14:46:48,Default
+Command executing success MainButton,2017-12-24 14:48:12,Default
+Command executing success MainButton,2017-12-24 14:48:36,Default
+Command executing success MainButton,2017-12-24 14:48:20,Default
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function podNotebook.startEdit.<locals>.<lambda> at 0x10f63e8c8>,2017-12-24 14:48:21,Default
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function podNotebook.startEdit.<locals>.<lambda> at 0x10f63e8c8>,2017-12-24 14:47:00,Default
+Command executing success MainButton,2017-12-24 14:46:52,Default

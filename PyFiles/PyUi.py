@@ -1301,18 +1301,29 @@ class privateSection(mainFrame):
 		"""
 		#Update to normal
 		if chosenState:
+			#Ensure the data is shown before editing
+			if self.hiddenState:
+				self.toggleHide(forced="Show")
+			#Disable the hide button
+			button=self.buttonContext.getButton("Hide")
+			if button:
+				button.changeState(False)
+			#Enable all the widgets
 			for widget in self.savedWidgets:
-				#Ensure the data is shown before editing
-				if self.hiddenState:
-					self.toggleHide(forced="Show")
+				#Change the state
 				changeWidgetState(self.savedWidgets[widget],NORMAL)
 
 		#Update to disabled
 		else:
+			#Enable the hide button
+			button=self.buttonContext.getButton("Hide")
+			if button:
+				button.changeState(True)
+			#Hide the password
+			if self.titleVar.get() == "Password":
+				self.toggleHide(forced="Hide")
+			#Disable the widgets
 			for widget in self.savedWidgets:
-				#Hide the password
-				if self.titleVar.get() == "Password":
-					self.toggleHide(forced="Hide")
 				changeWidgetState(self.savedWidgets[widget],DISABLED)
 
 class advancedNotebook(mainFrame):
