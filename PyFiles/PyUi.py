@@ -129,6 +129,20 @@ def loadWebsite(address):
 		else:
 			log.report("Opened web page")
 
+def changeWidgetState(widget,state):
+	"""
+	Function to update
+	state of a range
+	of diffrent widgets
+	"""
+	#Get the type of widget
+	widgetType=type(widget)
+	validWidgets=[Entry,advancedEntry,Text]
+
+	#Change the state
+	if widgetType in validWidgets:
+		widget.config(state=state)
+
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
@@ -1129,7 +1143,7 @@ class privateSection(mainFrame):
 		#Load the default widget
 		self.loadWidget(self.widgetType)
 
-		#Hidden state
+		#Hidden state True = Hidden
 		self.hiddenState=False
 
 	def displayWidget(self,widget):
@@ -1284,35 +1298,22 @@ class privateSection(mainFrame):
 		"""
 		Change the state of the private 
 		section. True = Enabled
-		False = Disabled
 		"""
-		valid=False
+		#Update to normal
 		if chosenState:
-			if self.state == False:
-				#Enable the section
-				for widget in self.savedWidgets:
-					self.savedWidgets[widget].config(state=NORMAL)
-				#Disable the hide button
-				for button in self.buttonContext.buttonArray:
-					if button.textVar.get() == "Hide":
-						button.changeState(False)
-						break
-				#Update var
-				self.state=True
+			for widget in self.savedWidgets:
+				#Ensure the data is shown before editing
+				if self.hiddenState:
+					self.toggleHide(forced="Show")
+				changeWidgetState(self.savedWidgets[widget],NORMAL)
 
+		#Update to disabled
 		else:
-			if self.state:
-				#Disable the section
-				for widget in self.savedWidgets:
-					self.savedWidgets[widget].config(state=DISABLED)
-				#Enable the copy hide button
-				for button in self.buttonContext.buttonArray:
-					if button.textVar.get() == "Hide":
-						button.changeState(True)
-						break
-				#Update Var
-				self.state=False
-
+			for widget in self.savedWidgets:
+				#Hide the password
+				if self.titleVar.get() == "Password":
+					self.toggleHide(forced="Hide")
+				changeWidgetState(self.savedWidgets[widget],DISABLED)
 
 class advancedNotebook(mainFrame):
 	"""
@@ -1508,6 +1509,7 @@ class podNotebook(advancedNotebook):
 						#Add the data to the screen
 						dataSection=self.sectionDict[tabName][sectionName]
 						dataSection.addData(podInstance.vault[sectionName])
+
 
 			#Disable the notebook
 			self.changeState(False)
