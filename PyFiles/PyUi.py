@@ -82,7 +82,7 @@ def insertEntry(entry,message):
 		entry.insert(END,message)
 	elif widgetType == Text:
 		entry.delete("1.0",END)
-		entry.insert("1.0",END)
+		entry.insert(END,message)
 	elif widgetType == mainLabel:
 		entry.update(text=message)
 
@@ -1210,6 +1210,9 @@ class privateSection(mainFrame):
 			elif widgetName == Text:
 				newWidget=Text(self.dataFrame,height=12,font="Avenir 15")
 
+			elif widgetName == Entry:
+				newWidget=Entry(self.dataFrame)
+
 			else:
 				newWidget=mainLabel(self.dataFrame,font="Avenir 15",width=25)
 				newWidget.update(width=25)
@@ -1218,7 +1221,6 @@ class privateSection(mainFrame):
 
 			#Add to the dict
 			self.savedWidgets[widgetName]=newWidget
-
 		#Set as current
 		self.currentWidget=newWidget
 
