@@ -83,6 +83,9 @@ def insertEntry(entry,message):
 	elif widgetType == Text:
 		entry.delete("1.0",END)
 		entry.insert("1.0",END)
+	elif widgetType == mainLabel:
+		entry.update(text=message)
+
 
 def getData(widget):
 	"""
@@ -93,6 +96,8 @@ def getData(widget):
 	widgetType=type(widget)
 	if widgetType == Entry:
 		return widget.get()
+	elif widgetType == mainLabel:
+		return widget.textVar.get()
 	elif widgetType == Text:
 		data=widget.get("1.0",END)
 		if len(data.split()) > 0:
@@ -1104,6 +1109,8 @@ class privateSection(mainFrame):
 	indicates the name of the data and then have ways
 	for the user to interact with the data.
 	"""
+	validLabels=[Label,mainLabel]
+	validWidgets=[Entry,Text,OptionMenu,Label,mainLabel]
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
@@ -1115,7 +1122,7 @@ class privateSection(mainFrame):
 
 		#Label
 		self.titleVar=StringVar()
-		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar,font="Avenir 15")
+		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar,font="Avenir 13",fg=mainGreyColour)
 		self.titleLabel.pack(expand=True)
 
 		#Button Context
@@ -1127,9 +1134,6 @@ class privateSection(mainFrame):
 		self.state=True
 
 		#--Widget--
-
-		#Store valid widgets
-		self.validWidgets=[Entry,Text,OptionMenu]
 
 		#Store the currently loaded widget
 		self.currentWidget=None
@@ -1207,8 +1211,8 @@ class privateSection(mainFrame):
 				newWidget=Text(self.dataFrame,height=12,font="Avenir 15")
 
 			else:
-				newWidget=Entry(self.dataFrame,font="Avenir 15",width=25)
-
+				newWidget=mainLabel(self.dataFrame,font="Avenir 15",width=25)
+				newWidget.update(width=25)
 			#Display on screen
 			self.displayWidget(newWidget)
 
@@ -1224,9 +1228,12 @@ class privateSection(mainFrame):
 		widget.
 		"""
 		#Collect the entry widget and insert data
-		if self.widgetType in self.validWidgets:
-			insertEntry(self.savedWidgets[self.widgetType],data)
-
+		widgetType=type(self.currentWidget)
+		if widgetType in privateSection.validWidgets:
+			currentWidget=self.savedWidgets[widgetType]
+			insertEntry(currentWidget,data)
+		else:
+			print("Non valid widget used")
 	def clearData(self):
 		"""
 		Used to clear data from the widget
@@ -1268,14 +1275,28 @@ class privateSection(mainFrame):
 			else:
 				currentFunction="Hide"
 
+		widgetType=type(self.currentWidget)
+
 		#Execute the function
 		if currentFunction == "Show":
-			self.currentWidget.config(show="")
+
+			#Show the data in the current widget
+			if widgetType in privateSection.validLabels:
+				self.currentWidget.update(text="Original Data")
+			elif widgetType == Entry:
+				self.currentWidget.config(show="")
+
 			button=self.buttonContext.getButton("Show")
 			button.textVar.set("Hide")
 			self.hiddenState=False
 		else:
-			self.currentWidget.config(show="•")
+
+			#Hide the data in the current widget
+			if widgetType in privateSection.validLabels:
+				self.currentWidget.update(text="•••••")
+			elif widgetType == Entry:
+				self.currentWidget.config(show="•")
+
 			button=self.buttonContext.getButton("Hide")
 			button.textVar.set("Show")
 			self.hiddenState=True
@@ -1295,7 +1316,7 @@ class privateSection(mainFrame):
 			self.buttonContext.addButton(index,text=buttonName,command=lambda :copyDataFromEntry(self.currentWidget))
 		elif buttonName == "Hide":
 			#Hide data in entry
-			if type(self.currentWidget) == Entry:
+			if type(self.currentWidget) in [Entry,Label,mainLabel]:
 				self.buttonContext.addButton(index, text=buttonName, command=lambda :self.toggleHide())
 		elif buttonName == "Launch":
 			#Load a website
@@ -1310,6 +1331,8 @@ class privateSection(mainFrame):
 		"""
 		#Update to normal
 		if chosenState:
+
+
 			#Ensure the data is shown before editing
 			if self.hiddenState:
 				self.toggleHide(forced="Show")
@@ -1470,11 +1493,11 @@ class podNotebook(advancedNotebook):
 					newPrivateSection.titleVar.set(widget[0])
 					#Add the context buttons
 					counter=-1
-					for buttonName in widget[2]:
+					for buttonName in widget[3]:
 						counter+=1
 						newPrivateSection.addContextCommand(counter,buttonName)
 					#Set context length
-					newPrivateSection.buttonContext.setPlaceholders(len(widget[2]))
+					newPrivateSection.buttonContext.setPlaceholders(len(widget[3]))
 					#Makes the striped colours
 					if sectionCount % 2 == 0:
 						newPrivateSection.colour("#C3C3C7")
@@ -1584,7 +1607,7 @@ class podNotebook(advancedNotebook):
 		notebook. This is where the user 
 		edits the data
 		"""
-		
+
 		#Change the state of everything
 		self.changeState(True)
 
@@ -1609,7 +1632,7 @@ class podNotebook(advancedNotebook):
 			screen.lastScreen.runContext()
 
 		#Restore the data
-		for
+
 
 
 class selectionBar(mainFrame):
@@ -1775,13 +1798,12 @@ class podTemplate:
 	templateColours={}
 	#Store a reference
 	templates={}
+	validDataTypes=[Entry,advancedEntry,Text,OptionMenu,Label,mainLabel]
+
 	def __init__(self,templateName,templateColour):
 		#Name and Colour of template
 		self.templateName=templateName
 		self.templateColour=templateColour
-
-		#Store valid data types
-		self.validDataTypes=[Entry,advancedEntry,Text,OptionMenu]
 
 		#Store the tabs
 		self.tabs={}
@@ -1802,7 +1824,7 @@ class podTemplate:
 		self.tabs[tabName]=[]
 		self.tabOrder.append(tabName)
 
-	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
+	def addTemplateSection(self,tabName,sectionName,dataType,editType,buttonList,**kwargs):
 		"""
 		This method allows a section of data to be added to the template.
 		For example a section for "Password" or "Email" 
@@ -1812,11 +1834,11 @@ class podTemplate:
 			sectionColour="#FFFFFF"
 			sectionColour=kwargs.get("colour",sectionColour)
 			#Check if dataType is valid
-			if dataType not in self.validDataTypes:
+			if dataType not in podTemplate.validDataTypes:
 				dataType=Entry
 				log.report("Changed data type for",sectionName)
 			#Add the data to list
-			dataArray=[sectionName,dataType,buttonList,sectionColour]
+			dataArray=[sectionName,dataType,editType,buttonList,sectionColour]
 			#Add list to dictionary
 			self.tabs[tabName].append(dataArray)
 
@@ -1827,17 +1849,17 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
-loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",Entry,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
-loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide","Launch"])
-loginTemplate.addTemplateSection("Advanced","Notes",Text,["Copy"])
+loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"])
+loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
 secureNoteTemplate.addTab("Note")
-secureNoteTemplate.addTemplateSection("Note","Note",Text,["Copy"])
+secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
 
 
 
