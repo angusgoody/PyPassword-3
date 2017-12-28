@@ -104,9 +104,9 @@ loginScreen=screen(window,"Login")
 
 #Context
 loginScreen.context=context
-loginScreen.addContextInfo(0,text="Back")
-loginScreen.addContextInfo(1,text="Unlock",enabledColour="#B1F62D")
-loginScreen.addContextInfo(2,text="Show Hint")
+loginScreen.addContextInfo(2,text="Back")
+loginScreen.addContextInfo(1,text="Unlock",enabledColour=mainGreenColour)
+loginScreen.addContextInfo(0,text="Show Hint")
 
 #Center
 loginSub=mainFrame(loginScreen)
@@ -143,7 +143,7 @@ openTopLabel.pack(side=TOP,fill=X)
 #Context
 openScreen.context=context
 openScreen.addContextInfo(0,text="Create New")
-openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697")
+openScreen.addContextInfo(1,text="Open",enabledColour=mainBlueColour)
 openScreen.addContextInfo(2,text="Open Other")
 
 #Listbox
@@ -169,8 +169,8 @@ podListbox=advancedListbox(podScreen,font="Avenir 25")
 podListbox.pack(expand=True,fill=BOTH)
 
 #Create the context buttons
-podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
-podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
+podScreen.addContextInfo(0,text="New Pod",enabledColour=mainBlueColour)
+podScreen.addContextInfo(1,text="Open Pod",enabledColour=mainGreenColour)
 podScreen.addContextInfo(2,text="Exit Pod",enabledColour=mainRedColour)
 
 #endregion
@@ -180,9 +180,9 @@ viewPodScreen=screen(window,"View Pod",protected=True)
 viewPodScreen.context=context
 
 #Create the context buttons
-viewPodScreen.addContextInfo(0,text="Delete")
-viewPodScreen.addContextInfo(1,text="Edit",enabledColour="#37EDB8")
-viewPodScreen.addContextInfo(2,text="Back")
+viewPodScreen.addContextInfo(0,text="Delete",enabledColour=mainRedColour)
+viewPodScreen.addContextInfo(1,text="Edit",enabledColour=mainBlueColour)
+viewPodScreen.addContextInfo(2,text="Back",enabledColour=mainOrangeColour)
 
 #Top Label
 viewPodLabelVar=StringVar()
@@ -418,8 +418,8 @@ splashScreen.updateCommand(2,command=lambda: closeProgram())
 #Open Screen
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 #Login Screen
-loginScreen.updateCommand(0,command=lambda: openScreen.show())
-loginScreen.updateCommand(2,command=lambda: showHint())
+loginScreen.updateCommand(2,command=lambda: openScreen.show())
+loginScreen.updateCommand(0,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(2,command=lambda: exitPod())

@@ -1005,7 +1005,9 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-		self.selectionBar.addPlace(places=3)
+		self.selectionBar.addPlace(places=5)
+
+
 
 		#Store a dictionary of tabs and frames
 		self.pages={}
@@ -1136,7 +1138,7 @@ class selectionBar(mainFrame):
 		places=kwargs.get("places",places)
 		for x in range(places):
 			#Add place to the array
-			self.tabList.append("")
+			#self.tabList.append("")
 			#Create a button
 			newButton=mainButton(self.centerFrame,enabledColour=self.notSelectedTabColour,
 			                     hoverColour=self.notSelectedHoverTabColour)
@@ -1145,6 +1147,22 @@ class selectionBar(mainFrame):
 			self.tabList.append(["New Tab",newButton])
 			#Add the tab
 			self.addTab("New Tab",index=len(self.tabList)-1)
+
+	def removePlace(self,index):
+		"""
+		This method will remove a place 
+		in the selection bar
+		"""
+		if index < len(self.tabList) and index >= 0:
+			#Remove the button
+			button=self.tabList[index][1]
+			button.pack_forget()
+			#Remove the ref
+			del self.tabList[index]
+
+			#Check if it was current
+			if index == self.currentIndex:
+				self.runTabCommand(0)
 
 	def addTab(self,tabName,**kwargs):
 		"""
@@ -1167,8 +1185,8 @@ class selectionBar(mainFrame):
 
 		#Update data
 		self.tabList[tabIndex][0]=tabName
-		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(tabIndex))
-
+		butt=self.tabList[tabIndex][1]
+		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(self.tabList.index([tabName,butt])))
 
 	def updateTab(self,index,**kwargs):
 		"""
@@ -1183,20 +1201,38 @@ class selectionBar(mainFrame):
 		This is what is called when the
 		tabs button is pressed
 		"""
-		#Run command here
-		print("HERE")
-		#Update the old current tab
-		if self.currentIndex:
-			self.updateTab(self.currentIndex,enabledColour=self.notSelectedTabColour,
-			               hoverColour=self.notSelectedHoverTabColour)
+		#Avoid running tab command on current tab
+		if index != self.currentIndex:
+			#Update the old current tab
+			if type(self.currentIndex) is int:
+				self.updateTab(self.currentIndex,enabledColour=self.notSelectedTabColour,
+				               hoverColour=self.notSelectedHoverTabColour)
 
-		#Update the colour
-		self.currentIndex=index
-		self.updateTab(index,enabledColour=self.selectedTabColour,
-		               hoverColour=self.selectedTabColour)
+			#Update the colour
+			self.currentIndex=index
+			self.updateTab(index,enabledColour=self.selectedTabColour,
+			               hoverColour=self.selectedTabColour)
 
+	def setSize(self,numberOfPlaces):
+		"""
+		Will set the bar to the set number
+		of places
+		"""
+		#Get the number of tabs
+		numberOfTabs=len(self.tabList)
 
+		#It tabs need to be created
+		if numberOfPlaces > numberOfTabs:
+			#Calculate number of places needed
+			numberNeeded=numberOfPlaces-numberOfTabs
+			self.addPlace(places=numberNeeded)
 
+		#If tabs need to be removed
+		elif numberOfPlaces < numberOfTabs and numberOfPlaces >= 0:
+			#Calculate slicing
+			numberToRemove=numberOfTabs-numberOfPlaces
+			for x in range(numberToRemove,len(self.tabList)-1):
+				self.removePlace(x)
 
 
 
