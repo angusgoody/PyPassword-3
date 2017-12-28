@@ -1109,7 +1109,7 @@ class privateSection(mainFrame):
 	indicates the name of the data and then have ways
 	for the user to interact with the data.
 	"""
-	validLabels=[Label,mainLabel]
+	validLabels=[mainLabel]
 	validWidgets=[Entry,Text,OptionMenu,Label,mainLabel]
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
@@ -1148,13 +1148,14 @@ class privateSection(mainFrame):
 		self.savedWidgetData={}
 
 		#Store the type of the widget
-		self.widgetType=Entry
+		self.defaultWidget=Entry
+		self.editType=Entry
 
 		#Store the format of the containers
 		self.format=None
 
 		#Load the default widget
-		self.loadWidget(self.widgetType)
+		self.loadWidget(self.defaultWidget)
 
 		#Hidden state True = Hidden
 		self.hiddenState=False
@@ -1229,11 +1230,13 @@ class privateSection(mainFrame):
 		This method allows data to be added to the 
 		widget.
 		"""
-		#Collect the entry widget and insert data
+		#Collect the widget and insert data
 		widgetType=type(self.currentWidget)
 		if widgetType in privateSection.validWidgets:
 			currentWidget=self.savedWidgets[widgetType]
 			insertEntry(currentWidget,data)
+			#Store the data inside the class
+			self.savedWidgetData[widgetType]=data
 		else:
 			print("Non valid widget used")
 	def clearData(self):
@@ -1249,11 +1252,10 @@ class privateSection(mainFrame):
 		"""
 		Return the data in the widget
 		"""
-		currentWidget=self.currentWidget
-		if type(currentWidget) == Entry:
-			return self.currentWidget.get()
-		elif type(currentWidget) == Text:
-			return self.currentWidget.get("1.0",END)
+		widgetType=type(self.currentWidget)
+		if widgetType in self.savedWidgetData:
+			return self.savedWidgetData[widgetType]
+
 
 	def toggleHide(self,**kwargs):
 		"""
@@ -1284,7 +1286,7 @@ class privateSection(mainFrame):
 
 			#Show the data in the current widget
 			if widgetType in privateSection.validLabels:
-				self.currentWidget.update(text="Original Data")
+				self.currentWidget.update(text=self.savedWidgetData[widgetType])
 			elif widgetType == Entry:
 				self.currentWidget.config(show="")
 
@@ -1295,7 +1297,7 @@ class privateSection(mainFrame):
 
 			#Hide the data in the current widget
 			if widgetType in privateSection.validLabels:
-				self.currentWidget.update(text="•••••")
+				self.currentWidget.update(text="••••••••••")
 			elif widgetType == Entry:
 				self.currentWidget.config(show="•")
 
@@ -1315,7 +1317,7 @@ class privateSection(mainFrame):
 		"""
 		if buttonName == "Copy":
 			#Copy to clipboard
-			self.buttonContext.addButton(index,text=buttonName,command=lambda :copyDataFromEntry(self.currentWidget))
+			self.buttonContext.addButton(index,text=buttonName,command=lambda :addDataToClipboard(self.getData()))
 		elif buttonName == "Hide":
 			#Hide data in entry
 			if type(self.currentWidget) in [Entry,Label,mainLabel]:
@@ -1334,10 +1336,16 @@ class privateSection(mainFrame):
 		#Update to normal
 		if chosenState:
 
+			#Load the correct widget for editing is loaded
+			self.loadWidget(self.editType)
 
 			#Ensure the data is shown before editing
 			if self.hiddenState:
 				self.toggleHide(forced="Show")
+
+			#Add the original data into the entry to edit
+			self.addData("blah")
+
 			#Disable the hide button
 			button=self.buttonContext.getButton("Hide")
 			if button:
@@ -1349,6 +1357,9 @@ class privateSection(mainFrame):
 
 		#Update to disabled
 		else:
+			#Load the correct widget for editing is loaded
+			self.loadWidget(self.defaultWidget)
+
 			#Enable the hide button
 			button=self.buttonContext.getButton("Hide")
 			if button:
@@ -1500,6 +1511,9 @@ class podNotebook(advancedNotebook):
 						newPrivateSection.addContextCommand(counter,buttonName)
 					#Set context length
 					newPrivateSection.buttonContext.setPlaceholders(len(widget[3]))
+					#Update the edit and default type
+					newPrivateSection.editType=widget[2]
+					newPrivateSection.defaultWidget=widget[1]
 					#Makes the striped colours
 					if sectionCount % 2 == 0:
 						newPrivateSection.colour("#C3C3C7")
@@ -1851,7 +1865,7 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",Entry,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
