@@ -976,79 +976,9 @@ class privateSection(mainFrame):
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
-		#Center frame
-		self.centerFrame=mainFrame(self)
-		self.centerFrame.pack(expand=True)
 
-		#Label
-		self.titleVar=StringVar()
-		self.titleLabel=mainLabel(self.centerFrame,textvariable=self.titleVar)
-		self.titleLabel.grid(row=0,column=0,padx=5)
 
-		#Widget frame
-		self.widgetFrame=mainFrame(self.centerFrame)
-		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
 
-		#Button Context
-		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#CDCED0")
-		self.buttonContext.grid(row=0,column=4,padx=5)
-
-		#Store the name of the section
-		self.sectionTitle="Data"
-
-		#--Widget--
-
-		#Store the currently loaded widget
-		self.currentWidget=None
-
-		#Store data for widget
-		self.widgetVar=StringVar()
-		self.widgetVar.set("Widget")
-
-		#Store the type of widget used
-		self.savedWidgets={}
-		self.widgetType=Entry
-
-		#Load the default widget
-		self.loadWidget(self.widgetType)
-
-	def loadWidget(self,widgetName):
-		"""
-		This function will load a widget
-		for the section. A widget is where
-		the data is stored.
-		"""
-		#Remove the current widget
-		if self.currentWidget:
-			self.currentWidget.pack_forget()
-
-		#If the widget has been loaded then load it again
-		if widgetName in self.savedWidgets:
-			self.savedWidgets[widgetName].pack(fill=X)
-		else:
-			#Create a new widget
-
-			#Entry
-
-			if widgetName == OptionMenu:
-				newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
-				newWidget.pack(fill=X)
-			else:
-				newWidget=Entry(self.widgetFrame,font="Avenir 15",width=25)
-				newWidget.pack(fill=X)
-			#Add to the dict
-			self.savedWidgets[widgetName]=newWidget
-		#Set as current
-		self.currentWidget=newWidget
-
-	def addData(self,data):
-		"""
-		This method allows data to be added to the 
-		widget.
-		"""
-		#Collect the entry widget and insert data
-		if self.widgetType == Entry:
-			insertEntry(self.savedWidgets[Entry],data)
 
 
 class advancedNotebook(mainFrame):
@@ -1127,7 +1057,7 @@ class podNotebook(advancedNotebook):
 	"""
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
-
+		self.colour("#76E071")
 
 		#Store templates that have already been generated
 		self.savedTemplates={}
@@ -1151,9 +1081,8 @@ class podNotebook(advancedNotebook):
 		#Get the correct template
 		correctTemplate=podTemplate.templates[templateName]
 		log.report("Loading template",correctTemplate)
-		print("Loading template",templateName)
 
-
+		print(correctTemplate)
 
 	def addPodData(self,podInstance):
 		"""
@@ -1175,132 +1104,9 @@ class selectionBar(mainFrame):
 	"""
 	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent,**kwargs)
-
-		#Store colours
-		self.selectedTabColour="#1BF293"
-		self.notselectedTabColour="#DFEDEA"
-		self.hoverColour="#F9FFFC"
-
-		#Store current tab
-		self.currentTab=None
-
-		#Store the tabs
-		self.tabCommandDict={}
-		self.tabDict={}
-		self.tabIndexDict={}
-		self.tabList=[]
-		self.tabCount=0
-
-		#How many placeholders are setup initially
-		self.initialPlaces=0
-		self.initialPlaces=kwargs.get("places",self.initialPlaces)
-
-		for x in range(self.initialPlaces):
-			self.addPlace()
-
-	def addPlace(self):
-		"""
-		This method will allow a tab
-		to be added to the frame
-		"""
-		#Create Button
-		newButton=mainButton(self,enabledColour=self.notselectedTabColour)
-		newButton.pack(fill=BOTH,expand=True,side=LEFT)
-		#Add to list
-		self.tabList.append(newButton)
-		#Add to counter
-		self.tabCount+=1
-
-	def addTab(self,tabName,command,**kwargs):
-		"""
-		This method allows a tab to
-		be added to the selection bar
-		"""
-		#Collects the index
-		index=self.tabCount
-		index=kwargs.get("index",self.tabCount)
-		#Check if a valid index is passed
-		if index == None:
-			index=self.tabCount
-		#Add reference
-		self.tabCommandDict[tabName]=command
-		if index+1 > len(self.tabList):
-			self.addPlace()
-		if index >= 0:
-			#Get the correct button
-			button=self.tabList[index]
-			#Add a reference
-			self.tabDict[tabName]=button
-			self.tabIndexDict[tabName]=index
-			#Update the button to correct info
-			button.updateButton(text=tabName,command=lambda: self.runTabCommand(tabName))
-			#If this is the first tab run it so the notebook is showing something
-			if index == 0:
-				self.runTabCommand(tabName)
-
-	def runTabCommand(self,tabName):
-		"""
-		This function overrides the commands
-		of all the tabs so it can handle things
-		such as colour change etc. 
-		"""
-		if tabName != self.currentTab:
-			#Get the correct command for that name
-			buttonCommand=self.tabCommandDict[tabName]
-
-			#Run the commmand
-			buttonCommand()
-
-			#Change other colours
-			if self.currentTab:
-				self.tabDict[self.currentTab].updateButton(enabledColour=self.notselectedTabColour,
-				                                           hoverColour=self.hoverColour,
-				                                           clickedColour=self.notselectedTabColour)
-
-			##Change the colour
-			selectButton=self.tabDict[tabName]
-			selectButton.updateButton(enabledColour=self.selectedTabColour,
-			                          hoverColour=self.selectedTabColour,
-			                          clickedColour=self.selectedTabColour)
-			#Update the current tab
-			self.currentTab=tabName
-
-	def clearBar(self):
-		"""
-		This method will clear the selection
-		bar so fresh tabs can be added
-		"""
-		for name in self.tabIndexDict:
-			self.removePlace(self.tabIndexDict[name])
+		
 
 
-	def removePlace(self,index,**kwargs):
-		"""
-		This function will allow
-		a tab to be removed from the bar
-		"""
-		removeName=None
-		removeName=kwargs.get("name",removeName)
-		if removeName:
-			match=self.tabDict[removeName]
-			index=self.tabList.index(match)
-		#Find correct index in the list
-		if index <= len(self.tabList)-1:
-			place=self.tabList[index]
-			#Remove from array
-			self.tabList.remove(place)
-			#Remove from the dictionary
-			for item in self.tabDict:
-				if self.tabDict[item] == place:
-					#Ensures the current tab is not still active
-					if item == self.currentTab:
-						self.currentTab=None
-					del self.tabDict[item]
-					break
-			#Remove the widget
-			place.pack_forget()
-			#Remove one from the counter
-			self.tabCount=self.tabCount-1
 
 
 
@@ -1328,20 +1134,18 @@ class podTemplate:
 	templateColours={}
 	#Store a reference
 	templates={}
+	#Store valid data types
+	validDataTypes=[Entry,advancedEntry,Text,OptionMenu,Label,mainLabel]
+
 	def __init__(self,templateName,templateColour):
 		#Name and Colour of template
 		self.templateName=templateName
 		self.templateColour=templateColour
-
-		#Store valid data types
-		self.validDataTypes=[Entry,advancedEntry,Text,OptionMenu]
-
 		#Store the tabs
 		self.tabs={}
 		#Stores the tab names in their order
 		self.tabOrder=[]
-
-		#Add to dict
+		#Add to class dict for reference
 		podTemplate.templateColours[self.templateName]=self.templateColour
 		podTemplate.templates[self.templateName]=self
 
@@ -1355,7 +1159,7 @@ class podTemplate:
 		self.tabs[tabName]=[]
 		self.tabOrder.append(tabName)
 
-	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
+	def addTemplateSection(self,tabName,sectionName,viewType,editType,buttonList,**kwargs):
 		"""
 		This method allows a section of data to be added to the template.
 		For example a section for "Password" or "Email" 
@@ -1364,12 +1168,8 @@ class podTemplate:
 			#Get section colour
 			sectionColour="#FFFFFF"
 			sectionColour=kwargs.get("colour",sectionColour)
-			#Check if dataType is valid
-			if dataType not in self.validDataTypes:
-				dataType=Entry
-				log.report("Changed data type for",sectionName)
 			#Add the data to list
-			dataArray=[sectionName,dataType,buttonList,sectionColour]
+			dataArray=[sectionName,viewType,editType,buttonList,sectionColour]
 			#Add list to dictionary
 			self.tabs[tabName].append(dataArray)
 
@@ -1380,16 +1180,16 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
-loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
-loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide"])
 
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
 secureNoteTemplate.addTab("Note")
-secureNoteTemplate.addTemplateSection("Note","Note",Text,["Copy"])
+secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
 
 
 
