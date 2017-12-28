@@ -18,14 +18,18 @@ from random import randint
 
 log=logClass("User Interface")
 #====================Preset variables====================
-incorrectColour="#E4747D"
-correctColour="#64D999"
+mainRedColour="#EE687F"
+mainGreenColour="#A9F955"
+mainOrangeColour="#E7A136"
+mainBlueColour="#17F388"
+mainGreyColour="#CDD7D6"
+mainClickedColour="#A9F955"
 
-mainRedColour="#ED8C8E"
-mainGreenColour="#96FF8D"
-
-def test():
-	print("test function")
+mainSecondOrangeColour="#D89633"
+mainSecondBlueColour="#13C770"
+mainSecondGreenColour="#7CCE32"
+mainSecondRedColour="#A25360"
+mainSecondGreyColour="#8B8F8F"
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -1104,7 +1108,10 @@ class selectionBar(mainFrame):
 	"""
 	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent,**kwargs)
-		
+
+		#Colours for tabs
+		self.selectedTabColour="#7A9AEB"
+		self.notSelectedTabColour=""
 
 
 

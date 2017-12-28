@@ -72,14 +72,14 @@ splashScreen=screen(window,"PyPassword")
 #Setup Context bar
 splashScreen.context=context
 #Go to pods
-splashScreen.addContextInfo(0,text="View Log",enabledColour="#17F388",
-                            hoverColour="#13C770",clickedColour="#41F59D")
+splashScreen.addContextInfo(0,text="View Log",enabledColour=mainBlueColour,
+                            hoverColour=mainSecondBlueColour,clickedColour=mainClickedColour)
 #View Log
-splashScreen.addContextInfo(1,text="Go to pods",enabledColour="#A5F413",
-                            hoverColour="#7CCE32",clickedColour="#B5F426")
+splashScreen.addContextInfo(1,text="Go to pods",enabledColour=mainGreenColour,
+                            hoverColour=mainSecondGreenColour,clickedColour=mainClickedColour)
 #Exit
-splashScreen.addContextInfo(2,text="Exit",enabledColour="#FFA500",
-                            hoverColour="#E89600",clickedColour="#FFB52E")
+splashScreen.addContextInfo(2,text="Exit",enabledColour=mainRedColour,
+                            hoverColour=mainSecondRedColour,clickedColour=mainClickedColour)
 
 #Create centered frame for logo
 splashCenter=mainFrame(splashScreen)
@@ -91,7 +91,7 @@ splashLabel=Label(splashCenter,image=splashImage)
 splashLabel.pack()
 
 #Create the title
-splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg="#43D4A0")
+splashTitle=mainLabel(splashCenter,text="PyPassword",font="Avenir 39",fg=mainBlueColour)
 splashTitle.pack()
 
 #Colour the splash screen
@@ -325,7 +325,7 @@ def attemptMasterPodUnlock():
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
 			#Colour the screen a green for correct
-			loginScreen.colour(correctColour)
+			loginScreen.colour(mainGreenColour)
 			#Reset the attempt var
 			loginAttemptNumberVar.set(0)
 
@@ -342,7 +342,7 @@ def attemptMasterPodUnlock():
 			#The password was incorrect
 			loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
 			#Colour the screen incorrect colour
-			loginScreen.colour(incorrectColour)
+			loginScreen.colour(mainRedColour)
 
 	else:
 		showMessage("Enter","Please enter password")
