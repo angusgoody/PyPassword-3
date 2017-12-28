@@ -1005,6 +1005,8 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
+		self.selectionBar.addPlace(places=3)
+
 		#Store a dictionary of tabs and frames
 		self.pages={}
 		self.pageList=[]
@@ -1061,7 +1063,6 @@ class podNotebook(advancedNotebook):
 	"""
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
-		self.colour("#76E071")
 
 		#Store templates that have already been generated
 		self.savedTemplates={}
@@ -1086,7 +1087,7 @@ class podNotebook(advancedNotebook):
 		correctTemplate=podTemplate.templates[templateName]
 		log.report("Loading template",correctTemplate)
 
-		print(correctTemplate)
+		#print(correctTemplate)
 
 	def addPodData(self,podInstance):
 		"""
@@ -1094,7 +1095,8 @@ class podNotebook(advancedNotebook):
 		and add the data to the notebook
 		view.
 		"""
-		print("Adding pod data for",podInstance)
+		pass
+		#print("Adding pod data for",podInstance)
 
 
 
@@ -1109,9 +1111,89 @@ class selectionBar(mainFrame):
 	def __init__(self,parent,**kwargs):
 		mainFrame.__init__(self,parent,**kwargs)
 
+		#Background colour for selection bar
+		self.preserveColour=True
+
 		#Colours for tabs
-		self.selectedTabColour="#7A9AEB"
-		self.notSelectedTabColour=""
+		self.selectedTabColour=mainBlueColour
+		self.notSelectedTabColour=mainGreyColour
+		self.notSelectedHoverTabColour=mainSecondGreyColour
+
+		#Place for the tabs
+		self.centerFrame=mainFrame(self)
+		self.centerFrame.pack(expand=True)
+
+		#Store tab data
+		self.tabList=[]
+		self.currentIndex=None
+
+	def addPlace(self,**kwargs):
+		"""
+		Will add a placeholder
+		for the selection bar
+		"""
+		places=1
+		places=kwargs.get("places",places)
+		for x in range(places):
+			#Add place to the array
+			self.tabList.append("")
+			#Create a button
+			newButton=mainButton(self.centerFrame,enabledColour=self.notSelectedTabColour,
+			                     hoverColour=self.notSelectedHoverTabColour)
+			newButton.pack(fill=BOTH,expand=True,side=LEFT)
+			#Store the button
+			self.tabList.append(["New Tab",newButton])
+			#Add the tab
+			self.addTab("New Tab",index=len(self.tabList)-1)
+
+	def addTab(self,tabName,**kwargs):
+		"""
+		This method will add
+		a tab to the selection bar
+		if no index specified it will
+		add to the end
+		"""
+		#Default index is last item in list
+		tabIndex=len(self.tabList)
+		#Attempt to get index from kwargs
+		tabIndex=kwargs.get("index",tabIndex)
+		#Check if index is valid
+		if tabIndex > len(self.tabList) or tabIndex < 0:
+			tabIndex=len(self.tabList)
+
+		#Add place if needed
+		if tabIndex == len(self.tabList):
+			self.addPlace()
+
+		#Update data
+		self.tabList[tabIndex][0]=tabName
+		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(tabIndex))
+
+
+	def updateTab(self,index,**kwargs):
+		"""
+		Used to update the button
+		at a specific index 
+		"""
+		correctButton=self.tabList[index][1]
+		correctButton.updateButton(**kwargs)
+
+	def runTabCommand(self,index):
+		"""
+		This is what is called when the
+		tabs button is pressed
+		"""
+		#Run command here
+		print("HERE")
+		#Update the old current tab
+		if self.currentIndex:
+			self.updateTab(self.currentIndex,enabledColour=self.notSelectedTabColour,
+			               hoverColour=self.notSelectedHoverTabColour)
+
+		#Update the colour
+		self.currentIndex=index
+		self.updateTab(index,enabledColour=self.selectedTabColour,
+		               hoverColour=self.selectedTabColour)
 
 
 
