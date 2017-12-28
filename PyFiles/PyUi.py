@@ -1005,7 +1005,7 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-		self.selectionBar.addPlace(places=5)
+		self.selectionBar.addPlace(places=2)
 
 
 
@@ -1228,11 +1228,13 @@ class selectionBar(mainFrame):
 			self.addPlace(places=numberNeeded)
 
 		#If tabs need to be removed
-		elif numberOfPlaces < numberOfTabs and numberOfPlaces >= 0:
+		elif numberOfPlaces < numberOfTabs and numberOfPlaces >= 1:
 			#Calculate slicing
 			numberToRemove=numberOfTabs-numberOfPlaces
-			for x in range(numberToRemove,len(self.tabList)-1):
-				self.removePlace(x)
+			counter=0
+			for x in range(numberOfPlaces,len(self.tabList)):
+				self.removePlace(x-counter)
+				counter+=1
 
 
 
