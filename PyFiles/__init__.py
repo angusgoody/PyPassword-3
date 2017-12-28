@@ -24,7 +24,6 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
-mainVars["window"]=window
 #====================Menus====================
 
 #Menu when locked
@@ -36,9 +35,6 @@ privateMenu=Menu(window)
 #Update the screen class menus
 screen.publicMenu=publicMenu
 screen.privateMenu=privateMenu
-
-#Public Sub menus
-privateFileMenu=Menu(privateMenu)
 
 #====================Log====================
 log=logClass("Main")
@@ -64,29 +60,9 @@ statusBar.pack(side=BOTTOM,fill=X)
 
 #Initiate the context bar for the whole program
 context=contextBar(window)
-mainVars["context"]=context
 context.pack(side=BOTTOM,fill=X)
 
 #endregion
-
-#======Log Screen======
-logScreen=screen(window,"Logs")
-logScreen.context=context
-
-logScreen.addContextInfo(0,text="Export",enabledColour=mainBlueColour,hoverColour=mainHoverBlueColour)
-logScreen.addContextInfo(1,text="Back",enabledColour=mainOrangeColour,hoverColour=mainHoverOrangeColour)
-
-logTab=selectionBar(logScreen)
-logTab.pack(side=TOP,fill=X)
-
-#===Main====
-logMainScreen=mainFrame(logScreen)
-logEncScreen=mainFrame(logScreen)
-logUiScreen=mainFrame(logScreen)
-
-#====Tabs====
-
-
 #======Splash Screen======
 #region splash
 
@@ -96,14 +72,14 @@ splashScreen=screen(window,"PyPassword")
 #Setup Context bar
 splashScreen.context=context
 #Go to pods
-splashScreen.addContextInfo(0,text="View Log",enabledColour=mainBlueColour,
-                            hoverColour=mainHoverBlueColour)
+splashScreen.addContextInfo(0,text="View Log",enabledColour="#17F388",
+                            hoverColour="#13C770",clickedColour="#41F59D")
 #View Log
-splashScreen.addContextInfo(1,text="Go to pods",enabledColour=mainGreenColour,
-                            hoverColour=mainHoverGreenColour)
+splashScreen.addContextInfo(1,text="Go to pods",enabledColour="#A5F413",
+                            hoverColour="#7CCE32",clickedColour="#B5F426")
 #Exit
-splashScreen.addContextInfo(2,text="Exit",enabledColour=mainRedColour,
-                            hoverColour=mainHoverRedColour)
+splashScreen.addContextInfo(2,text="Exit",enabledColour="#FFA500",
+                            hoverColour="#E89600",clickedColour="#FFB52E")
 
 #Create centered frame for logo
 splashCenter=mainFrame(splashScreen)
@@ -128,9 +104,9 @@ loginScreen=screen(window,"Login")
 
 #Context
 loginScreen.context=context
-loginScreen.addContextInfo(0,text="Show Hint")
-loginScreen.addContextInfo(1,text="Unlock",enabledColour=mainGreenColour,hoverColour=mainHoverGreenColour)
-loginScreen.addContextInfo(2,text="Back")
+loginScreen.addContextInfo(0,text="Back")
+loginScreen.addContextInfo(1,text="Unlock",enabledColour="#B1F62D")
+loginScreen.addContextInfo(2,text="Show Hint")
 
 #Center
 loginSub=mainFrame(loginScreen)
@@ -167,9 +143,8 @@ openTopLabel.pack(side=TOP,fill=X)
 #Context
 openScreen.context=context
 openScreen.addContextInfo(0,text="Create New")
-openScreen.addContextInfo(1,text="Open Other")
-openScreen.addContextInfo(2,text="Open",enabledColour=mainBlueColour,hoverColour=mainHoverBlueColour)
-openScreen.addContextInfo(3,text="Back",enabledColour=mainOrangeColour,hoverColour=mainHoverOrangeColour)
+openScreen.addContextInfo(1,text="Open",enabledColour="#2EE697")
+openScreen.addContextInfo(2,text="Open Other")
 
 #Listbox
 openListbox=advancedListbox(openScreen,font="Avenir 37")
@@ -194,9 +169,9 @@ podListbox=advancedListbox(podScreen,font="Avenir 25")
 podListbox.pack(expand=True,fill=BOTH)
 
 #Create the context buttons
-podScreen.addContextInfo(0,text="New Pod",enabledColour=mainBlueColour,hoverColour=mainHoverBlueColour)
-podScreen.addContextInfo(1,text="Open Pod",enabledColour=mainGreenColour,hoverColour=mainHoverGreenColour)
-podScreen.addContextInfo(2,text="Exit Pod",enabledColour=mainRedColour,hoverColour=mainHoverRedColour)
+podScreen.addContextInfo(0,text="New Pod",enabledColour="#35D193")
+podScreen.addContextInfo(1,text="Open Pod",enabledColour="#D1C425")
+podScreen.addContextInfo(2,text="Exit Pod",enabledColour=mainRedColour)
 
 #endregion
 #======View Pod Screen======
@@ -206,7 +181,7 @@ viewPodScreen.context=context
 
 #Create the context buttons
 viewPodScreen.addContextInfo(0,text="Delete")
-viewPodScreen.addContextInfo(1,text="Edit",enabledColour=mainBlueColour,hoverColour=mainHoverBlueColour)
+viewPodScreen.addContextInfo(1,text="Edit",enabledColour="#37EDB8")
 viewPodScreen.addContextInfo(2,text="Back")
 
 #Top Label
@@ -350,7 +325,7 @@ def attemptMasterPodUnlock():
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
 			#Colour the screen a green for correct
-			loginScreen.colour(mainGreenColour)
+			loginScreen.colour(correctColour)
 			#Reset the attempt var
 			loginAttemptNumberVar.set(0)
 
@@ -367,7 +342,7 @@ def attemptMasterPodUnlock():
 			#The password was incorrect
 			loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
 			#Colour the screen incorrect colour
-			loginScreen.colour(mainRedColour)
+			loginScreen.colour(incorrectColour)
 
 	else:
 		showMessage("Enter","Please enter password")
@@ -435,29 +410,22 @@ def exitPod():
 	#Show the correct frame
 	openScreen.show()
 
-#======View Pod Screen========
-
 #====================Button commands====================
-#Log Screen
-logScreen.updateCommand(1,command=lambda: splashScreen.show())
+
 #Splash Screen
-splashScreen.updateCommand(0,command=lambda: logScreen.show())
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: closeProgram())
 #Open Screen
-openScreen.updateCommand(2,command=lambda: loadMasterPodToLogin())
-openScreen.updateCommand(3,command=lambda: splashScreen.show())
-
+openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 #Login Screen
-loginScreen.updateCommand(2,command=lambda: openScreen.show())
-loginScreen.updateCommand(0,command=lambda: showHint())
+loginScreen.updateCommand(0,command=lambda: openScreen.show())
+loginScreen.updateCommand(2,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
-viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -480,9 +448,6 @@ recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,
 recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
-#====================Menus====================
-privateMenu.add_cascade(label="File",menu=privateFileMenu)
-
 #====================Testing Area====================
 
 #====================Initial Loaders====================

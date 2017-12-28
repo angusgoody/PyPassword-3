@@ -14,25 +14,18 @@ are created and used.
 from tkinter import *
 from PEM import *
 from random import randint
-import webbrowser
 #====================Log====================
 
 log=logClass("User Interface")
 #====================Preset variables====================
-mainRedColour="#EE687F"
-mainGreenColour="#A9F955"
-mainOrangeColour="#E7A136"
-mainBlueColour="#17F388"
-mainGreyColour="#BEC0B8"
-mainBlackColour="#000000"
+incorrectColour="#E4747D"
+correctColour="#64D999"
 
-mainHoverOrangeColour="#D89633"
-mainHoverBlueColour="#13C770"
-mainHoverGreenColour="#7CCE32"
-mainHoverRedColour="#A25360"
+mainRedColour="#ED8C8E"
+mainGreenColour="#96FF8D"
 
-#Store variables for all programs
-mainVars={}
+def test():
+	print("test function")
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -75,85 +68,8 @@ def insertEntry(entry,message):
 	This function is used
 	for adding data to widgets 
 	"""
-	widgetType=type(entry)
-
-	if widgetType == Entry:
-		entry.delete(0,END)
-		entry.insert(END,message)
-	elif widgetType == Text:
-		entry.delete("1.0",END)
-		entry.insert(END,message)
-	elif widgetType == mainLabel:
-		entry.update(text=message)
-
-
-def getData(widget):
-	"""
-	A function that can get 
-	data from a wide range
-	of widget 
-	"""
-	widgetType=type(widget)
-	if widgetType == Entry:
-		return widget.get()
-	elif widgetType == mainLabel:
-		return widget.textVar.get()
-	elif widgetType == Text:
-		data=widget.get("1.0",END)
-		if len(data.split()) > 0:
-			return data
-		else:
-			return ""
-
-def loadWebsite(address):
-	"""
-	Load a website with a certain address
-	"""
-
-	httpCheck=False
-	wwwCheck=False
-
-	if len(address.split()) > 0:
-		#Check for a prefix
-		if "https://" in address or "http://" in address:
-			httpCheck=True
-		else:
-			if "www." in address:
-				wwwCheck=True
-
-		#Add if needed
-		if wwwCheck == False:
-			address="www."+str(address)
-		if httpCheck == False:
-			address="https://"+str(address)
-
-		#Add the www
-		try:
-			webbrowser.open_new(address)
-		except:
-			showMessage("Error","Could not open address")
-			log.report("Error opening address",tag="Error")
-		else:
-			log.report("Opened web page")
-
-def changeWidgetState(widget,state):
-	"""
-	Function to update
-	state of a range
-	of diffrent widgets
-	"""
-	#Get the type of widget
-	widgetType=type(widget)
-	validWidgets=[Entry,advancedEntry,Text]
-
-	#Change the state
-	if widgetType in validWidgets:
-		widget.config(state=state)
-		if widgetType == Text:
-			if state == DISABLED:
-				widget.config(fg=mainGreyColour)
-			else:
-				widget.config(fg=mainBlackColour)
+	entry.delete(0,END)
+	entry.insert(END,message)
 
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
@@ -300,30 +216,6 @@ def generateHexColour():
 		hexLeng=len(hexValue)
 	return hexValue
 
-#Copy and Paste
-
-def addDataToClipboard(data):
-	mainWindow=mainVars["window"]
-	if mainWindow != None and data != None:
-		if len(data.split()) > 0:
-			mainWindow.clipboard_clear()
-			mainWindow.clipboard_append(data)
-			log.report("Added data to clipboard","(Func)")
-		else:
-			log.report("No data to copy to clipboard")
-
-def copyDataFromEntry(entry):
-	"""
-	This function will copy the password generated
-	to the clipboard
-	"""
-	data=getData(entry)
-	if data:
-		addDataToClipboard(data)
-		log.report("Added data to clipboard","(Copy)")
-
-	else:
-		showMessage("Empty","No data to copy")
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -521,8 +413,7 @@ class mainButton(mainFrame):
 			self.state=False
 			#Change colours
 			self.changeButtonColour(self.disabledColour)
-			#Change the foreground colour
-			self.textLabel.config(fg=self.disabledFG)
+			self.textLabel.update(fg="#1BF293")
 
 class mainLabel(Label):
 	"""
@@ -557,10 +448,10 @@ class mainLabel(Label):
 		self.colourVar=kwargs.get("colour",self.colourVar)
 		#Update
 		self.config(textvariable=self.textVar,font=self.font)
-		if self.fg:
-			self.config(fg=self.fg)
-		else:
+		if self.fg == None:
 			self.colour(self.colourVar)
+		else:
+			self.config(fg=self.fg)
 
 	def colour(self,background):
 		"""
@@ -682,8 +573,8 @@ class advancedEntry(Entry):
 
 		#Store Colour info
 		self.placeHolder=placeHolder
-		self.placeHolderColour=mainGreyColour
-		self.defaultColour=mainBlackColour
+		self.placeHolderColour="#BEC0B8"
+		self.defaultColour="#000000"
 
 		#Set up the placeholder
 		self.placeHolderActive=True
@@ -696,7 +587,6 @@ class advancedEntry(Entry):
 		#Add bindings
 		self.bind("<Button-1>",lambda event: self.updatePlaceHolder())
 		self.bind("<FocusOut>",lambda event: self.clickOff())
-		self.bind("<FocusIn>",lambda event: self.updatePlaceHolder())
 
 	def updatePlaceHolder(self):
 		"""
@@ -869,7 +759,7 @@ class screen(mainFrame):
 				runCommand(command,name="Screen Class")
 
 			#Update the menu
-			if self.protected:
+			if self.protected == True:
 				#Load the private menu
 				if self.privateMenu:
 					self.parent.config(menu=self.privateMenu)
@@ -949,18 +839,16 @@ class contextBar(mainFrame):
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
 
-
-		#Update
-		self.storedKwargs=None
-		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
-		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
-		self.updateBar(**kwargs)
-
 		#Generate preset placeholders
 		self.presetPlaces=1
 		self.presetPlaces=kwargs.get("places",self.presetPlaces)
 		for x in range(self.presetPlaces):
 			self.addPlaceholder()
+
+		#Update
+		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
+		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
+		self.updateBar(**kwargs)
 
 	def updateBar(self,**kwargs):
 		"""
@@ -972,8 +860,6 @@ class contextBar(mainFrame):
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(**kwargs)
-		#Update store
-		self.storedKwargs=kwargs
 
 	def updateContextButton(self, index, **kwargs):
 		"""
@@ -992,7 +878,8 @@ class contextBar(mainFrame):
 		"""
 		self.sections+=1
 		#Create Button
-		newButton=mainButton(self,**self.storedKwargs)
+		newButton=mainButton(self,enabledColour=self.enabledColour,
+		                     hoverColour=self.hoverColour,text=self.defaultText)
 		#Add button to array
 		self.buttonArray.append(newButton)
 		#Show the button on the bar itself
@@ -1027,10 +914,7 @@ class contextBar(mainFrame):
 		This method allows a button to be added
 		to the context bar
 		"""
-		if index+1 > len(self.buttonArray):
-			self.addPlaceholder()
-			index=len(self.buttonArray)-1
-		if index >= 0:
+		if index+1 <= len(self.buttonArray) and index >= 0:
 
 			#Ensures a disabled button doesn't stay disabled when used again
 			butState=True
@@ -1081,26 +965,6 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
-	def getButtonIndex(self,buttonName):
-		"""
-		Return the index of a button by
-		the name passed
-		"""
-		for button in self.buttonArray:
-			currentButtonName=button.textVar.get()
-			if buttonName == currentButtonName:
-				buttonIndex=self.buttonArray.index(button)
-				return buttonIndex
-
-	def getButton(self,buttonName):
-		"""
-		This function will return the 
-		button widget itself
-		"""
-		for button in self.buttonArray:
-			if button.textVar.get() == buttonName:
-				return button
-
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1109,29 +973,28 @@ class privateSection(mainFrame):
 	indicates the name of the data and then have ways
 	for the user to interact with the data.
 	"""
-	validLabels=[mainLabel]
-	validWidgets=[Entry,Text,OptionMenu,Label,mainLabel]
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
-		#Containers
-		self.container=mainFrame(self)
-		self.labelFrame=mainFrame(self.container)
-		self.dataFrame=mainFrame(self.container)
-		self.buttonFrame=mainFrame(self.container)
+		#Center frame
+		self.centerFrame=mainFrame(self)
+		self.centerFrame.pack(expand=True)
 
 		#Label
 		self.titleVar=StringVar()
-		self.titleLabel=mainLabel(self.labelFrame,textvariable=self.titleVar,font="Avenir 13",fg=mainGreyColour)
-		self.titleLabel.pack(expand=True)
+		self.titleLabel=mainLabel(self.centerFrame,textvariable=self.titleVar)
+		self.titleLabel.grid(row=0,column=0,padx=5)
+
+		#Widget frame
+		self.widgetFrame=mainFrame(self.centerFrame)
+		self.widgetFrame.grid(row=0,column=1,padx=5,columnspan=3,sticky=EW)
 
 		#Button Context
-		self.buttonContext=contextBar(self.buttonFrame,places=2,enabledColour="#CDCED0",font="Avenir 10")
-		self.buttonContext.pack(expand=True)
+		self.buttonContext=contextBar(self.centerFrame,places=2,enabledColour="#CDCED0")
+		self.buttonContext.grid(row=0,column=4,padx=5)
 
-
-		#Store the state False = Disabled
-		self.state=True
+		#Store the name of the section
+		self.sectionTitle="Data"
 
 		#--Widget--
 
@@ -1144,49 +1007,10 @@ class privateSection(mainFrame):
 
 		#Store the type of widget used
 		self.savedWidgets={}
-		#Store the data in the widget key=widget type
-		self.savedWidgetData={}
-
-		#Store the type of the widget
-		self.defaultWidget=Entry
-		self.editType=Entry
-
-		#Store the format of the containers
-		self.format=None
+		self.widgetType=Entry
 
 		#Load the default widget
-		self.loadWidget(self.defaultWidget)
-
-		#Hidden state True = Hidden
-		self.hiddenState=False
-
-	def displayWidget(self,widget):
-		"""
-		This is the function for
-		actually displaying the wifget
-		on screen and chanaging layout etc
-		"""
-		widgetType=type(widget)
-
-		#Organise container
-		if widgetType == Text:
-			self.container.pack(expand=True,fill=BOTH)
-			self.labelFrame.grid(row=0,column=0,sticky=EW,pady=2)
-			self.dataFrame.grid(row=2,column=0,sticky=NSEW,padx=0)
-			self.buttonFrame.grid(row=1,column=0,sticky=EW,pady=5)
-
-			#Grid configure
-			self.container.columnconfigure(0,weight=1)
-			self.container.rowconfigure(2,weight=1)
-			#Display text widget
-			widget.pack(fill=BOTH,expand=True)
-		else:
-			self.container.pack(expand=True)
-			self.labelFrame.grid(row=0,column=0,padx=5)
-			self.dataFrame.grid(row=0,column=1,padx=5)
-			self.buttonFrame.grid(row=0,column=2)
-			#Display the other widget
-			widget.pack(fill=X)
+		self.loadWidget(self.widgetType)
 
 	def loadWidget(self,widgetName):
 		"""
@@ -1200,26 +1024,18 @@ class privateSection(mainFrame):
 
 		#If the widget has been loaded then load it again
 		if widgetName in self.savedWidgets:
-			newWidget=self.savedWidgets[widgetName]
-			self.displayWidget(newWidget)
-
+			self.savedWidgets[widgetName].pack(fill=X)
 		else:
 			#Create a new widget
+
+			#Entry
+
 			if widgetName == OptionMenu:
-				newWidget=OptionMenu(self.dataFrame,self.widgetVar,self.widgetVar.get())
-
-			elif widgetName == Text:
-				newWidget=Text(self.dataFrame,height=12,font="Avenir 15")
-
-			elif widgetName == Entry:
-				newWidget=Entry(self.dataFrame)
-
+				newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
+				newWidget.pack(fill=X)
 			else:
-				newWidget=mainLabel(self.dataFrame,font="Avenir 15",width=25)
-				newWidget.update(width=25)
-			#Display on screen
-			self.displayWidget(newWidget)
-
+				newWidget=Entry(self.widgetFrame,font="Avenir 15",width=25)
+				newWidget.pack(fill=X)
 			#Add to the dict
 			self.savedWidgets[widgetName]=newWidget
 		#Set as current
@@ -1230,146 +1046,10 @@ class privateSection(mainFrame):
 		This method allows data to be added to the 
 		widget.
 		"""
-		#Collect the widget and insert data
-		widgetType=type(self.currentWidget)
-		if widgetType in privateSection.validWidgets:
-			currentWidget=self.savedWidgets[widgetType]
-			insertEntry(currentWidget,data)
-			#Store the data inside the class
-			self.savedWidgetData[widgetType]=data
-		else:
-			print("Non valid widget used")
-	def clearData(self):
-		"""
-		Used to clear data from the widget
-		and remove any variable data
-		"""
-		self.addData("")
-		#Remove any variables below here
-		log.report("Data securely removed from widget")
+		#Collect the entry widget and insert data
+		if self.widgetType == Entry:
+			insertEntry(self.savedWidgets[Entry],data)
 
-	def getData(self):
-		"""
-		Return the data in the widget
-		"""
-		widgetType=type(self.currentWidget)
-		if widgetType in self.savedWidgetData:
-			return self.savedWidgetData[widgetType]
-
-
-	def toggleHide(self,**kwargs):
-		"""
-		This function will
-		hide or show the contents
-		of the Entry
-		"""
-		#Stores forced variable
-		forced=None
-		forced=kwargs.get("forced",forced)
-
-		#The function variable
-		currentFunction="Hide"
-
-		#Determine the current function
-		if forced:
-			currentFunction=forced
-		else:
-			if self.hiddenState:
-				currentFunction="Show"
-			else:
-				currentFunction="Hide"
-
-		widgetType=type(self.currentWidget)
-
-		#Execute the function
-		if currentFunction == "Show":
-
-			#Show the data in the current widget
-			if widgetType in privateSection.validLabels:
-				self.currentWidget.update(text=self.savedWidgetData[widgetType])
-			elif widgetType == Entry:
-				self.currentWidget.config(show="")
-
-			button=self.buttonContext.getButton("Show")
-			button.textVar.set("Hide")
-			self.hiddenState=False
-		else:
-
-			#Hide the data in the current widget
-			if widgetType in privateSection.validLabels:
-				self.currentWidget.update(text="••••••••••")
-			elif widgetType == Entry:
-				self.currentWidget.config(show="•")
-
-			button=self.buttonContext.getButton("Hide")
-			button.textVar.set("Show")
-			self.hiddenState=True
-		#Report
-		log.report("Data section changed state",currentFunction)
-
-
-
-	def addContextCommand(self,index,buttonName,**kwargs):
-		"""
-		This function will add a command 
-		to the context bar with some pre set
-		command such as Copy and Launch websites etc
-		"""
-		if buttonName == "Copy":
-			#Copy to clipboard
-			self.buttonContext.addButton(index,text=buttonName,command=lambda :addDataToClipboard(self.getData()))
-		elif buttonName == "Hide":
-			#Hide data in entry
-			if type(self.currentWidget) in [Entry,Label,mainLabel]:
-				self.buttonContext.addButton(index, text=buttonName, command=lambda :self.toggleHide())
-		elif buttonName == "Launch":
-			#Load a website
-			self.buttonContext.addButton(index,text=buttonName,command=lambda :loadWebsite(getData(self.currentWidget)))
-		else:
-			self.buttonContext.addButton(index,text=buttonName)
-
-	def updateState(self,chosenState):
-		"""
-		Change the state of the private 
-		section. True = Enabled
-		"""
-		#Update to normal
-		if chosenState:
-
-			#Load the correct widget for editing is loaded
-			self.loadWidget(self.editType)
-
-			#Ensure the data is shown before editing
-			if self.hiddenState:
-				self.toggleHide(forced="Show")
-
-			#Add the original data into the entry to edit
-			self.addData("blah")
-
-			#Disable the hide button
-			button=self.buttonContext.getButton("Hide")
-			if button:
-				button.changeState(False)
-			#Enable all the widgets
-			for widget in self.savedWidgets:
-				#Change the state
-				changeWidgetState(self.savedWidgets[widget],NORMAL)
-
-		#Update to disabled
-		else:
-			#Load the correct widget for editing is loaded
-			self.loadWidget(self.defaultWidget)
-
-			#Enable the hide button
-			button=self.buttonContext.getButton("Hide")
-			if button:
-				button.changeState(True)
-			#Hide the password
-			if self.titleVar.get() == "Password":
-				self.toggleHide(forced="Hide")
-			#Disable the widgets
-			for widget in self.savedWidgets:
-				changeWidgetState(self.savedWidgets[widget],DISABLED)
 
 class advancedNotebook(mainFrame):
 	"""
@@ -1448,14 +1128,13 @@ class podNotebook(advancedNotebook):
 	def __init__(self,parent,**kwargs):
 		advancedNotebook.__init__(self,parent,**kwargs)
 
+
 		#Store templates that have already been generated
 		self.savedTemplates={}
 		#Store current template
 		self.currentTemplate=None
-		#Store the sections key1 = tab key2 =
+		#Store the sections
 		self.sectionDict={}
-		#Store the state of the notebook False = Disabled
-		self.notebookState=True
 
 	def addPage(self,tabName,pageFrame,**kwargs):
 		if tabName not in self.sectionDict:
@@ -1472,71 +1151,9 @@ class podNotebook(advancedNotebook):
 		#Get the correct template
 		correctTemplate=podTemplate.templates[templateName]
 		log.report("Loading template",correctTemplate)
-		#Check the template hasn't been generated already
-		if templateName not in self.savedTemplates:
+		print("Loading template",templateName)
 
-			#Update the current
-			self.currentTemplate=templateName
 
-			#Get the tabs to add
-			tabOrder=correctTemplate.tabOrder
-
-			#Remove the old tabs
-			self.selectionBar.clearBar()
-
-			#Add to saved templates
-			self.savedTemplates[templateName]={}
-
-			#Generate tabs
-			for tabName in tabOrder:
-				newFrame=mainFrame(self)
-				self.addPage(tabName, newFrame)
-				#Add the widgets to the tabs
-
-				#Collect the dict with widgets
-				tabWidgets=correctTemplate.tabs[tabName]
-				#Store counter for number of sections
-				sectionCount=0
-				for widget in tabWidgets:
-					sectionCount+=1
-					#Create each section
-					newPrivateSection=privateSection(newFrame)
-					newPrivateSection.loadWidget(widget[1])
-					#Update the label of the new section
-					newPrivateSection.titleVar.set(widget[0])
-					#Add the context buttons
-					counter=-1
-					for buttonName in widget[3]:
-						counter+=1
-						newPrivateSection.addContextCommand(counter,buttonName)
-					#Set context length
-					newPrivateSection.buttonContext.setPlaceholders(len(widget[3]))
-					#Update the edit and default type
-					newPrivateSection.editType=widget[2]
-					newPrivateSection.defaultWidget=widget[1]
-					#Makes the striped colours
-					if sectionCount % 2 == 0:
-						newPrivateSection.colour("#C3C3C7")
-					newPrivateSection.pack(expand=True,fill=BOTH)
-					#Add the section to the dict
-					self.sectionDict[tabName][widget[0]]=newPrivateSection
-
-				#Adds the page for later use
-				self.savedTemplates[templateName][tabName]=newFrame
-
-		else:
-			#If the template has been loaded before it does not need to be generated
-			if templateName != self.currentTemplate:
-				#Get the list of generated frames
-				generatedFrames=self.savedTemplates[templateName]
-				#Remove the old tabs
-				self.selectionBar.clearBar()
-				for tab in correctTemplate.tabOrder:
-					#Remove from the list to avoid duplication warning
-					self.pageList.remove(tab)
-					self.addPage(tab,generatedFrames[tab])
-				#Make the current template
-				self.currentTemplate=templateName
 
 	def addPodData(self,podInstance):
 		"""
@@ -1544,110 +1161,8 @@ class podNotebook(advancedNotebook):
 		and add the data to the notebook
 		view.
 		"""
-		if type(podInstance) is peaPod:
+		print("Adding pod data for",podInstance)
 
-			#Ensure the state is enabled
-			self.changeState(True)
-
-			#First Remove all the data on screen
-			self.clearData()
-
-			#If the vault is locked unlock it
-			if podInstance.vaultState:
-				podInstance.unlockVault("Unlock")
-
-			#Get the data for the current template
-			currentTemp=podTemplate.templates[self.currentTemplate]
-			#Iterate through
-			for tabName in currentTemp.tabs:
-				#Iterate through sections
-				for section in currentTemp.tabs[tabName]:
-					#Get name of section
-					sectionName=section[0]
-					if sectionName in podInstance.vault:
-						#Add the data to the screen
-						dataSection=self.sectionDict[tabName][sectionName]
-						dataSection.addData(podInstance.vault[sectionName])
-
-
-			#Disable the notebook
-			self.changeState(False)
-	def clearData(self):
-		"""
-		This method allows data
-		to be removed from the notebook
-		"""
-		#Remove data from every single widget stored
-		for tabName in self.sectionDict:
-			#Get the screen with all the sections in
-			currentScreen=self.sectionDict[tabName]
-			#Go through each section
-			for sectionName in currentScreen:
-				currentSection=currentScreen[sectionName]
-				currentSection.clearData()
-
-	def changeState(self,chosenState):
-		"""
-		This method will change the 
-		state of the pod notebook. False
-		will disabled the notebook and 
-		True will enable it 
-		False = Disabled
-		True = Enabled
-		"""
-		valid=False
-		if chosenState:
-			if self.notebookState == False:
-				valid=True
-		else:
-			if self.notebookState:
-				valid=True
-
-		if valid:
-			#Change the state of all the sections
-			for tab in self.sectionDict:
-				tabDict=self.sectionDict[tab]
-				for section in tabDict:
-					tabDict[section].updateState(chosenState)
-
-			#Update state variable
-			if chosenState:
-				self.notebookState=True
-			else:
-				self.notebookState=False
-
-	def startEdit(self):
-		"""
-		This function allows 
-		a edit to be started on the pod
-		notebook. This is where the user 
-		edits the data
-		"""
-
-		#Change the state of everything
-		self.changeState(True)
-
-		#Update the context
-		context=None
-		context=mainVars.get("context",context)
-		if context:
-			context.updateContextButton(0, text="Cancel", command=lambda: self.cancelEdit())
-			context.updateContextButton(1,text="Save",command=None)
-			context.setPlaceholders(2)
-
-	def cancelEdit(self):
-		"""
-		Stop the edit functions
-		"""
-		self.changeState(False)
-
-		#Update the context
-		context=None
-		context=mainVars.get("context",context)
-		if context:
-			screen.lastScreen.runContext()
-
-		#Restore the data
 
 
 
@@ -1756,7 +1271,6 @@ class selectionBar(mainFrame):
 		bar so fresh tabs can be added
 		"""
 		for name in self.tabIndexDict:
-			#print("Removing",name)
 			self.removePlace(self.tabIndexDict[name])
 
 
@@ -1814,12 +1328,13 @@ class podTemplate:
 	templateColours={}
 	#Store a reference
 	templates={}
-	validDataTypes=[Entry,advancedEntry,Text,OptionMenu,Label,mainLabel]
-
 	def __init__(self,templateName,templateColour):
 		#Name and Colour of template
 		self.templateName=templateName
 		self.templateColour=templateColour
+
+		#Store valid data types
+		self.validDataTypes=[Entry,advancedEntry,Text,OptionMenu]
 
 		#Store the tabs
 		self.tabs={}
@@ -1840,7 +1355,7 @@ class podTemplate:
 		self.tabs[tabName]=[]
 		self.tabOrder.append(tabName)
 
-	def addTemplateSection(self,tabName,sectionName,dataType,editType,buttonList,**kwargs):
+	def addTemplateSection(self,tabName,sectionName,dataType,buttonList,**kwargs):
 		"""
 		This method allows a section of data to be added to the template.
 		For example a section for "Password" or "Email" 
@@ -1850,11 +1365,11 @@ class podTemplate:
 			sectionColour="#FFFFFF"
 			sectionColour=kwargs.get("colour",sectionColour)
 			#Check if dataType is valid
-			if dataType not in podTemplate.validDataTypes:
+			if dataType not in self.validDataTypes:
 				dataType=Entry
 				log.report("Changed data type for",sectionName)
 			#Add the data to list
-			dataArray=[sectionName,dataType,editType,buttonList,sectionColour]
+			dataArray=[sectionName,dataType,buttonList,sectionColour]
 			#Add list to dictionary
 			self.tabs[tabName].append(dataArray)
 
@@ -1865,17 +1380,16 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#3CE995")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
-loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Password",Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
-loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"])
-loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
+loginTemplate.addTemplateSection("Advanced","Website",Entry,["Copy","Hide"])
 
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
 secureNoteTemplate.addTab("Note")
-secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
+secureNoteTemplate.addTemplateSection("Note","Note",Text,["Copy"])
 
 
 
