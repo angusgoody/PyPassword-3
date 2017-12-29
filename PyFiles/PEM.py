@@ -62,8 +62,7 @@ class logClass:
 
 
 		#Check for tags
-		if "tag" in kwargs:
-			tag=kwargs["tag"]
+		tag=kwargs.get("tag",tag)
 
 		#Check for system or default data
 		if "system" in kwargs:
@@ -74,7 +73,7 @@ class logClass:
 		currentTime=datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 		#Report to class
-		dataDictionary[currentTime]=message
+		dataDictionary[currentTime]=[message,tag]
 
 	def saveLog(self):
 		"""
@@ -94,10 +93,12 @@ class logClass:
 
 		#Save the default data
 		for item in self.generalData:
-			writeString=str(self.generalData[item])
+			writeString=str(self.generalData[item][0])
 			writeString+=","
 			writeString+=item
-			writeString+=",Default\n"
+			writeString+=","
+			writeString+=str(self.generalData[item][1])
+			writeString+="\n"
 			file.write(writeString)
 
 		#Close file

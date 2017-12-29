@@ -88,6 +88,22 @@ def addDataToWidget(widget,data):
 	else:
 		log.report("Non supported widget used to add data",type(widget))
 
+def getDataFromWidget(widget):
+	"""
+	Function to get data
+	from a range of widgets 
+	"""
+	validWidgets=[Entry,mainLabel,Text]
+	widgetType=type(widget)
+	if widgetType in validWidgets:
+		if widgetType == Entry:
+			return widget.get()
+		elif widgetType == Text:
+			return widget.get("1.0",END)
+		elif widgetType == mainLabel:
+			return widget.textVar.get()
+	else:
+		log.report("Attempt to get info from non supported widget",widgetType)
 
 
 #Recursion
@@ -1138,9 +1154,44 @@ class privateSection(mainFrame):
 		and stored or raw.
 		Raw = currently in widget 
 		"""
-		raw=False
+		stored=False
 		widget=self.loadedWidget
-		
+		widget=kwargs.get("widget",widget)
+		stored=kwargs.get("stored",stored)
+
+		#If the data is got from stored memory
+		if stored:
+			if self.loadedWidget in self.savedWidgetData:
+				data=self.savedWidgetData[self.loadedWidget]
+			else:
+				data="N/A"
+		#If data is straight from widget
+		else:
+			data=getDataFromWidget(widget)
+
+		return data
+
+	def addContextCommand(self,index,buttonName,**kwargs):
+		"""
+		This function will add
+		a button to the context bar
+		of the private section
+		"""
+		#Copy to clipboard command
+		if buttonName == "Copy":
+			self.context.addButton(index,text=buttonName)
+		#Hide data
+		elif buttonName == "Hide":
+			self.context.addButton(index,text=buttonName)
+		#Launch a website
+		elif buttonName == "Launch":
+			self.context.addButton(index,text=buttonName)
+		#Generate a password for the entry
+		elif buttonName == "Generate":
+			self.context.addButton(index,text=buttonName)
+		#Not specified do nothing
+		else:
+			self.context.addButton(index,text=buttonName)
 
 
 
@@ -1164,7 +1215,7 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-		self.selectionBar.addPlace(places=2)
+		#self.selectionBar.addPlace(places=2)
 
 		#Store a dictionary of tabs and frames
 		self.pages={}
@@ -1246,7 +1297,23 @@ class podNotebook(advancedNotebook):
 		correctTemplate=podTemplate.templates[templateName]
 		log.report("Loading template",correctTemplate)
 
-		#print(correctTemplate)
+		#Attempt to load from memory
+		if templateName in self.savedTemplates:
+			log.report("A template was loaded from memory",templateName)
+			templateArray=self.savedTemplates[templateName]
+			correctTemplate=podTemplate.templates[templateName]
+			#Set the selection bar
+			self.selectionBar.setSize(len(correctTemplate.tabs))
+
+
+		#Need to generate a new section
+		else:
+			log.report("A template was generated",templateName)
+
+			#Add to saved templates then load
+			self.savedTemplates[templateName]=""
+			self.loadTemplate(templateName)
+
 
 	def addPodData(self,podInstance):
 		"""
