@@ -67,13 +67,28 @@ def showMessage(pre,message):
 	except:
 		print(message)
 
-def insertEntry(entry,message):
+def addDataToWidget(widget,data):
 	"""
-	This function is used
-	for adding data to widgets 
+	Function to add data to a variety
+	of widgets 
 	"""
-	entry.delete(0,END)
-	entry.insert(END,message)
+	validWidgets=[Entry,mainLabel,Text]
+	widgetType=type(widget)
+	#Check widget type
+	if widgetType in validWidgets:
+
+		if widgetType == Entry:
+			widget.delete(0,END)
+			widget.insert(END,data)
+		elif widgetType == Text:
+			widget.delete("1.0",END)
+			widget.insert("1.0",data)
+		elif widgetType == mainLabel:
+			widget.textVar.set(data)
+	else:
+		log.report("Non supported widget used to add data",type(widget))
+
+
 
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
@@ -977,11 +992,155 @@ class privateSection(mainFrame):
 	indicates the name of the data and then have ways
 	for the user to interact with the data.
 	"""
+	validWidgets=[mainLabel,Label,Entry,advancedEntry,OptionMenu,Text]
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
 
+		#-----Widgets------
 
+		#Container to manage the widgets
+		self.container=mainFrame(self)
+		self.labelFrame=mainFrame(self.container)
+		self.widgetFrame=mainFrame(self.container)
+		self.buttonFrame=mainFrame(self.container)
 
+		#Label
+		self.textVar=StringVar()
+		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar)
+		#Widget
+		self.widgetFrame=mainFrame(self.widgetFrame)
+		#Context bar
+		self.context=contextBar(self.buttonFrame)
+
+		#-----Widgets------
+		self.loadedWidget=None
+		self.defaultWidget=mainLabel
+		self.editWidget=Entry
+		self.widgetFont="Avenir 15"
+
+		self.savedWidgets={}
+		self.savedWidgetData={}
+		self.widgetVar=StringVar()
+		self.widgetVar.set("Widget")
+
+	def displayWidget(self,widgetInstance):
+		"""
+		The function to actually configure
+		the container to display
+		the correct widget 
+		"""
+		widgetType=type(widgetInstance)
+
+		#Organise container
+		if widgetType == Text:
+			self.container.pack(expand=True,fill=BOTH)
+			self.labelFrame.grid(row=0,column=0,sticky=EW,pady=2)
+			self.widgetFrame.grid(row=2,column=0,sticky=NSEW,padx=0)
+			self.buttonFrame.grid(row=1,column=0,sticky=EW,pady=5)
+			#Grid configure
+			self.container.columnconfigure(0,weight=1)
+			self.container.rowconfigure(2,weight=1)
+			#Display text widget
+			widgetInstance.pack(fill=BOTH,expand=True)
+		else:
+			self.container.pack(expand=True)
+			self.labelFrame.grid(row=0,column=0,padx=5)
+			self.widgetFrame.grid(row=0,column=1,padx=5)
+			self.buttonFrame.grid(row=0,column=2)
+			#Display the other widget
+			widgetInstance.pack(fill=X)
+
+	def loadWidget(self,widgetName):
+		"""
+		This method allows different
+		 types of widgets to be loaded
+		 onto the frame
+		"""
+		#Check same widget is not loaded again
+		if widgetName != self.loadedWidget:
+
+			#Hide the current
+			if self.loadedWidget:
+				self.savedWidgets[self.loadedWidget].pack_forget()
+
+			#Check if the widget is stored in memory
+			if widgetName in self.savedWidgets:
+				correctWidget=self.savedWidgets[widgetName]
+				self.displayWidget(correctWidget)
+
+			#Otherwise generate one and display it
+			if widgetName in privateSection.validWidgets:
+
+				if widgetName == Entry:
+					newWidget=Entry(self.widgetFrame,font=self.widgetFont)
+				elif widgetName == Text:
+					newWidget=Text(self.widgetFrame,height=12,font=self.widgetFont)
+				elif widgetName == OptionMenu:
+					newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
+				else:
+					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont)
+
+				#Add the widget to dict
+				self.savedWidgets[widgetName]=newWidget
+				#Display
+				self.displayWidget(newWidget)
+			#Update variable
+			self.loadedWidget=widgetName
+		else:
+			log.report("Attempt to load same widget: ",widgetName)
+
+	def addData(self,data):
+		"""
+		This function will add
+		data to the current widget
+		in the private section
+		"""
+		#Add data from currently loaded widget
+		if self.loadedWidget in self.savedWidgets:
+			addDataToWidget(self.savedWidgets[self.loadedWidget],data)
+
+	def clearData(self,**kwargs):
+		"""
+		The method to remove data from the
+		private section. kwargs
+		specify if all the widgets
+		need to be clear and if stored data
+		needs to be removed
+		"""
+		#Collect kwargs
+		allWidgets=False
+		widgetData=False
+		allWidgets=kwargs.get("allWidgets",allWidgets)
+		widgetData=kwargs.get("widgetData",widgetData)
+
+		if allWidgets:
+			for widgetName in self.savedWidgets:
+				#Remove the data from widget
+				currentWidget=self.savedWidgets[widgetName]
+				addDataToWidget(currentWidget,"")
+				if widgetData:
+					#Remove the stored data
+					if widgetName in self.savedWidgetData:
+						self.savedWidgetData[widgetName]="?"
+
+		#Clear only the loaded widget
+		else:
+			if self.loadedWidget in self.savedWidgets:
+				addDataToWidget(self.savedWidgets[self.loadedWidget],"")
+				if widgetData and self.loadedWidget in self.savedWidgetData:
+					self.savedWidgetData[self.loadedWidget]="?"
+
+	def getData(self,**kwargs):
+		"""
+		Will get the data from
+		a widget. specific 
+		widget can be specified 
+		and stored or raw.
+		Raw = currently in widget 
+		"""
+		raw=False
+		widget=self.loadedWidget
+		
 
 
 
@@ -1006,8 +1165,6 @@ class advancedNotebook(mainFrame):
 		self.selectionBar.pack(expand=True)
 
 		self.selectionBar.addPlace(places=2)
-
-
 
 		#Store a dictionary of tabs and frames
 		self.pages={}
