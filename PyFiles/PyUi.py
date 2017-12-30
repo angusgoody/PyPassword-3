@@ -24,6 +24,7 @@ mainOrangeColour="#E7A136"
 mainBlueColour="#17F388"
 mainGreyColour="#CDD7D6"
 mainClickedColour="#A9F955"
+mainWhiteColour="#E8EDEA"
 
 mainSecondOrangeColour="#D89633"
 mainSecondBlueColour="#13C770"
@@ -861,7 +862,7 @@ class contextBar(mainFrame):
 		mainFrame.__init__(self,parent)
 		#Preset bar colours, fonts etc
 		self.font="Avenir 14"
-		self.enabledColour="#E8EDEA"
+		self.enabledColour=mainWhiteColour
 		self.hoverColour="#DFE4E2"
 		self.clickedColour="#C5F71C"
 		self.defaultText=""
@@ -1027,17 +1028,19 @@ class privateSection(mainFrame):
 
 		#Label
 		self.textVar=StringVar()
-		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar)
+		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13",fg=mainGreyColour)
 		self.textLabel.pack(expand=True)
 		#Context bar
-		self.context=contextBar(self.buttonFrame,font="Avenir 10",enabledColour=mainBlueColour)
+		self.contextKwargs={"font":"Avenir 10","enabledColour":mainWhiteColour}
+		self.context=contextBar(self.buttonFrame,**self.contextKwargs)
 		self.context.pack(expand=True)
+
 
 		#-----Widgets------
 		self.loadedWidget=None
 		self.defaultWidget=mainLabel
 		self.editWidget=Entry
-		self.widgetFont="Avenir 15"
+		self.widgetFont="Avenir 16"
 
 		self.savedWidgets={}
 		self.savedWidgetData={}
@@ -1182,19 +1185,19 @@ class privateSection(mainFrame):
 		"""
 		#Copy to clipboard command
 		if buttonName == "Copy":
-			self.context.addButton(index,text=buttonName)
+			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 		#Hide data
 		elif buttonName == "Hide":
-			self.context.addButton(index,text=buttonName)
+			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 		#Launch a website
 		elif buttonName == "Launch":
-			self.context.addButton(index,text=buttonName)
+			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 		#Generate a password for the entry
 		elif buttonName == "Generate":
-			self.context.addButton(index,text=buttonName)
+			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 		#Not specified do nothing
 		else:
-			self.context.addButton(index,text=buttonName)
+			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 
 
 
@@ -1349,12 +1352,12 @@ class podNotebook(advancedNotebook):
 						newPrivateSection.defaultWidget=viewType
 						newPrivateSection.editWidget=editType
 						newPrivateSection.loadWidget(viewType)
+						#Set context to right length
+						newPrivateSection.context.setPlaceholders(len(buttonList))
 						#Add context buttons to section
 						for buttonName in buttonList:
 							newPrivateSection.addContextCommand(buttonList.index(buttonName),buttonName)
 
-						#Set context to right length
-						newPrivateSection.context.setPlaceholders(len(buttonList))
 						#Display on screen
 						newPrivateSection.pack(expand=True,fill=BOTH)
 						newPrivateSection.colour(generateHexColour())
