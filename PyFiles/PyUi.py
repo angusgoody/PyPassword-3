@@ -874,16 +874,21 @@ class contextBar(mainFrame):
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
 
+
+		#Update
+		self.storedKwargs=None
+		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
+		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
+		self.updateBar(**kwargs)
+
+
 		#Generate preset placeholders
 		self.presetPlaces=1
 		self.presetPlaces=kwargs.get("places",self.presetPlaces)
 		for x in range(self.presetPlaces):
 			self.addPlaceholder()
 
-		#Update
-		self.mainAttributes={self.font:"font",self.enabledColour:"enabledColour",
-		                     self.hoverColour:"hoverColour",self.clickedColour:"clickedColour"}
-		self.updateBar(**kwargs)
+
 
 	def updateBar(self,**kwargs):
 		"""
@@ -895,7 +900,8 @@ class contextBar(mainFrame):
 		#Update
 		for button in self.buttonArray:
 			button.updateButton(**kwargs)
-
+		#Update the store kwargs
+		self.storedKwargs=kwargs
 	def updateContextButton(self, index, **kwargs):
 		"""
 		This method will allow a
@@ -913,8 +919,7 @@ class contextBar(mainFrame):
 		"""
 		self.sections+=1
 		#Create Button
-		newButton=mainButton(self,enabledColour=self.enabledColour,
-		                     hoverColour=self.hoverColour,text=self.defaultText)
+		newButton=mainButton(self,**self.storedKwargs)
 		#Add button to array
 		self.buttonArray.append(newButton)
 		#Show the button on the bar itself
@@ -1023,10 +1028,10 @@ class privateSection(mainFrame):
 		#Label
 		self.textVar=StringVar()
 		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar)
-		#Widget
-		self.widgetFrame=mainFrame(self.widgetFrame)
+		self.textLabel.pack(expand=True)
 		#Context bar
-		self.context=contextBar(self.buttonFrame)
+		self.context=contextBar(self.buttonFrame,font="Avenir 10",enabledColour=mainBlueColour)
+		self.context.pack(expand=True)
 
 		#-----Widgets------
 		self.loadedWidget=None
@@ -1046,7 +1051,7 @@ class privateSection(mainFrame):
 		the correct widget 
 		"""
 		widgetType=type(widgetInstance)
-
+		print("Displaying widget type:",widgetType)
 		#Organise container
 		if widgetType == Text:
 			self.container.pack(expand=True,fill=BOTH)
@@ -1086,7 +1091,6 @@ class privateSection(mainFrame):
 
 			#Otherwise generate one and display it
 			if widgetName in privateSection.validWidgets:
-
 				if widgetName == Entry:
 					newWidget=Entry(self.widgetFrame,font=self.widgetFont)
 				elif widgetName == Text:
@@ -1095,7 +1099,6 @@ class privateSection(mainFrame):
 					newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont)
-
 				#Add the widget to dict
 				self.savedWidgets[widgetName]=newWidget
 				#Display
@@ -1249,7 +1252,6 @@ class advancedNotebook(mainFrame):
 		"""
 		#Get the correct frame to load
 		frameToLoad=self.pages[tabName]
-		print("Loading",tabName)
 		#Hide the current frame
 		if self.currentFrame:
 			self.currentFrame.pack_forget()
@@ -1407,7 +1409,6 @@ class selectionBar(mainFrame):
 		Will add a placeholder
 		for the selection bar
 		"""
-		print("Added placeholder")
 		places=1
 		places=kwargs.get("places",places)
 		for x in range(places):
@@ -1444,7 +1445,6 @@ class selectionBar(mainFrame):
 		if no index specified it will
 		add to the end
 		"""
-		print("Adding tab",tabName,kwargs)
 		#Default index is last item in list
 		tabIndex=len(self.tabList)
 		last=False
@@ -1510,7 +1510,7 @@ class selectionBar(mainFrame):
 			#Run the command
 			commandToRun=self.tabList[index][2]
 			if commandToRun:
-				commandToRun()
+				runCommand(commandToRun,name="Running selection bar tab command")
 			else:
 				print("Non command")
 
@@ -1519,7 +1519,6 @@ class selectionBar(mainFrame):
 		Will set the bar to the set number
 		of places
 		"""
-		print("Set size to be",numberOfPlaces)
 		#Get the number of tabs
 		numberOfTabs=len(self.tabList)
 
@@ -1614,6 +1613,7 @@ loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hid
 
 loginTemplate.addTab("Advanced")
 loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 
 #=====Secure Note======
 secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
