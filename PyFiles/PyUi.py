@@ -1215,11 +1215,8 @@ class advancedNotebook(mainFrame):
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
 
-		#self.selectionBar.addPlace(places=2)
-
 		#Store a dictionary of tabs and frames
 		self.pages={}
-		self.pageList=[]
 
 		#Store tab counter
 		self.tabCounter=-1
@@ -1241,10 +1238,8 @@ class advancedNotebook(mainFrame):
 		#Get the index
 		index=None
 		index=kwargs.get("index",index)
-		if tabName not in self.pageList:
-			self.pageList.append(tabName)
-			#Add a bar to the self
-			self.selectionBar.addTab(tabName,command=lambda tab=tabName: self.loadFrame(tab),index=index)
+		#Add a bar to the self
+		self.selectionBar.addTab(tabName,command=lambda tab=tabName: self.loadFrame(tab),index=index)
 
 	def loadFrame(self,tabName):
 		"""
@@ -1254,7 +1249,7 @@ class advancedNotebook(mainFrame):
 		"""
 		#Get the correct frame to load
 		frameToLoad=self.pages[tabName]
-
+		print("Loading",tabName)
 		#Hide the current frame
 		if self.currentFrame:
 			self.currentFrame.pack_forget()
@@ -1282,9 +1277,6 @@ class podNotebook(advancedNotebook):
 		self.sectionDict={}
 
 	def addPage(self,tabName,pageFrame,**kwargs):
-		if tabName not in self.sectionDict:
-			#Add to section dict
-			self.sectionDict[tabName]={}
 		return super(podNotebook, self).addPage(tabName,pageFrame,**kwargs)
 
 	def loadTemplate(self,templateName):
@@ -1307,17 +1299,14 @@ class podNotebook(advancedNotebook):
 			#Set the selection bar
 			self.selectionBar.setSize(len(correctTemplate.tabs))
 
-
 			#Load the tabs
 			counter=0
 			for tabList in templateArray:
 				tabName=tabList[0]
 				tabFrame=tabList[1]
 				#Add the frame to the correct tab
-				#self.addPage(tabName,tabFrame)
-
-
-
+				self.addPage(tabName,tabFrame,index=counter)
+				counter+=1
 
 
 		#Need to generate a new section
@@ -1328,18 +1317,23 @@ class podNotebook(advancedNotebook):
 				log.report("A template was generated",templateName)
 
 				#First get the template information
-				correctTemplate=podTemplate[templateName]
+				correctTemplate=podTemplate.templates[templateName]
 
 				#Initalise an array to store data
-				self.savedTemplates[templateName]=["","",{}]
+				self.savedTemplates[templateName]=[]
 
 				#Iterate through the template
-				for tabName in correctTemplate.tabs:
+				for tabName in correctTemplate.tabOrder:
+					#Initialise array
+					currentTemplateArray=["","",{}]
+					self.savedTemplates[templateName].append(currentTemplateArray)
 					#Create a new frame
 					newFrame=mainFrame(self)
-					self.addPage(tabName,newFrame)
 					#Get the widget list
 					sectionList=correctTemplate.tabs[tabName]
+					#Add to saved templates in memory
+					currentTemplateArray[0]=tabName
+					currentTemplateArray[1]=newFrame
 					#Create private sections
 					for section in sectionList:
 						#Gather Info
@@ -1347,14 +1341,27 @@ class podNotebook(advancedNotebook):
 						viewType=section[1]
 						editType=section[2]
 						buttonList=section[3]
+						#Create section
+						newPrivateSection=privateSection(newFrame)
+						newPrivateSection.textVar.set(sectionName)
+						newPrivateSection.defaultWidget=viewType
+						newPrivateSection.editWidget=editType
+						newPrivateSection.loadWidget(viewType)
+						#Add context buttons to section
+						for buttonName in buttonList:
+							newPrivateSection.addContextCommand(buttonList.index(buttonName),buttonName)
 
+						#Set context to right length
+						newPrivateSection.context.setPlaceholders(len(buttonList))
+						#Display on screen
+						newPrivateSection.pack(expand=True,fill=BOTH)
+						newPrivateSection.colour(generateHexColour())
+						#Store the section in memory
+						#self.sectionDict[tabName][sectionName]=newPrivateSection
+						currentTemplateArray[2][sectionName]=newPrivateSection
 
-
-
-
-				#Add to saved templates then load
-				#self.savedTemplates[templateName]=""
-				#self.loadTemplate(templateName)
+				#Call the function again to load from memory
+				self.loadTemplate(templateName)
 
 
 	def addPodData(self,podInstance):
@@ -1400,11 +1407,10 @@ class selectionBar(mainFrame):
 		Will add a placeholder
 		for the selection bar
 		"""
+		print("Added placeholder")
 		places=1
 		places=kwargs.get("places",places)
 		for x in range(places):
-			#Add place to the array
-			#self.tabList.append("")
 			#Create a button
 			newButton=mainButton(self.centerFrame,enabledColour=self.notSelectedTabColour,
 			                     hoverColour=self.notSelectedHoverTabColour)
@@ -1420,15 +1426,16 @@ class selectionBar(mainFrame):
 		in the selection bar
 		"""
 		if index < len(self.tabList) and index >= 0:
+			#Check if it was current
+			if index == self.currentIndex:
+				self.runTabCommand(0)
 			#Remove the button
 			button=self.tabList[index][1]
 			button.pack_forget()
 			#Remove the ref
 			del self.tabList[index]
 
-			#Check if it was current
-			if index == self.currentIndex:
-				self.runTabCommand(0)
+
 
 	def addTab(self,tabName,**kwargs):
 		"""
@@ -1437,14 +1444,25 @@ class selectionBar(mainFrame):
 		if no index specified it will
 		add to the end
 		"""
+		print("Adding tab",tabName,kwargs)
 		#Default index is last item in list
 		tabIndex=len(self.tabList)
+		last=False
 		command=None
 		#Attempt to get index from kwargs
 		tabIndex=kwargs.get("index",tabIndex)
 		command=kwargs.get("command",command)
+		last=kwargs.get("last",last)
+
+		#If last is specified
+		if last:
+			tabIndex=len(self.tabList)-1
+
 		#Check if index is valid
-		if tabIndex > len(self.tabList) or tabIndex < 0:
+		if type(tabIndex) is int:
+			if tabIndex > len(self.tabList) or tabIndex < 0:
+				tabIndex=len(self.tabList)
+		else:
 			tabIndex=len(self.tabList)
 
 		#Add place if needed
@@ -1455,8 +1473,11 @@ class selectionBar(mainFrame):
 		self.tabList[tabIndex][0]=tabName
 		self.tabList[tabIndex][2]=command
 		butt=self.tabList[tabIndex][1]
-
 		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(self.tabList.index([tabName,butt,command])))
+
+		#If index is 0 then run it
+		if tabIndex == 0:
+			self.runTabCommand(0,forced=True)
 
 	def updateTab(self,index,**kwargs):
 		"""
@@ -1466,13 +1487,16 @@ class selectionBar(mainFrame):
 		correctButton=self.tabList[index][1]
 		correctButton.updateButton(**kwargs)
 
-	def runTabCommand(self,index):
+	def runTabCommand(self,index,**kwargs):
 		"""
 		This is what is called when the
 		tabs button is pressed
 		"""
+		#Can be forced to run to override
+		forced=False
+		forced=kwargs.get("forced",forced)
 		#Avoid running tab command on current tab
-		if index != self.currentIndex:
+		if index != self.currentIndex or forced == True:
 			#Update the old current tab
 			if type(self.currentIndex) is int:
 				self.updateTab(self.currentIndex,enabledColour=self.notSelectedTabColour,
@@ -1486,7 +1510,7 @@ class selectionBar(mainFrame):
 			#Run the command
 			commandToRun=self.tabList[index][2]
 			if commandToRun:
-				print("Valid command to run")
+				commandToRun()
 			else:
 				print("Non command")
 
@@ -1495,6 +1519,7 @@ class selectionBar(mainFrame):
 		Will set the bar to the set number
 		of places
 		"""
+		print("Set size to be",numberOfPlaces)
 		#Get the number of tabs
 		numberOfTabs=len(self.tabList)
 
