@@ -1028,10 +1028,10 @@ class privateSection(mainFrame):
 
 		#Label
 		self.textVar=StringVar()
-		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13",fg=mainGreyColour)
+		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13")
 		self.textLabel.pack(expand=True)
 		#Context bar
-		self.contextKwargs={"font":"Avenir 10","enabledColour":mainWhiteColour}
+		self.contextKwargs={"font":"Avenir 10","clickedColour":mainBlueColour}
 		self.context=contextBar(self.buttonFrame,**self.contextKwargs)
 		self.context.pack(expand=True)
 
@@ -1214,7 +1214,6 @@ class advancedNotebook(mainFrame):
 		#The tab
 		self.tabFrame=mainFrame(self)
 		self.tabFrame.pack(side=TOP,fill=X)
-
 		self.tabFrame.colour("#BDC7C5")
 
 		#Selection bar
@@ -1313,7 +1312,6 @@ class podNotebook(advancedNotebook):
 				self.addPage(tabName,tabFrame,index=counter)
 				counter+=1
 
-
 		#Need to generate a new section
 		else:
 
@@ -1340,7 +1338,9 @@ class podNotebook(advancedNotebook):
 					currentTemplateArray[0]=tabName
 					currentTemplateArray[1]=newFrame
 					#Create private sections
+					sectionCount=0
 					for section in sectionList:
+						sectionCount+=1
 						#Gather Info
 						sectionName=section[0]
 						viewType=section[1]
@@ -1360,15 +1360,17 @@ class podNotebook(advancedNotebook):
 
 						#Display on screen
 						newPrivateSection.pack(expand=True,fill=BOTH)
-						newPrivateSection.colour(generateHexColour())
+						if sectionCount % 2 == 0:
+							newPrivateSection.colour("#C3C3C7")
 						#Store the section in memory
-						#self.sectionDict[tabName][sectionName]=newPrivateSection
 						currentTemplateArray[2][sectionName]=newPrivateSection
 
 				#Call the function again to load from memory
 				self.loadTemplate(templateName)
 
-
+		#Update the colour
+		templateColour=podTemplate.templateColours[templateName]
+		#todo add colour config here
 	def addPodData(self,podInstance):
 		"""
 		This method will take a pod
@@ -1609,7 +1611,7 @@ class podTemplate:
 
 
 #=====Login======
-loginTemplate=podTemplate("Login","#3CE995")
+loginTemplate=podTemplate("Login","#A9F955")
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
@@ -1619,7 +1621,7 @@ loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","H
 loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 
 #=====Secure Note======
-secureNoteTemplate=podTemplate("SecureNote","#56B6C4")
+secureNoteTemplate=podTemplate("SecureNote","#78C2D2")
 secureNoteTemplate.addTab("Note")
 secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
 

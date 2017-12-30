@@ -180,9 +180,9 @@ viewPodScreen=screen(window,"View Pod",protected=True)
 viewPodScreen.context=context
 
 #Create the context buttons
-viewPodScreen.addContextInfo(0,text="Delete",enabledColour=mainRedColour)
+viewPodScreen.addContextInfo(0,text="Delete",clickedColour=mainRedColour)
 viewPodScreen.addContextInfo(1,text="Edit",enabledColour=mainBlueColour)
-viewPodScreen.addContextInfo(2,text="Back",enabledColour=mainOrangeColour)
+viewPodScreen.addContextInfo(2,text="Back")
 
 #Top Label
 viewPodLabelVar=StringVar()
