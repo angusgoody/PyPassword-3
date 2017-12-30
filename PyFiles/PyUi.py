@@ -1244,7 +1244,7 @@ class advancedNotebook(mainFrame):
 		if tabName not in self.pageList:
 			self.pageList.append(tabName)
 			#Add a bar to the self
-			self.selectionBar.addTab(tabName,lambda tab=tabName: self.loadFrame(tab),index=index)
+			self.selectionBar.addTab(tabName,command=lambda tab=tabName: self.loadFrame(tab),index=index)
 
 	def loadFrame(self,tabName):
 		"""
@@ -1300,19 +1300,61 @@ class podNotebook(advancedNotebook):
 		#Attempt to load from memory
 		if templateName in self.savedTemplates:
 			log.report("A template was loaded from memory",templateName)
+			#Get the stored widgets from memory
 			templateArray=self.savedTemplates[templateName]
+			#Get the template info from the class
 			correctTemplate=podTemplate.templates[templateName]
 			#Set the selection bar
 			self.selectionBar.setSize(len(correctTemplate.tabs))
 
 
+			#Load the tabs
+			counter=0
+			for tabList in templateArray:
+				tabName=tabList[0]
+				tabFrame=tabList[1]
+				#Add the frame to the correct tab
+				#self.addPage(tabName,tabFrame)
+
+
+
+
+
 		#Need to generate a new section
 		else:
-			log.report("A template was generated",templateName)
 
-			#Add to saved templates then load
-			self.savedTemplates[templateName]=""
-			self.loadTemplate(templateName)
+			#Check its a valid pod
+			if templateName in podTemplate.templates:
+				log.report("A template was generated",templateName)
+
+				#First get the template information
+				correctTemplate=podTemplate[templateName]
+
+				#Initalise an array to store data
+				self.savedTemplates[templateName]=["","",{}]
+
+				#Iterate through the template
+				for tabName in correctTemplate.tabs:
+					#Create a new frame
+					newFrame=mainFrame(self)
+					self.addPage(tabName,newFrame)
+					#Get the widget list
+					sectionList=correctTemplate.tabs[tabName]
+					#Create private sections
+					for section in sectionList:
+						#Gather Info
+						sectionName=section[0]
+						viewType=section[1]
+						editType=section[2]
+						buttonList=section[3]
+
+
+
+
+
+				#Add to saved templates then load
+				#self.savedTemplates[templateName]=""
+				#self.loadTemplate(templateName)
 
 
 	def addPodData(self,podInstance):
@@ -1368,7 +1410,7 @@ class selectionBar(mainFrame):
 			                     hoverColour=self.notSelectedHoverTabColour)
 			newButton.pack(fill=BOTH,expand=True,side=LEFT)
 			#Store the button
-			self.tabList.append(["New Tab",newButton])
+			self.tabList.append(["New Tab",newButton,None])
 			#Add the tab
 			self.addTab("New Tab",index=len(self.tabList)-1)
 
@@ -1397,8 +1439,10 @@ class selectionBar(mainFrame):
 		"""
 		#Default index is last item in list
 		tabIndex=len(self.tabList)
+		command=None
 		#Attempt to get index from kwargs
 		tabIndex=kwargs.get("index",tabIndex)
+		command=kwargs.get("command",command)
 		#Check if index is valid
 		if tabIndex > len(self.tabList) or tabIndex < 0:
 			tabIndex=len(self.tabList)
@@ -1409,8 +1453,10 @@ class selectionBar(mainFrame):
 
 		#Update data
 		self.tabList[tabIndex][0]=tabName
+		self.tabList[tabIndex][2]=command
 		butt=self.tabList[tabIndex][1]
-		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(self.tabList.index([tabName,butt])))
+
+		self.updateTab(tabIndex,text=tabName,command=lambda: self.runTabCommand(self.tabList.index([tabName,butt,command])))
 
 	def updateTab(self,index,**kwargs):
 		"""
@@ -1436,6 +1482,13 @@ class selectionBar(mainFrame):
 			self.currentIndex=index
 			self.updateTab(index,enabledColour=self.selectedTabColour,
 			               hoverColour=self.selectedTabColour)
+
+			#Run the command
+			commandToRun=self.tabList[index][2]
+			if commandToRun:
+				print("Valid command to run")
+			else:
+				print("Non command")
 
 	def setSize(self,numberOfPlaces):
 		"""
