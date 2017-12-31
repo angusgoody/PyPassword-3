@@ -473,6 +473,7 @@ class mainLabel(Label):
 		self.fg=None
 		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
+		self.width=10
 		#Initiate update
 		self.update(**kwargs)
 
@@ -486,8 +487,9 @@ class mainLabel(Label):
 		self.font=kwargs.get("font",self.font)
 		self.fg=kwargs.get("fg",self.fg)
 		self.colourVar=kwargs.get("colour",self.colourVar)
+		self.width=kwargs.get("width",self.width)
 		#Update
-		self.config(textvariable=self.textVar,font=self.font)
+		self.config(textvariable=self.textVar,font=self.font,width=self.width)
 		if self.fg == None:
 			self.colour(self.colourVar)
 		else:
@@ -1045,6 +1047,7 @@ class privateSection(mainFrame):
 		self.defaultWidget=mainLabel
 		self.editWidget=Entry
 		self.widgetFont="Avenir 16"
+		self.widgetWidth=15
 
 		self.savedWidgets={}
 		self.savedWidgetData={}
@@ -1074,7 +1077,7 @@ class privateSection(mainFrame):
 			self.container.pack(expand=True)
 			self.labelFrame.grid(row=0,column=0,padx=5)
 			self.widgetFrame.grid(row=0,column=1,padx=5)
-			self.buttonFrame.grid(row=0,column=2)
+			self.buttonFrame.grid(row=0,column=2,padx=5)
 			#Display the other widget
 			widgetInstance.pack(fill=X)
 
@@ -1099,13 +1102,13 @@ class privateSection(mainFrame):
 			#Otherwise generate one and display it
 			if widgetName in privateSection.validWidgets:
 				if widgetName == Entry:
-					newWidget=Entry(self.widgetFrame,font=self.widgetFont)
+					newWidget=Entry(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
 				elif widgetName == Text:
 					newWidget=Text(self.widgetFrame,height=12,font=self.widgetFont,bg="#E2E9F0")
 				elif widgetName == OptionMenu:
 					newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
-					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont)
+					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
 				#Add the widget to dict
 				self.savedWidgets[widgetName]=newWidget
 				#Display
@@ -1386,6 +1389,8 @@ class podNotebook(advancedNotebook):
 		"""
 		if type(podInstance) is peaPod:
 			log.report("Adding pod data")
+			#Clear data first
+			self.clearData(allWidgets=True,widgetData=True)
 			#Unlock pod if needed
 			if podInstance.vaultState:
 				podInstance.unlockVault("Unlock")
