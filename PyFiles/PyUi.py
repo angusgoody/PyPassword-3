@@ -473,7 +473,7 @@ class mainLabel(Label):
 		self.fg=None
 		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
-		self.width=10
+		self.width=None
 		#Initiate update
 		self.update(**kwargs)
 
@@ -489,7 +489,10 @@ class mainLabel(Label):
 		self.colourVar=kwargs.get("colour",self.colourVar)
 		self.width=kwargs.get("width",self.width)
 		#Update
-		self.config(textvariable=self.textVar,font=self.font,width=self.width)
+		if self.width:
+			self.config(textvariable=self.textVar,font=self.font,width=self.width)
+		else:
+			self.config(textvariable=self.textVar,font=self.font)
 		if self.fg == None:
 			self.colour(self.colourVar)
 		else:
