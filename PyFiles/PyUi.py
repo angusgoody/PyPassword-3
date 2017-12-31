@@ -14,6 +14,7 @@ are created and used.
 from tkinter import *
 from PEM import *
 from random import randint
+
 #====================Log====================
 
 log=logClass("User Interface")
@@ -31,6 +32,9 @@ mainSecondBlueColour="#13C770"
 mainSecondGreenColour="#7CCE32"
 mainSecondRedColour="#A25360"
 mainSecondGreyColour="#8B8F8F"
+
+#Store variables for all programs
+mainVars={}
 #====================Functions====================
 """
 This section is for functions that aid with the user
@@ -1097,7 +1101,7 @@ class privateSection(mainFrame):
 				if widgetName == Entry:
 					newWidget=Entry(self.widgetFrame,font=self.widgetFont)
 				elif widgetName == Text:
-					newWidget=Text(self.widgetFrame,height=12,font=self.widgetFont)
+					newWidget=Text(self.widgetFrame,height=12,font=self.widgetFont,bg="#E2E9F0")
 				elif widgetName == OptionMenu:
 					newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
@@ -1364,6 +1368,8 @@ class podNotebook(advancedNotebook):
 							newPrivateSection.colour("#C3C3C7")
 						#Store the section in memory
 						currentTemplateArray[2][sectionName]=newPrivateSection
+						#Store ref in self dict
+						self.sectionDict[sectionName]=newPrivateSection
 
 				#Call the function again to load from memory
 				self.loadTemplate(templateName)
@@ -1371,14 +1377,34 @@ class podNotebook(advancedNotebook):
 		#Update the colour
 		templateColour=podTemplate.templateColours[templateName]
 		#todo add colour config here
+
 	def addPodData(self,podInstance):
 		"""
 		This method will take a pod
 		and add the data to the notebook
 		view.
 		"""
-		pass
-		#print("Adding pod data for",podInstance)
+		if type(podInstance) is peaPod:
+			log.report("Adding pod data")
+			#Unlock pod if needed
+			if podInstance.vaultState:
+				podInstance.unlockVault("Unlock")
+			#Add the pod data
+			for sectionName in self.sectionDict:
+				if sectionName in podInstance.vault:
+					#Add to screen
+					self.sectionDict[sectionName].addData(podInstance.vault[sectionName])
+
+	def clearData(self,**kwargs):
+		"""
+		Used to clear
+		the notebook of all data
+		"""
+		for section in self.sectionDict:
+			self.sectionDict[section].clearData(**kwargs)
+
+
+
 
 
 
@@ -1395,6 +1421,7 @@ class selectionBar(mainFrame):
 
 		#Background colour for selection bar
 		self.preserveColour=True
+
 
 		#Colours for tabs
 		self.selectedTabColour=mainBlueColour

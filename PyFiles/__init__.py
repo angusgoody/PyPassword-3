@@ -24,13 +24,16 @@ is initiated and setup.
 window=Tk()
 window.title("PyPassword 3")
 window.geometry("570x450")
+mainVars["window"]=window
 #====================Menus====================
 
 #Menu when locked
 publicMenu=Menu(window)
+mainVars["publicMenu"]=publicMenu
 
 #Menu inside the program
 privateMenu=Menu(window)
+mainVars["privateMenu"]=publicMenu
 
 #Update the screen class menus
 screen.publicMenu=publicMenu
