@@ -1152,6 +1152,8 @@ class privateSection(mainFrame):
 		#Add data from currently loaded widget
 		if self.loadedWidget in self.savedWidgets:
 			addDataToWidget(self.savedWidgets[self.loadedWidget],data)
+			#Store data
+			self.savedWidgetData[self.loadedWidget]=data
 
 	def clearData(self,**kwargs):
 		"""
@@ -1249,7 +1251,7 @@ class privateSection(mainFrame):
 			#MainLabel
 			elif widgetType == mainLabel:
 				if hideOrShow == "Hide":
-					widget.textVar.set("•••••")
+					widget.textVar.set("••••••••")
 				else:
 					if mainLabel in self.savedWidgetData:
 						widget.textVar.set(self.savedWidgetData[mainLabel])
@@ -1271,8 +1273,10 @@ class privateSection(mainFrame):
 		#Determine default
 		if self.hiddenState == False:
 			currentCommand=True
+			self.hiddenState=True
 		elif self.hiddenState == True:
 			currentCommand=False
+			self.hiddenState=False
 
 		#Check for kwargs
 		forced=kwargs.get("forced",forced)
@@ -1280,8 +1284,7 @@ class privateSection(mainFrame):
 			currentCommand=forced
 
 		#Check data needs to be hidden
-		if currentCommand:
-
+		if currentCommand is not None:
 			#Show the data
 			if currentCommand == False:
 				for widget in self.savedWidgets:

@@ -769,3 +769,24 @@ Command executing success Running selection bar tab command,2017-12-30 18:01:53,
 Command executing success MainButton,2017-12-30 18:01:49,System
 Command executing success Running selection bar tab command,2017-12-30 18:02:02,System
 Command executing success MainButton,2017-12-30 18:01:54,System
+Command executing success Screen Class,2018-01-01 14:54:40,System
+Command executing success MainButton,2018-01-01 14:54:46,System
+Command executing success MainButton,2018-01-01 14:55:31,System
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function privateSection.addContextCommand.<locals>.<lambda> at 0x10f2e1ea0>,2018-01-01 14:55:29,Error
+Command executing success MainButton,2018-01-01 14:55:34,System
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function privateSection.addContextCommand.<locals>.<lambda> at 0x10f2e1ea0>,2018-01-01 14:54:47,Error
+Command executing success MainButton,2018-01-01 14:54:37,System
+Command executing success Finding master pods,2018-01-01 14:54:36,System
+Adding pod data,2018-01-01 14:54:44,Default
+Command executing success MainButton,2018-01-01 14:55:32,System
+Command executing success Screen Class,2018-01-01 14:54:38,System
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function privateSection.addContextCommand.<locals>.<lambda> at 0x10f2e1ea0>,2018-01-01 14:55:00,Error
+Command executing success Finding master pods,2018-01-01 15:16:32,System
+Command executing success MainButton,2018-01-01 15:16:34,System
+Command executing success Screen Class,2018-01-01 15:16:35,System
+Command executing success MainButton,2018-01-01 15:16:42,System
+Command executing success MainButton,2018-01-01 15:16:38,System
+Command executing success Screen Class,2018-01-01 15:16:36,System
+Error executing command through function 'NoneType' object has no attribute 'textVar' <function privateSection.addContextCommand.<locals>.<lambda> at 0x10f2e1ea0>,2018-01-01 15:16:40,Error
+Adding pod data,2018-01-01 15:16:37,Default
+Command executing success MainButton,2018-01-01 15:16:39,System
