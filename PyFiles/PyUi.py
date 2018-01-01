@@ -327,6 +327,7 @@ class mainButton(mainFrame):
 		#Store button state
 		self.state=True
 		self.hoverOn=False
+		self.mouseInside=False
 		self.pressing=False
 		#Fonts
 		self.font="Avenir 14"
@@ -347,7 +348,7 @@ class mainButton(mainFrame):
 		#Bindings
 		self.addBinding("<Enter>",lambda event: self.hover(True))
 		self.addBinding("<Leave>",lambda event: self.hover(False))
-		self.addBinding("<Button-1>",lambda event: self.runCommand())
+		#self.addBinding("<Button-1>",lambda event: self.runCommand())
 		self.addBinding("<ButtonRelease-1>",lambda event: self.pressBind(False))
 
 		#Check for Kwargs
@@ -414,6 +415,9 @@ class mainButton(mainFrame):
 			else:
 				self.pressing=False
 				self.changeButtonColour(self.hoverColour)
+				#Run command if mouse is over button
+				if self.mouseInside:
+					self.runCommand()
 
 	def runCommand(self):
 		"""
@@ -437,6 +441,7 @@ class mainButton(mainFrame):
 		False = Out
 		"""
 		if self.state:
+			self.mouseInside=inOut
 			#If the hover state is false then hover is not active
 			if inOut:
 				#Only change to hover if user isn't still pressing button
