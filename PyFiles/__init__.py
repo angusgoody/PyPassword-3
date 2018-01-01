@@ -64,6 +64,7 @@ statusBar.pack(side=BOTTOM,fill=X)
 #Initiate the context bar for the whole program
 context=contextBar(window)
 context.pack(side=BOTTOM,fill=X)
+mainVars["context"]=context
 
 #endregion
 #======Splash Screen======
@@ -429,6 +430,8 @@ podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
+viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
+
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))

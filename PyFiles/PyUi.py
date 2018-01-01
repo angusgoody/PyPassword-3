@@ -110,7 +110,24 @@ def getDataFromWidget(widget):
 	else:
 		log.report("Attempt to get info from non supported widget",widgetType)
 
+def changeWidgetState(widget,state):
+	"""
+	Function to update
+	state of a range
+	of diffrent widgets
+	"""
+	#Get the type of widget
+	widgetType=type(widget)
+	validWidgets=[Entry,advancedEntry,Text]
 
+	#Change the state
+	if widgetType in validWidgets:
+		widget.config(state=state)
+		if widgetType == Text:
+			if state == DISABLED:
+				widget.config(fg=mainGreyColour)
+			else:
+				widget.config(fg="#000000")
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
@@ -1086,7 +1103,6 @@ class privateSection(mainFrame):
 		the correct widget 
 		"""
 		widgetType=type(widgetInstance)
-		print("Displaying widget type:",widgetType)
 		#Organise container
 		if widgetType == Text:
 			self.container.pack(expand=True,fill=BOTH)
@@ -1125,7 +1141,7 @@ class privateSection(mainFrame):
 				self.displayWidget(correctWidget)
 
 			#Otherwise generate one and display it
-			if widgetName in privateSection.validWidgets:
+			elif widgetName in privateSection.validWidgets:
 				if widgetName == Entry:
 					newWidget=Entry(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
 				elif widgetName == Text:
@@ -1258,8 +1274,6 @@ class privateSection(mainFrame):
 					else:
 						print("Could not find data for mainLabel")
 
-
-
 	def toggleHide(self,**kwargs):
 		"""
 		This function will change the 
@@ -1301,6 +1315,27 @@ class privateSection(mainFrame):
 				#Update the button
 				but=self.context.getButton("Hide")
 				but.textVar.set("Show")
+
+	def changeState(self,chosenState):
+		"""
+		Disable or enable the section
+		False = Normal
+		True = Disabled
+		"""
+		#Disable
+		if chosenState == True and self.widgetState == False:
+			for widget in self.savedWidgets:
+				changeWidgetState(self.savedWidgets[widget],DISABLED)
+			#Update the var
+			self.widgetState=True
+		elif chosenState == False and self.widgetState == True:
+			for widget in self.savedWidgets:
+				changeWidgetState(self.savedWidgets[widget],NORMAL)
+			#Update the var
+			self.widgetState=False
+
+
+
 
 
 
@@ -1387,6 +1422,8 @@ class podNotebook(advancedNotebook):
 		self.currentTemplate=None
 		#Store the sections
 		self.sectionDict={}
+		#Store state
+		self.notebookState=None #False = Normal True = Disabled
 
 	def addPage(self,tabName,pageFrame,**kwargs):
 		return super(podNotebook, self).addPage(tabName,pageFrame,**kwargs)
@@ -1509,9 +1546,65 @@ class podNotebook(advancedNotebook):
 		for section in self.sectionDict:
 			self.sectionDict[section].clearData(**kwargs)
 
+	def changeNotebookState(self,chosenState,**kwargs):
+		"""
+		Will change the state of the notebook
+		to either enabled or disabled
+		"""
+
+		if chosenState and self.notebookState == False:
+			#Disable the notebook
+			for section in self.sectionDict:
+				self.sectionDict[section].changeState(chosenState)
+			self.notebookState=True
+		elif chosenState == False and self.notebookState == True:
+			#Enable the notebook
+			for section in self.sectionDict:
+				self.sectionDict[section].changeState(chosenState)
+			self.notebookState=True
 
 
+	def startEdit(self):
+		"""
+		Run when the user wants 
+		to edit the data on screen
+		"""
+		#Load the correct widget
+		for sectionName in self.sectionDict:
+			sect=self.sectionDict[sectionName]
+			sect.loadWidget(sect.editWidget)
 
+		#Enable the section
+		self.changeNotebookState(False)
+
+		#Disable the hide buttons
+
+		#Update the context
+		context=None
+		context=mainVars.get("context",context)
+		if context:
+			context.updateContextButton(0, text="Cancel", command=lambda: self.cancelEdit())
+			context.updateContextButton(1,text="Save",command=None)
+			context.setPlaceholders(2)
+
+	def cancelEdit(self):
+		"""
+		Cancel the edit means
+		if the user clicks
+		 cancel when editing
+		 data not saved
+		"""
+		#Update state of notebook
+		self.changeNotebookState(False)
+		#Load the correct widget
+		for sectionName in self.sectionDict:
+			sect=self.sectionDict[sectionName]
+			sect.loadWidget(sect.defaultWidget)
+		#Update the context
+		context=None
+		context=mainVars.get("context",context)
+		if context:
+			screen.lastScreen.runContext()
 
 
 
