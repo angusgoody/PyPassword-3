@@ -1301,6 +1301,10 @@ class privateSection(mainFrame):
 		forced=kwargs.get("forced",forced)
 		if forced:
 			currentCommand=forced
+			if forced == False:
+				self.hiddenState=False
+			elif forced:
+				self.hiddenState=True
 
 		#Check data needs to be hidden
 		if currentCommand is not None:
@@ -1333,11 +1337,14 @@ class privateSection(mainFrame):
 				changeWidgetState(self.savedWidgets[widget],DISABLED)
 			#Update the var
 			self.widgetState=True
+		#Enable
 		elif chosenState == False and self.widgetState == True:
 			for widget in self.savedWidgets:
 				changeWidgetState(self.savedWidgets[widget],NORMAL)
 			#Update the var
 			self.widgetState=False
+
+
 
 
 
@@ -1568,21 +1575,23 @@ class podNotebook(advancedNotebook):
 				self.sectionDict[section].changeState(chosenState)
 			self.notebookState=True
 
-
 	def startEdit(self):
 		"""
 		Run when the user wants 
 		to edit the data on screen
 		"""
+		#Enable the section
+		self.changeNotebookState(False)
+
 		#Load the correct widget
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
 			sect.loadWidget(sect.editWidget)
+			#Ensure the data is showing
+			sect.toggleHide(forced=False)
 
-		#Enable the section
-		self.changeNotebookState(False)
 
-		#Disable the hide buttons
+
 
 		#Update the context
 		context=None
