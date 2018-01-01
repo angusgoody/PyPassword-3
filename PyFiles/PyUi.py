@@ -898,8 +898,6 @@ class contextBar(mainFrame):
 		for x in range(self.presetPlaces):
 			self.addPlaceholder()
 
-
-
 	def updateBar(self,**kwargs):
 		"""
 		Update the bar with KWARGS
@@ -912,6 +910,7 @@ class contextBar(mainFrame):
 			button.updateButton(**kwargs)
 		#Update the store kwargs
 		self.storedKwargs=kwargs
+
 	def updateContextButton(self, index, **kwargs):
 		"""
 		This method will allow a
@@ -1015,6 +1014,25 @@ class contextBar(mainFrame):
 			#Ensures the button isn't still being pressed when context changes
 			self.buttonArray[index].pressBind(False)
 
+	def getButtonIndex(self,buttonName):
+		"""
+		Return the index of a button by
+		the name passed
+		"""
+		for button in self.buttonArray:
+			currentButtonName=button.textVar.get()
+			if buttonName == currentButtonName:
+				buttonIndex=self.buttonArray.index(button)
+				return buttonIndex
+
+	def getButton(self,buttonName):
+		"""
+		This function will return the 
+		button widget itself
+		"""
+		for button in self.buttonArray:
+			if button.textVar.get() == buttonName:
+				return button
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1056,6 +1074,10 @@ class privateSection(mainFrame):
 		self.savedWidgetData={}
 		self.widgetVar=StringVar()
 		self.widgetVar.set("Widget")
+
+		#-----States-------
+		self.hiddenState=False # False = Showing
+		self.widgetState=False # False = Normal
 
 	def displayWidget(self,widgetInstance):
 		"""
@@ -1198,7 +1220,7 @@ class privateSection(mainFrame):
 			self.context.addButton(index,text=buttonName,**self.contextKwargs)
 		#Hide data
 		elif buttonName == "Hide":
-			self.context.addButton(index,text=buttonName,**self.contextKwargs)
+			self.context.addButton(index,text=buttonName,command=lambda: self.toggleHide(),**self.contextKwargs)
 		#Launch a website
 		elif buttonName == "Launch":
 			self.context.addButton(index,text=buttonName,**self.contextKwargs)
@@ -1208,6 +1230,79 @@ class privateSection(mainFrame):
 		#Not specified do nothing
 		else:
 			self.context.addButton(index,text=buttonName,**self.contextKwargs)
+
+	def hideWidget(self,widget,hideOrShow):
+		"""
+		This method actually changes
+		the data in the widget
+		"""
+		widgetType=type(widget)
+		if widgetType in [Entry,mainLabel]:
+
+			#Entry
+			if widgetType == Entry:
+				if hideOrShow == "Hide":
+					widget.config(show="•")
+				else:
+					widget.config(show="")
+
+			#MainLabel
+			elif widgetType == mainLabel:
+				if hideOrShow == "Hide":
+					widget.textVar.set("•••••")
+				else:
+					if mainLabel in self.savedWidgetData:
+						widget.textVar.set(self.savedWidgetData[mainLabel])
+					else:
+						print("Could not find data for mainLabel")
+
+
+
+	def toggleHide(self,**kwargs):
+		"""
+		This function will change the 
+		contents of the section to be hidden
+		or showing.
+		False = Showing
+		True = Hidden
+		"""
+		currentCommand=None
+		forced=None
+		#Determine default
+		if self.hiddenState == False:
+			currentCommand=True
+		elif self.hiddenState == True:
+			currentCommand=False
+
+		#Check for kwargs
+		forced=kwargs.get("forced",forced)
+		if forced:
+			currentCommand=forced
+
+		#Check data needs to be hidden
+		if currentCommand:
+
+			#Show the data
+			if currentCommand == False:
+				for widget in self.savedWidgets:
+					self.hideWidget(self.savedWidgets[widget],"Show")
+				#Update the button
+				but=self.context.getButton("Show")
+				but.textVar.set("Hide")
+
+
+			#Hide the data
+			elif currentCommand == True:
+				for widget in self.savedWidgets:
+					self.hideWidget(self.savedWidgets[widget],"Hide")
+				#Update the button
+				but=self.context.getButton("Hide")
+				but.textVar.set("Show")
+
+
+
+
+
 
 
 
