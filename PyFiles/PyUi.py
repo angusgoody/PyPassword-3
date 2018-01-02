@@ -475,7 +475,8 @@ class mainButton(mainFrame):
 			self.state=False
 			#Change colours
 			self.changeButtonColour(self.disabledColour)
-			self.textLabel.update(fg="#1BF293")
+			#Change the foreground colour
+			self.textLabel.config(fg=self.disabledFG)
 
 class mainLabel(Label):
 	"""
@@ -1055,6 +1056,7 @@ class contextBar(mainFrame):
 		for button in self.buttonArray:
 			if button.textVar.get() == buttonName:
 				return button
+
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -1099,7 +1101,7 @@ class privateSection(mainFrame):
 
 		#-----States-------
 		self.hiddenState=False # False = Showing
-		self.widgetState=False # False = Normal
+		self.widgetState=None # False = Normal
 
 	def displayWidget(self,widgetInstance):
 		"""
@@ -1331,16 +1333,37 @@ class privateSection(mainFrame):
 		False = Normal
 		True = Disabled
 		"""
+		#So when program first runs None is changed
+		if self.widgetState == None:
+			self.widgetState = not chosenState
+
 		#Disable
 		if chosenState == True and self.widgetState == False:
 			for widget in self.savedWidgets:
 				changeWidgetState(self.savedWidgets[widget],DISABLED)
+			#Enable the hide button
+			button=self.context.getButton("Hide")
+			if button:
+				button.changeState(True)
+
+			#Hide the password
+			if self.textVar.get() == "Password":
+				self.toggleHide(forced=False)
+
 			#Update the var
 			self.widgetState=True
+
 		#Enable
 		elif chosenState == False and self.widgetState == True:
 			for widget in self.savedWidgets:
 				changeWidgetState(self.savedWidgets[widget],NORMAL)
+			#Ensure that data can be viewed
+			if self.hiddenState:
+				self.toggleHide(forced=False)
+			#Disable the hide button
+			button=self.context.getButton("Hide")
+			if button:
+				button.changeState(False)
 			#Update the var
 			self.widgetState=False
 
@@ -1563,8 +1586,9 @@ class podNotebook(advancedNotebook):
 		Will change the state of the notebook
 		to either enabled or disabled
 		"""
-
-		if chosenState and self.notebookState == False:
+		if self.notebookState == None:
+			self.notebookState = not chosenState
+		if chosenState == True and self.notebookState == False:
 			#Disable the notebook
 			for section in self.sectionDict:
 				self.sectionDict[section].changeState(chosenState)
@@ -1573,7 +1597,7 @@ class podNotebook(advancedNotebook):
 			#Enable the notebook
 			for section in self.sectionDict:
 				self.sectionDict[section].changeState(chosenState)
-			self.notebookState=True
+			self.notebookState=False
 
 	def startEdit(self):
 		"""
@@ -1587,11 +1611,6 @@ class podNotebook(advancedNotebook):
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
 			sect.loadWidget(sect.editWidget)
-			#Ensure the data is showing
-			sect.toggleHide(forced=False)
-
-
-
 
 		#Update the context
 		context=None
@@ -1609,7 +1628,7 @@ class podNotebook(advancedNotebook):
 		 data not saved
 		"""
 		#Update state of notebook
-		self.changeNotebookState(False)
+		self.changeNotebookState(True)
 		#Load the correct widget
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
