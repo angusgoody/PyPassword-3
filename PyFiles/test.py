@@ -1,9 +1,15 @@
 
-from PEM import decrypt,encrypt
 
-print(encrypt("Angus123","turtle"))
 
-data=input("Enter data to decrypt: ")
-key=input("Enter key: ")
+import pickle
+import PEM
 
-print(decrypt(data,key))
+files=PEM.findFiles(PEM.getWorkingDirectory(),".mp")
+
+for file in files:
+	masterPod=pickle.load( open( file, "rb" ) )
+	#Get the pea pods
+	pods=masterPod.peas
+	#Get the encryption key
+	key=masterPod.key
+	print("Key:",key)

@@ -324,6 +324,25 @@ class peaPod:
 		"""
 		self.templateType=kwargs.get("template",self.templateType)
 
+	def updateVault(self,sectionName,data):
+		"""
+		This method allows new data
+		to be stored in the peaPod. 
+		"""
+		#If title is updated
+		if sectionName == "Title":
+			self.peaName=data
+		#Ensure pod vault is unlocked
+		self.unlockVault("Unlock")
+		if sectionName in self.vault:
+			print("Updating the vault")
+			self.vault[sectionName]=data
+		elif sectionName not in self.vault:
+			print("Adding new data to the vault")
+			self.vault[sectionName]=data
+		#Save the master pod
+
+
 	def unlockVault(self,unlockOrLock):
 		"""
 		This method will secure the vault
@@ -466,7 +485,6 @@ class masterPod:
 		This function will close the master pod
 		and secure the data
 		"""
-		print("Closing")
 		#Ensure all pods are secure
 		for podName in self.peas:
 			pod=self.peas[podName]
@@ -475,7 +493,7 @@ class masterPod:
 
 		#Encrypt the key to a vaule which can only be decrypted with current key
 		self.checkKey=encrypt("key",self.key)
-		self.key=None
+		#self.key=None
 
 
 #====================Core Functions====================

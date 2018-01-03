@@ -1169,17 +1169,22 @@ class privateSection(mainFrame):
 		else:
 			log.report("Attempt to load same widget: ",widgetName)
 
-	def addData(self,data):
+	def addData(self,data,**kwargs):
 		"""
 		This function will add
 		data to the current widget
 		in the private section
 		"""
-		#Add data from currently loaded widget
-		if self.loadedWidget in self.savedWidgets:
-			addDataToWidget(self.savedWidgets[self.loadedWidget],data)
+		#Get a widget name to add to
+		currentWidgetName=self.loadedWidget
+		currentWidgetName=kwargs.get("widget",currentWidgetName)
+		#Find the corresponding widget
+		widget=self.savedWidgets[currentWidgetName]
+		#Add data from chosen widget
+		if currentWidgetName in self.savedWidgets:
+			addDataToWidget(widget,data)
 			#Store data
-			self.savedWidgetData[self.loadedWidget]=data
+			self.savedWidgetData[currentWidgetName]=data
 
 	def clearData(self,**kwargs):
 		"""
@@ -1630,7 +1635,7 @@ class podNotebook(advancedNotebook):
 		context=mainVars.get("context",context)
 		if context:
 			context.updateContextButton(0, text="Cancel", command=lambda: self.cancelEdit())
-			context.updateContextButton(1,text="Save",command=None)
+			context.updateContextButton(1,text="Save",command=lambda: self.saveEdit())
 			context.setPlaceholders(2)
 
 	def cancelEdit(self):
@@ -1652,6 +1657,40 @@ class podNotebook(advancedNotebook):
 		if context:
 			screen.lastScreen.runContext()
 
+	def saveEdit(self):
+		"""
+		When the user 
+		clicks the save button.
+		Overwrite the pod data
+		"""
+		#Overwite
+		for sectionName in self.sectionDict:
+			sect=self.sectionDict[sectionName]
+			#Get the new data
+			newData=sect.getData()
+			#Get the old data to compare with
+			oldData=sect.getData(widget=sect.savedWidgets[sect.defaultWidget],stored=True)
+			#Only update if changed
+			if newData != oldData:
+				#Update the edit widget
+				sect.addData(newData)
+				#Update stored
+				sect.savedWidgetData[sect.defaultWidget]=newData
+				#Update current
+				sect.addData(newData,widget=sect.defaultWidget)
+
+				print("NEW DATA:",newData,"OLD DATA:",oldData)
+
+				#Get the sect name
+				currentSectionName=sect.textVar.get()
+				#Update the stored data
+				currentPeaPod=masterPod.currentMasterPod.currentPeaPod
+				currentPeaPod.updateVault(currentSectionName,newData)
+				print("Overwrite complete for",newData,"Section",currentSectionName)
+
+		#Save the current master pod
+		masterPod.currentMasterPod.save()
+		self.cancelEdit()
 
 
 class selectionBar(mainFrame):

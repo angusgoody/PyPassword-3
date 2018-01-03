@@ -397,7 +397,7 @@ def openPod():
 		#Load the notebook with a template type
 		viewPodNotebook.loadTemplate(podType)
 		#Update the variable
-		masterPod.currentPeaPod=selectedPod
+		masterPod.currentMasterPod.currentPeaPod=selectedPod
 		#Update the top bar on the view pod screen
 		viewPodLabelVar.set(selectedPod.peaName)
 		#Add the pod data to screen
