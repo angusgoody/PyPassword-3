@@ -52,10 +52,6 @@ def runCommand(command,**kwargs):
 	#Collect idetifier from KWARGS
 	identifier="No Data Available"
 	identifier=kwargs.get("name",identifier)
-	#Run the command
-	content=command()
-	return content
-	"""
 	try:
 		content=command()
 	except Exception as e:
@@ -64,7 +60,7 @@ def runCommand(command,**kwargs):
 	else:
 		log.report("Command executing success",identifier,tag="System")
 		return content
-	"""
+
 def showMessage(pre,message):
 	"""
 	Function to show a tkinter
@@ -128,7 +124,7 @@ def changeWidgetState(widget,state):
 		widget.config(state=state)
 		if widgetType == Text:
 			if state == DISABLED:
-				widget.config(fg=mainGreyColour)
+				widget.config(fg="#474846")
 			else:
 				widget.config(fg="#000000")
 #Recursion
@@ -1560,6 +1556,7 @@ class podNotebook(advancedNotebook):
 				#Call the function again to load from memory
 				self.loadTemplate(templateName)
 
+
 		#Update the colour
 		templateColour=podTemplate.templateColours[templateName]
 		#todo add colour config here
@@ -1595,6 +1592,8 @@ class podNotebook(advancedNotebook):
 		"""
 		Will change the state of the notebook
 		to either enabled or disabled
+		False = Normal
+		True = Disabled
 		"""
 		if self.notebookState == None:
 			self.notebookState = not chosenState

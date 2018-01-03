@@ -402,6 +402,8 @@ def openPod():
 		viewPodLabelVar.set(selectedPod.peaName)
 		#Add the pod data to screen
 		viewPodNotebook.addPodData(selectedPod)
+		#Then disable the screen for read only
+		viewPodNotebook.changeNotebookState(True)
 
 def exitPod():
 	"""
