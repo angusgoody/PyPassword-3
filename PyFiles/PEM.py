@@ -291,6 +291,21 @@ structure of PyPasswords security, they are the classes
 the sensitive data is stored in.
 """
 
+class keyBox:
+	"""
+	The key box
+	is a place to store
+	encyption keys while the program
+	is running. It will clear
+	when the program is killed.
+	"""
+	keyHoles={}
+	def __init__(self,masterPodInstance,key):
+		self.masterPodInstance=masterPodInstance
+		self.key=key
+		#Add to dict
+		keyBox.keyHoles[masterPodInstance]=self
+
 class peaPod:
 	"""
 	The peaPod class is a class
@@ -342,7 +357,6 @@ class peaPod:
 			self.vault[sectionName]=data
 		#Save the master pod
 
-
 	def unlockVault(self,unlockOrLock):
 		"""
 		This method will secure the vault
@@ -362,7 +376,7 @@ class peaPod:
 
 		if valid:
 			#Get the key to encrypt with
-			encryptionKey=self.master.key
+			encryptionKey=self.master.getKey()
 			#Iterate through peaPod
 			newVault={}
 			for item in self.vault:
@@ -492,10 +506,29 @@ class masterPod:
 				pod.unlockVault("Lock")
 
 		#Encrypt the key to a vaule which can only be decrypted with current key
-		self.checkKey=encrypt("key",self.key)
-		#self.key=None
+		encryptionKey=self.getKey()
+		self.checkKey=encrypt("key",encryptionKey)
 
+	def addKey(self,key):
+		"""
+		Used to add a encryption key
+		to the master pod
+		"""
+		#Create a keyBox
+		newBox=keyBox(self,key)
+		log.report("A new master pod encryption key was added for",self.masterName)
 
+	def getKey(self):
+		"""
+		Will attempt to retrieve
+		the encryption key
+		from the keybox
+		"""
+		if self in keyBox.keyHoles:
+			key=keyBox.keyHoles[self].key
+			return key
+		else:
+			log.report("Unable to find masterpod key")
 #====================Core Functions====================
 
 def loadMasterPodFromFile(fileName):
@@ -525,7 +558,7 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 		#If the result is not None then it was correct
 		if decryptResult:
 			#Add key to master pod for use later on
-			masterPodInstance.key=attempt
+			newKeyBox=keyBox(masterPodInstance,attempt)
 			return True
 		else:
 			return None
@@ -542,7 +575,7 @@ names={"Simon":"Angy","Sam":"gay","Bob":"Bob"}
 hints=["A secret hint","Ahahhah me","Never guess me password"]
 for item in names:
 	newPod=masterPod(item)
-	newPod.key=names[item]
+	newPod.addKey(names[item])
 	newPod.hint=hints.pop()
 
 	podName=pods.pop()
@@ -555,7 +588,7 @@ for item in names:
 #""
 
 newMasterPod=masterPod("NewBoi")
-newMasterPod.key="boi123"
+newMasterPod.addKey("boi123")
 newMasterPod.hint="Boi with 123"
 
 newMasterPod.addPeaPod("my notes",template="SecureNote")

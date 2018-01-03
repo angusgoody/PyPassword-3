@@ -1091,7 +1091,7 @@ class privateSection(mainFrame):
 		self.defaultWidget=mainLabel
 		self.editWidget=Entry
 		self.widgetFont="Avenir 16"
-		self.widgetWidth=15
+		self.widgetWidth=20
 
 		self.savedWidgets={}
 		self.savedWidgetData={}
