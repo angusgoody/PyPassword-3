@@ -53,6 +53,9 @@ def runCommand(command,**kwargs):
 	identifier="No Data Available"
 	identifier=kwargs.get("name",identifier)
 	#Run the command
+	content=command()
+	return content
+	"""
 	try:
 		content=command()
 	except Exception as e:
@@ -61,7 +64,7 @@ def runCommand(command,**kwargs):
 	else:
 		log.report("Command executing success",identifier,tag="System")
 		return content
-
+	"""
 def showMessage(pre,message):
 	"""
 	Function to show a tkinter
@@ -1088,7 +1091,7 @@ class privateSection(mainFrame):
 
 
 		#-----Widgets------
-		self.loadedWidget=None
+		self.loadedWidget=None #String Value
 		self.defaultWidget=mainLabel
 		self.editWidget=Entry
 		self.widgetFont="Avenir 16"
@@ -1200,14 +1203,14 @@ class privateSection(mainFrame):
 				if widgetData:
 					#Remove the stored data
 					if widgetName in self.savedWidgetData:
-						self.savedWidgetData[widgetName]="?"
+						self.savedWidgetData[widgetName]=""
 
 		#Clear only the loaded widget
 		else:
 			if self.loadedWidget in self.savedWidgets:
 				addDataToWidget(self.savedWidgets[self.loadedWidget],"")
 				if widgetData and self.loadedWidget in self.savedWidgetData:
-					self.savedWidgetData[self.loadedWidget]="?"
+					self.savedWidgetData[self.loadedWidget]=""
 
 	def getData(self,**kwargs):
 		"""
@@ -1218,16 +1221,18 @@ class privateSection(mainFrame):
 		Raw = currently in widget 
 		"""
 		stored=False
-		widget=self.loadedWidget
+		widget=self.savedWidgets[self.loadedWidget]
 		widget=kwargs.get("widget",widget)
 		stored=kwargs.get("stored",stored)
 
+		widgetType=type(widget)
+
 		#If the data is got from stored memory
 		if stored:
-			if self.loadedWidget in self.savedWidgetData:
-				data=self.savedWidgetData[self.loadedWidget]
+			if widgetType in self.savedWidgetData:
+				data=self.savedWidgetData[widgetType]
 			else:
-				data="N/A"
+				data=None
 		#If data is straight from widget
 		else:
 			data=getDataFromWidget(widget)
@@ -1607,10 +1612,18 @@ class podNotebook(advancedNotebook):
 		#Enable the section
 		self.changeNotebookState(False)
 
+
 		#Load the correct widget
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
+			#Get old widget data before overwrite
+			oldData=sect.getData(stored=True)
+			#Load widget
 			sect.loadWidget(sect.editWidget)
+			#Add the old data
+			if oldData:
+				sect.addData(oldData)
+
 
 		#Update the context
 		context=None
