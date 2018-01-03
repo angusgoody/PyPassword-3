@@ -430,8 +430,6 @@ class masterPod:
 		self.masterName=name
 		self.masterColour=choice(masterPodColours)
 		self.baseName=self.masterName+".mp"
-		#Store the key used during runtime
-		self.key=None
 		#Key used for checking master key
 		self.checkKey="key"
 		#Store the hint
@@ -440,8 +438,6 @@ class masterPod:
 		self.peas={}
 		#Store currently loaded pea pod
 		self.currentPeaPod=None
-		#The master key used for encryption
-		self.masterKey=None
 		#Where the master peaPod is saved
 		self.location=None
 		#Add to loaded pods
@@ -469,6 +465,9 @@ class masterPod:
 
 		#Save self to pickle
 		savePickle(self,fileName)
+
+		#Remove the key from box
+		del keyBox.keyHoles[self]
 
 	def addPeaPod(self,podName,**kwargs):
 		"""

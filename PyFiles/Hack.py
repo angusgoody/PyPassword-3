@@ -6,8 +6,5 @@ files=PEM.findFiles(PEM.getWorkingDirectory(),".mp")
 
 for file in files:
 	masterPod=pickle.load( open( file, "rb" ) )
-	#Get the pea pods
-	pods=masterPod.peas
-	#Get the encryption key
-	key=masterPod.key
-	print("Key:",key)
+	print("\n---Opening",masterPod.masterName,"---")
+	print(masterPod.__dict__)

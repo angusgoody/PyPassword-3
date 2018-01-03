@@ -1826,8 +1826,6 @@ class selectionBar(mainFrame):
 			commandToRun=self.tabList[index][2]
 			if commandToRun:
 				runCommand(commandToRun,name="Running selection bar tab command")
-			else:
-				print("Non command")
 
 	def setSize(self,numberOfPlaces):
 		"""
