@@ -76,7 +76,7 @@ def addDataToWidget(widget,data):
 	Function to add data to a variety
 	of widgets 
 	"""
-	validWidgets=[Entry,mainLabel,Text]
+	validWidgets=[Entry,mainLabel,Text,advancedEntry]
 	widgetType=type(widget)
 	#Check widget type
 	if widgetType in validWidgets:
@@ -84,6 +84,7 @@ def addDataToWidget(widget,data):
 		if widgetType == Entry:
 			widget.delete(0,END)
 			widget.insert(END,data)
+			print("Added data into Entry widget:",data)
 		elif widgetType == Text:
 			widget.delete("1.0",END)
 			widget.insert("1.0",data)
@@ -1616,14 +1617,15 @@ class podNotebook(advancedNotebook):
 		#Enable the section
 		self.changeNotebookState(False)
 
-
 		#Load the correct widget
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
 			#Get old widget data before overwrite
 			oldData=sect.getData(stored=True)
+			print("The old data is:",oldData)
 			#Load widget
 			sect.loadWidget(sect.editWidget)
+			print("The data currently stored in edit widget is:",sect.getData())
 			#Add the old data
 			if oldData:
 				sect.addData(oldData)
@@ -1678,14 +1680,11 @@ class podNotebook(advancedNotebook):
 				#Update current
 				sect.addData(newData,widget=sect.defaultWidget)
 
-				print("NEW DATA:",newData,"OLD DATA:",oldData)
-
 				#Get the sect name
 				currentSectionName=sect.textVar.get()
 				#Update the stored data
 				currentPeaPod=masterPod.currentMasterPod.currentPeaPod
 				currentPeaPod.updateVault(currentSectionName,newData)
-				print("Overwrite complete for",newData,"Section",currentSectionName)
 
 		#Save the current master pod
 		masterPod.currentMasterPod.save()

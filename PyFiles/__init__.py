@@ -413,6 +413,8 @@ def exitPod():
 	"""
 	#Save
 	masterPod.currentMasterPod.save()
+	#Remove the key from box
+	del keyBox.keyHoles[masterPod.currentMasterPod]
 	#Show the correct frame
 	openScreen.show()
 

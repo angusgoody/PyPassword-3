@@ -295,7 +295,7 @@ class keyBox:
 	"""
 	The key box
 	is a place to store
-	encyption keys while the program
+	encryption keys while the program
 	is running. It will clear
 	when the program is killed.
 	"""
@@ -350,12 +350,11 @@ class peaPod:
 		#Ensure pod vault is unlocked
 		self.unlockVault("Unlock")
 		if sectionName in self.vault:
-			print("Updating the vault")
+			log.report("Vault updated with new info",self.peaName)
 			self.vault[sectionName]=data
 		elif sectionName not in self.vault:
-			print("Adding new data to the vault")
+			log.report("New section added to the vault",self.peaName)
 			self.vault[sectionName]=data
-		#Save the master pod
 
 	def unlockVault(self,unlockOrLock):
 		"""
@@ -454,7 +453,7 @@ class masterPod:
 		"""
 		#Close the pod (Encrypt etc)
 		self.close()
-
+		print("Closing complete")
 		#First check location is valid
 		if checkLocation(self.location) is False:
 			#If not create a new file in the correct place
@@ -466,8 +465,6 @@ class masterPod:
 		#Save self to pickle
 		savePickle(self,fileName)
 
-		#Remove the key from box
-		del keyBox.keyHoles[self]
 
 	def addPeaPod(self,podName,**kwargs):
 		"""
