@@ -79,12 +79,12 @@ def addDataToWidget(widget,data):
 	validWidgets=[Entry,mainLabel,Text,advancedEntry]
 	widgetType=type(widget)
 	#Check widget type
+	print("Using utlity",widgetType,widget.cget("state"),data)
 	if widgetType in validWidgets:
 
 		if widgetType == Entry:
 			widget.delete(0,END)
 			widget.insert(END,data)
-			print("Added data into Entry widget:",data)
 		elif widgetType == Text:
 			widget.delete("1.0",END)
 			widget.insert("1.0",data)
@@ -1570,6 +1570,8 @@ class podNotebook(advancedNotebook):
 		"""
 		if type(podInstance) is peaPod:
 			log.report("Adding pod data")
+			#Enable the notebook to insert data
+			self.changeNotebookState(False)
 			#Clear data first
 			self.clearData(allWidgets=True,widgetData=True)
 			#Unlock pod if needed
@@ -1622,10 +1624,8 @@ class podNotebook(advancedNotebook):
 			sect=self.sectionDict[sectionName]
 			#Get old widget data before overwrite
 			oldData=sect.getData(stored=True)
-			print("The old data is:",oldData)
 			#Load widget
 			sect.loadWidget(sect.editWidget)
-			print("The data currently stored in edit widget is:",sect.getData())
 			#Add the old data
 			if oldData:
 				sect.addData(oldData)
@@ -1920,7 +1920,7 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#A9F955")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",Entry,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
