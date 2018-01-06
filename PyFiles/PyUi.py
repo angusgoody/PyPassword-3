@@ -79,15 +79,16 @@ def addDataToWidget(widget,data):
 	validWidgets=[Entry,mainLabel,Text,advancedEntry]
 	widgetType=type(widget)
 	#Check widget type
-	print("Using utlity",widgetType,widget.cget("state"),data)
 	if widgetType in validWidgets:
-
+		#Add to Entry
 		if widgetType == Entry:
 			widget.delete(0,END)
 			widget.insert(END,data)
+		#Add to type Text
 		elif widgetType == Text:
 			widget.delete("1.0",END)
 			widget.insert("1.0",data)
+		#Add to type mainLabel
 		elif widgetType == mainLabel:
 			widget.textVar.set(data)
 	else:
@@ -1374,6 +1375,22 @@ class privateSection(mainFrame):
 			#Update the var
 			self.widgetState=False
 
+	def restoreData(self,widgetName):
+		"""
+		This method will restore
+		the data inside a certain saved
+		widget. This removes data
+		in the widget and replaces it with
+		saved data
+		"""
+		if widgetName in self.savedWidgets:
+			widget=self.savedWidgets[widgetName]
+			#Clear the widget
+			addDataToWidget(widget,"")
+			#Restore
+			if widgetName in self.savedWidgetData:
+				addDataToWidget(widget,self.savedWidgetData[widgetName])
+				log.report("Restored data for widget",widgetName)
 
 
 
@@ -1646,12 +1663,17 @@ class podNotebook(advancedNotebook):
 		 cancel when editing
 		 data not saved
 		"""
-		#Update state of notebook
-		self.changeNotebookState(True)
 		#Load the correct widget
 		for sectionName in self.sectionDict:
 			sect=self.sectionDict[sectionName]
 			sect.loadWidget(sect.defaultWidget)
+			#If the edit and default widgets are same they need to be updated
+			if sect.editWidget == sect.defaultWidget:
+				sect.restoreData(sect.defaultWidget)
+
+		#Update state of notebook
+		self.changeNotebookState(True)
+
 		#Update the context
 		context=None
 		context=mainVars.get("context",context)
