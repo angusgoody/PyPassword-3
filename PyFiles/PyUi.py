@@ -716,6 +716,19 @@ class advancedEntry(Entry):
 		if len(self.get().split()) < 1:
 			self.resetEntry()
 
+class dataWindow(Toplevel):
+	"""
+	The data window is a top
+	level window that allows
+	user to enter and input data
+	and the class will store and return
+	data.
+	"""
+	def __init__(self,root,name,**kwargs):
+		Toplevel.__init__(self,root)
+		self.master=root
+		self.name=name
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
@@ -1942,7 +1955,7 @@ class podTemplate:
 #=====Login======
 loginTemplate=podTemplate("Login","#A9F955")
 loginTemplate.addTab("Login")
-loginTemplate.addTemplateSection("Login","Username",Entry,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")

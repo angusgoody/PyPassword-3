@@ -223,9 +223,15 @@ def closeProgram():
 	program
 	"""
 	#Save logs
-	saveLogs()
-	#Exit the program
-	window.destroy()
+	try:
+		saveLogs()
+	except Exception as e:
+		print("Error saving logs because..",e)
+		#Exit even if error saving logs
+		window.destroy()
+	else:
+		#Exit the program
+		window.destroy()
 #======Splash Screen========
 
 #======Open Screen========
