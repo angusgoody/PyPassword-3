@@ -331,7 +331,10 @@ def attemptMasterPodUnlock():
 	if attempt:
 		#Check the password
 		unlockAttempt=checkMasterPodPassword(masterPod.currentMasterPod,attempt)
-		if unlockAttempt:
+		if unlockAttempt == "locked":
+			showMessage("Locked","This master pod is locked try again")
+
+		elif unlockAttempt:
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
 			#Colour the screen a green for correct
@@ -424,6 +427,19 @@ def exitPod():
 	#Show the correct frame
 	openScreen.show()
 
+def createNewPeaPod():
+	"""
+	Function to create a new pea
+	pod inside a master pod
+	"""
+	newWindow=dataWindow(window,"Create Pea Pod")
+	#Add the status bar
+	#Add the context buttons
+	newWindow.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
+	newWindow.context.addButton(1,text="Create",enabledColour=mainBlueColour)
+
+
+
 #====================Button commands====================
 
 #Splash Screen
@@ -436,6 +452,7 @@ loginScreen.updateCommand(2,command=lambda: openScreen.show())
 loginScreen.updateCommand(0,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
+podScreen.updateCommand(0,command=createNewPeaPod)
 podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen

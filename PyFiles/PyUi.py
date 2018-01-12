@@ -14,7 +14,7 @@ are created and used.
 from tkinter import *
 from PEM import *
 from random import randint
-
+import webbrowser
 #====================Log====================
 
 log=logClass("User Interface")
@@ -129,6 +129,37 @@ def changeWidgetState(widget,state):
 				widget.config(fg="#474846")
 			else:
 				widget.config(fg="#000000")
+
+def loadWebsite(address):
+	"""
+	Load a website with a certain address
+	"""
+	print(address)
+	httpCheck=False
+	wwwCheck=False
+
+	if len(address.split()) > 0:
+		#Check for a prefix
+		if "https://" in address or "http://" in address:
+			httpCheck=True
+		else:
+			if "www." in address:
+				wwwCheck=True
+
+		#Add if needed
+		if wwwCheck == False:
+			address="www."+str(address)
+		if httpCheck == False:
+			address="https://"+str(address)
+
+		#Add the www
+		try:
+			webbrowser.open_new(address)
+		except:
+			showMessage("Error","Could not open address")
+			log.report("Error opening address",tag="Error")
+		else:
+			log.report("Opened web page")
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
@@ -279,6 +310,7 @@ def generateHexColour():
 Core Classes are the core custom classes in PyPassword
 that are the top level of objects.
 """
+
 
 class mainFrame(Frame):
 	"""
@@ -726,8 +758,35 @@ class dataWindow(Toplevel):
 	"""
 	def __init__(self,root,name,**kwargs):
 		Toplevel.__init__(self,root)
+		#Variables
 		self.master=root
 		self.name=name
+		#Configure window
+		self.title=self.name
+		self.geometry("300x200")
+		#Status
+		self.status=mainLabel(self,font="Avenir 15")
+		self.status.pack(side=BOTTOM,fill=X)
+		self.status.textVar.set(self.name)
+		self.status.colour("#3F5B65")
+		#Context bar
+		self.context=contextBar(self,places=2)
+		self.context.pack(side=BOTTOM,fill=X)
+
+
+		#Run
+		self.runWindow()
+	def runWindow(self):
+		"""
+		Running a window will
+		set the program focus to the popup
+		window so the user cannot interact with
+		the program.
+		"""
+
+		self.focus_set()
+		self.grab_set()
+		self.transient(self.master)
 
 #====================Secondary Classes====================
 """
@@ -848,8 +907,6 @@ class screen(mainFrame):
 			else:
 				if self.publicMenu:
 					self.parent.config(menu=self.publicMenu)
-
-
 
 	def addContextInfo(self,position,**kwargs):
 		"""
@@ -1269,7 +1326,7 @@ class privateSection(mainFrame):
 			self.context.addButton(index,text=buttonName,command=lambda: self.toggleHide(),**self.contextKwargs)
 		#Launch a website
 		elif buttonName == "Launch":
-			self.context.addButton(index,text=buttonName,**self.contextKwargs)
+			self.context.addButton(index,text=buttonName,command=lambda: loadWebsite(self.getData(stored=True)),**self.contextKwargs)
 		#Generate a password for the entry
 		elif buttonName == "Generate":
 			self.context.addButton(index,text=buttonName,**self.contextKwargs)
@@ -1405,17 +1462,6 @@ class privateSection(mainFrame):
 				addDataToWidget(widget,self.savedWidgetData[widgetName])
 				log.report("Restored data for widget",widgetName)
 
-
-
-
-
-
-
-
-
-
-
-
 class advancedNotebook(mainFrame):
 	"""
 	The advanced notebook class
@@ -1510,87 +1556,92 @@ class podNotebook(advancedNotebook):
 		correctTemplate=podTemplate.templates[templateName]
 		log.report("Loading template",correctTemplate)
 
-		#Attempt to load from memory
-		if templateName in self.savedTemplates:
-			log.report("A template was loaded from memory",templateName)
-			#Get the stored widgets from memory
-			templateArray=self.savedTemplates[templateName]
-			#Get the template info from the class
-			correctTemplate=podTemplate.templates[templateName]
-			#Set the selection bar
-			self.selectionBar.setSize(len(correctTemplate.tabs))
-
-			#Load the tabs
-			counter=0
-			for tabList in templateArray:
-				tabName=tabList[0]
-				tabFrame=tabList[1]
-				#Add the frame to the correct tab
-				self.addPage(tabName,tabFrame,index=counter)
-				counter+=1
-
-		#Need to generate a new section
-		else:
-
-			#Check its a valid pod
-			if templateName in podTemplate.templates:
-				log.report("A template was generated",templateName)
-
-				#First get the template information
+		#First stop loading the same template
+		if self.currentTemplate != templateName:
+			#Attempt to load from memory
+			if templateName in self.savedTemplates:
+				log.report("A template was loaded from memory",templateName)
+				#Get the stored widgets from memory
+				templateArray=self.savedTemplates[templateName]
+				#Get the template info from the class
 				correctTemplate=podTemplate.templates[templateName]
+				#Set the selection bar
+				self.selectionBar.setSize(len(correctTemplate.tabs))
 
-				#Initalise an array to store data
-				self.savedTemplates[templateName]=[]
+				#Load the tabs
+				counter=0
+				for tabList in templateArray:
+					tabName=tabList[0]
+					tabFrame=tabList[1]
+					#Add the frame to the correct tab
+					self.addPage(tabName,tabFrame,index=counter)
+					counter+=1
 
-				#Iterate through the template
-				for tabName in correctTemplate.tabOrder:
-					#Initialise array
-					currentTemplateArray=["","",{}]
-					self.savedTemplates[templateName].append(currentTemplateArray)
-					#Create a new frame
-					newFrame=mainFrame(self)
-					#Get the widget list
-					sectionList=correctTemplate.tabs[tabName]
-					#Add to saved templates in memory
-					currentTemplateArray[0]=tabName
-					currentTemplateArray[1]=newFrame
-					#Create private sections
-					sectionCount=0
-					for section in sectionList:
-						sectionCount+=1
-						#Gather Info
-						sectionName=section[0]
-						viewType=section[1]
-						editType=section[2]
-						buttonList=section[3]
-						#Create section
-						newPrivateSection=privateSection(newFrame)
-						newPrivateSection.textVar.set(sectionName)
-						newPrivateSection.defaultWidget=viewType
-						newPrivateSection.editWidget=editType
-						newPrivateSection.loadWidget(viewType)
-						#Set context to right length
-						newPrivateSection.context.setPlaceholders(len(buttonList))
-						#Add context buttons to section
-						for buttonName in buttonList:
-							newPrivateSection.addContextCommand(buttonList.index(buttonName),buttonName)
+				#Update the variable
+				self.currentTemplate=templateName
 
-						#Display on screen
-						newPrivateSection.pack(expand=True,fill=BOTH)
-						if sectionCount % 2 == 0:
-							newPrivateSection.colour("#C3C3C7")
-						#Store the section in memory
-						currentTemplateArray[2][sectionName]=newPrivateSection
-						#Store ref in self dict
-						self.sectionDict[sectionName]=newPrivateSection
+			#Need to generate a new section
+			else:
 
-				#Call the function again to load from memory
-				self.loadTemplate(templateName)
+				#Check its a valid pod
+				if templateName in podTemplate.templates:
+					log.report("A template was generated",templateName)
+
+					#First get the template information
+					correctTemplate=podTemplate.templates[templateName]
+
+					#Initalise an array to store data
+					self.savedTemplates[templateName]=[]
+
+					#Iterate through the template
+					for tabName in correctTemplate.tabOrder:
+						#Initialise array
+						currentTemplateArray=["","",{}]
+						self.savedTemplates[templateName].append(currentTemplateArray)
+						#Create a new frame
+						newFrame=mainFrame(self)
+						#Get the widget list
+						sectionList=correctTemplate.tabs[tabName]
+						#Add to saved templates in memory
+						currentTemplateArray[0]=tabName
+						currentTemplateArray[1]=newFrame
+						#Create private sections
+						sectionCount=0
+						for section in sectionList:
+							sectionCount+=1
+							#Gather Info
+							sectionName=section[0]
+							viewType=section[1]
+							editType=section[2]
+							buttonList=section[3]
+							#Create section
+							newPrivateSection=privateSection(newFrame)
+							newPrivateSection.textVar.set(sectionName)
+							newPrivateSection.defaultWidget=viewType
+							newPrivateSection.editWidget=editType
+							newPrivateSection.loadWidget(viewType)
+							#Set context to right length
+							newPrivateSection.context.setPlaceholders(len(buttonList))
+							#Add context buttons to section
+							for buttonName in buttonList:
+								newPrivateSection.addContextCommand(buttonList.index(buttonName),buttonName)
+
+							#Display on screen
+							newPrivateSection.pack(expand=True,fill=BOTH)
+							if sectionCount % 2 == 0:
+								newPrivateSection.colour("#C3C3C7")
+							#Store the section in memory
+							currentTemplateArray[2][sectionName]=newPrivateSection
+							#Store ref in self dict
+							self.sectionDict[sectionName]=newPrivateSection
+
+					#Call the function again to load from memory
+					self.loadTemplate(templateName)
 
 
-		#Update the colour
-		templateColour=podTemplate.templateColours[templateName]
-		#todo add colour config here
+			#Update the colour
+			templateColour=podTemplate.templateColours[templateName]
+			#todo add colour config here
 
 	def addPodData(self,podInstance):
 		"""
@@ -1724,7 +1775,6 @@ class podNotebook(advancedNotebook):
 		#Save the current master pod
 		masterPod.currentMasterPod.save()
 		self.cancelEdit()
-
 
 class selectionBar(mainFrame):
 	"""
@@ -1885,13 +1935,6 @@ class selectionBar(mainFrame):
 				counter+=1
 
 
-
-
-
-
-
-
-
 #====================Non UI Classes====================
 """
 The non ui classes are classes that are not based on 
@@ -1959,7 +2002,7 @@ loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hid
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
 
 loginTemplate.addTab("Advanced")
-loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"])
 loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 
 #=====Secure Note======
