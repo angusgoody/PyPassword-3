@@ -302,9 +302,12 @@ def loadMasterPodToLogin():
 		#Check if the masterPod is locked
 		if hasattr(currentSelection,"locked"):
 			if type(currentSelection.locked) is datetime:
-				if currentSelection.locked > getCurrentTime():
-					loginAttemptVar.set("Master pod has been locked")
-					loginScreen.colour("#6251B3")
+				currentTime=getCurrentTime()
+				if currentSelection.locked > currentTime:
+					#Calculate time remaining
+					timeRemaining=calculateTimeRemaining(currentSelection.locked,currentTime,"string")
+					loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+					loginScreen.colour(mainLockedColour)
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
@@ -353,10 +356,11 @@ def attemptMasterPodUnlock():
 
 		else:
 			if unlockAttempt == "locked":
-				loginAttemptVar.set("Master pod has been locked")
-				loginScreen.colour("#6251B3")
+				timeRemaining=calculateTimeRemaining(masterPod.currentMasterPod.locked,getCurrentTime(),"string")
+				loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+				loginScreen.colour(mainLockedColour)
 				#Should go last because processes will freeze
-				showMessage("Locked","This master pod is locked for 5 minutes")
+				showMessage("Locked","This master pod has been locked for 5 minutes")
 
 			else:
 				#Add one to the attempt counter

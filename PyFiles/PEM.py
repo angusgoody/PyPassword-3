@@ -302,6 +302,26 @@ def addTimeToCurrent(unit,value):
 		newTime=getCurrentTime()
 	return newTime
 
+def calculateTimeRemaining(time1,time2,stringOrRaw):
+	"""
+	Calculate the difference between two
+	times. StringOrRaw specifies whether
+	the object or string should be returned
+	Time1 = Bigger
+	string=string
+	raw=raw
+	"""
+	#Calculate time remaining
+	timeRemaining=(time1-time2)
+	if stringOrRaw == "raw":
+		return timeRemaining
+	else:
+		timeList=str(timeRemaining).split(":")
+		hours=timeList[0]
+		minutes=timeList[1]
+		seconds=timeList[2].split(".")[0]
+		timeRemainingString=hours+":"+minutes+":"+seconds
+		return timeRemainingString
 
 #====================Core Classes====================
 """

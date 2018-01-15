@@ -26,6 +26,7 @@ mainBlueColour="#17F388"
 mainGreyColour="#CDD7D6"
 mainClickedColour="#A9F955"
 mainWhiteColour="#E8EDEA"
+mainLockedColour="#685DE3"
 
 mainSecondOrangeColour="#D89633"
 mainSecondBlueColour="#13C770"
