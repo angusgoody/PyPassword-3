@@ -288,6 +288,21 @@ def decrypt(data, key):
 def getCurrentTime():
 	return datetime.now()
 
+def addTimeToCurrent(unit,value):
+	"""
+	Get the current system time
+	and add a value onto this
+	"""
+	currentTime=getCurrentTime()
+	if unit == "minutes":
+		newTime=currentTime+timedelta(minutes=value)
+	elif unit == "seconds":
+		newTime=currentTime+timedelta(seconds=value)
+	else:
+		newTime=getCurrentTime()
+	return newTime
+
+
 #====================Core Classes====================
 """
 The PEM core classes are the classes that form the basic 
@@ -447,8 +462,7 @@ class masterPod:
 		masterPod.loadedPods[self.masterName]=self
 
 		#Locked info
-		self.locked=False
-		self.lockDate=None
+		self.locked=getCurrentTime()
 
 	def save(self):
 		"""
@@ -552,66 +566,83 @@ def loadMasterPodFromFile(fileName):
 			#Return the master pod
 			return contents
 
-def checkMasterPodPassword(masterPodInstance,attempt):
+def checkMasterPodPassword(masterPodInstance, attempt):
 	"""
-	Will check the password attempt of a certain
-	master pod.
-	Returns true if the password is correct
-	Return false is the password is incorrect
+	This is the function in which
+	the password is actually decrypted
+	and will return a value based on if
+	the attempt is correct or not
+	"""
+	if type(masterPodInstance) is masterPod and hasattr(masterPodInstance,"checkKey"):
+		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
+		if decryptResult:
+			return decryptResult
+		else:
+			return None
+	else:
+		log.report("Non master pod passed to function or checkKey is invalid")
+
+def checkMasterPodAttempt(masterPodInstance,attempt):
+	"""
+	This is the function in which
+	the password is actually decrypted
+	and will return a value based on if
+	the attempt is correct or not
 	"""
 	if type(masterPodInstance) == masterPod:
-		lockedState=False
-
+		#Check for locked values
 		if hasattr(masterPodInstance,"locked"):
+			if type(masterPodInstance.locked) is not datetime:
+				log.report("Locked attribute has been changed")
+				masterPodInstance.locked=addTimeToCurrent("minutes",2)
 
-				#Store locked value
-				lockedValue=masterPodInstance.locked
 
-				#Get the current time
-				currentTime=getCurrentTime()
-
-				#Check for a time to unlock the pod
-				if type(lockedValue) is datetime:
-					masterPodTime=lockedValue
-
-					#If the pod still needs to be locked
-					if masterPodTime > currentTime:
-						lockedState=True
-					#If time has expired
-					else:
-						masterPodInstance.locked=False
-						#Remove from attempts
-						masterPodAttempts[masterPodInstance]=0
-
-				#Check the number of attempts
+			if masterPodInstance.locked < getCurrentTime():
+				currentNumberOfAttempts=0
+				#Check for a stored number of attempts
 				if masterPodInstance in masterPodAttempts:
-					numberOfAttempts=masterPodAttempts[masterPodInstance]
+					currentNumberOfAttempts=masterPodAttempts[masterPodInstance]
+				#Create a new dictionary key
 				else:
-					numberOfAttempts=0
 					masterPodAttempts[masterPodInstance]=0
 
-				#Add to attempts
-				numberOfAttempts+=1
-				masterPodAttempts[masterPodInstance]=numberOfAttempts
-				if numberOfAttempts == 5:
-					masterPodInstance.locked=currentTime+timedelta(minutes=5)
-					masterPodInstance.save()
-					log.report("Locked masterpod from 5 failed attempts")
-					return "locked"
+				#Attempt to unlock with password
+				decryptResult=checkMasterPodPassword(masterPodInstance,attempt)
 
-		#Decrypt the key
-		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
-		#If the result is not None then it was correct
-		if decryptResult:
-			#Add key to master pod for use later on
-			newKeyBox=keyBox(masterPodInstance,attempt)
-			#Reset number of attempts
-			masterPodAttempts[masterPodInstance]=0
-			return True
+				#If the password correct
+				if decryptResult:
+					masterPodAttempts[masterPodInstance]=0
+					#Store the key in a secure key box
+					newKey=keyBox(masterPodInstance,attempt)
+					return True
+
+				#If the attempt is incorrect
+				else:
+					#Add one to counter
+					currentNumberOfAttempts+=1
+					masterPodAttempts[masterPodInstance]=currentNumberOfAttempts
+					#Check if limit reached
+					if currentNumberOfAttempts == 5:
+						masterPodInstance.locked=addTimeToCurrent("minutes",2)
+						masterPodAttempts[masterPodInstance]=0
+						masterPodInstance.save()
+						log.report("Pod locked for 5 minutes",masterPodInstance.masterName)
+						return "locked"
+
+
+
+
+			else:
+				return "locked"
+
+		#If class does not support locking then add the attribute
 		else:
-			#If the master class supports locking
+			masterPodInstance.locked=getCurrentTime()
+			checkMasterPodPassword(masterPodInstance,attempt)
 
-			return None
+
+
+
 
 #====================Testing area====================
 

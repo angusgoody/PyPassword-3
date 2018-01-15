@@ -335,8 +335,7 @@ def attemptMasterPodUnlock():
 	#Check the user entered something
 	if attempt:
 		#Check the password
-		unlockAttempt=checkMasterPodPassword(masterPod.currentMasterPod,attempt)
-
+		unlockAttempt=checkMasterPodAttempt(masterPod.currentMasterPod, attempt)
 		if unlockAttempt == True:
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
