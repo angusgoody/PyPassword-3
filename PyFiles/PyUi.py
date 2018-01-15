@@ -81,7 +81,7 @@ def addDataToWidget(widget,data):
 	#Check widget type
 	if widgetType in validWidgets:
 		#Add to Entry
-		if widgetType == Entry:
+		if widgetType == Entry or widgetType == advancedEntry:
 			widget.delete(0,END)
 			widget.insert(END,data)
 		#Add to type Text
@@ -747,6 +747,7 @@ class advancedEntry(Entry):
 		"""
 		if len(self.get().split()) < 1:
 			self.resetEntry()
+		mainVars["window"].focus()
 
 class dataWindow(Toplevel):
 	"""

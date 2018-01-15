@@ -295,11 +295,16 @@ def loadMasterPodToLogin():
 	currentSelection=openListbox.getSelection()
 	#Check if there is something selected that is valid
 	if type(currentSelection) == masterPod:
-
 		#Set the selected pod variable to the selected object
 		masterPod.currentMasterPod=currentSelection
 		#Show the screen
 		loginScreen.show()
+		#Check if the masterPod is locked
+		if hasattr(currentSelection,"locked"):
+			if type(currentSelection.locked) is datetime:
+				if currentSelection.locked > getCurrentTime():
+					loginAttemptVar.set("Master pod has been locked")
+					loginScreen.colour("#6251B3")
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
@@ -331,10 +336,8 @@ def attemptMasterPodUnlock():
 	if attempt:
 		#Check the password
 		unlockAttempt=checkMasterPodPassword(masterPod.currentMasterPod,attempt)
-		if unlockAttempt == "locked":
-			showMessage("Locked","This master pod is locked try again")
 
-		elif unlockAttempt:
+		if unlockAttempt == True:
 			#Password was correct
 			loginAttemptVar.set("Access Granted")
 			#Colour the screen a green for correct
@@ -350,12 +353,21 @@ def attemptMasterPodUnlock():
 			podTopVar.set(masterPod.currentMasterPod.masterName+" Accounts")
 
 		else:
-			#Add one to the attempt counter
-			loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
-			#The password was incorrect
-			loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
-			#Colour the screen incorrect colour
-			loginScreen.colour(mainRedColour)
+			if unlockAttempt == "locked":
+				loginAttemptVar.set("Master pod has been locked")
+				loginScreen.colour("#6251B3")
+				#Should go last because processes will freeze
+				showMessage("Locked","This master pod is locked for 5 minutes")
+
+			else:
+				#Add one to the attempt counter
+				loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+				#The password was incorrect
+				loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
+				#Colour the screen incorrect colour
+				loginScreen.colour(mainRedColour)
+
+			addDataToWidget(loginEntry,"")
 
 	else:
 		showMessage("Enter","Please enter password")

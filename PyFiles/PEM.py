@@ -12,7 +12,7 @@ data takes place here.
 
 #====================Imports====================
 import pickle
-from datetime import datetime
+from datetime import datetime,timedelta
 import os
 from random import choice
 from tkinter import PhotoImage,messagebox
@@ -25,6 +25,7 @@ filesDirectory="PyFiles"
 assetDirectory="PyAssets"
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
+masterPodAttempts={}
 #====================Log====================
 class logClass:
 	"""
@@ -112,7 +113,6 @@ log=logClass("Encryption")
 These functions are used for generating passwords, 
 and also encrypting and decrypting data.
 """
-
 
 #Folder and Directory functions
 def getWorkingDirectory():
@@ -284,6 +284,10 @@ def decrypt(data, key):
 		log.report("An error occurred when attempting to decrypt","(Decrypt)",tag="Error")
 		return None
 
+#Time functions
+def getCurrentTime():
+	return datetime.now()
+
 #====================Core Classes====================
 """
 The PEM core classes are the classes that form the basic 
@@ -442,6 +446,10 @@ class masterPod:
 		#Add to loaded pods
 		masterPod.loadedPods[self.masterName]=self
 
+		#Locked info
+		self.locked=False
+		self.lockDate=None
+
 	def save(self):
 		"""
 		This method saves the master peaPod to file
@@ -503,7 +511,10 @@ class masterPod:
 
 		#Encrypt the key to a vaule which can only be decrypted with current key
 		encryptionKey=self.getKey()
-		self.checkKey=encrypt("key",encryptionKey)
+		if encryptionKey:
+			self.checkKey=encrypt("key",encryptionKey)
+		else:
+			log.report("Could not find encryption key")
 
 	def addKey(self,key):
 		"""
@@ -549,14 +560,54 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	Return false is the password is incorrect
 	"""
 	if type(masterPodInstance) == masterPod:
+
 		#Decrypt the key
 		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
 		#If the result is not None then it was correct
 		if decryptResult:
 			#Add key to master pod for use later on
 			newKeyBox=keyBox(masterPodInstance,attempt)
+			#Reset number of attempts
+			masterPodAttempts[masterPodInstance]=0
 			return True
 		else:
+			#If the master class supports locking
+			if hasattr(masterPodInstance,"locked"):
+
+				#Store locked value
+				lockedValue=masterPodInstance.locked
+
+				#Get the current time
+				currentTime=getCurrentTime()
+
+				#Check for a time to unlock the pod
+				if type(lockedValue) is datetime:
+					masterPodTime=lockedValue
+
+					#If the pod still needs to be locked
+					if masterPodTime > currentTime:
+						return "locked"
+					#If time has expired
+					else:
+						masterPodInstance.locked=False
+						#Remove from attempts
+						masterPodAttempts[masterPodInstance]=0
+	
+				#Check the number of attempts
+				if masterPodInstance in masterPodAttempts:
+					numberOfAttempts=masterPodAttempts[masterPodInstance]
+				else:
+					numberOfAttempts=0
+					masterPodAttempts[masterPodInstance]=0
+
+				#Add to attempts
+				numberOfAttempts+=1
+				masterPodAttempts[masterPodInstance]=numberOfAttempts
+				if numberOfAttempts == 5:
+					masterPodInstance.locked=currentTime+timedelta(minutes=5)
+					masterPodInstance.save()
+					log.report("Locked masterpod from 5 failed attempts")
+					return "locked"
 			return None
 
 #====================Testing area====================
