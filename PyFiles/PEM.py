@@ -560,19 +560,9 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 	Return false is the password is incorrect
 	"""
 	if type(masterPodInstance) == masterPod:
+		lockedState=False
 
-		#Decrypt the key
-		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
-		#If the result is not None then it was correct
-		if decryptResult:
-			#Add key to master pod for use later on
-			newKeyBox=keyBox(masterPodInstance,attempt)
-			#Reset number of attempts
-			masterPodAttempts[masterPodInstance]=0
-			return True
-		else:
-			#If the master class supports locking
-			if hasattr(masterPodInstance,"locked"):
+		if hasattr(masterPodInstance,"locked"):
 
 				#Store locked value
 				lockedValue=masterPodInstance.locked
@@ -586,13 +576,13 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 
 					#If the pod still needs to be locked
 					if masterPodTime > currentTime:
-						return "locked"
+						lockedState=True
 					#If time has expired
 					else:
 						masterPodInstance.locked=False
 						#Remove from attempts
 						masterPodAttempts[masterPodInstance]=0
-	
+
 				#Check the number of attempts
 				if masterPodInstance in masterPodAttempts:
 					numberOfAttempts=masterPodAttempts[masterPodInstance]
@@ -608,6 +598,19 @@ def checkMasterPodPassword(masterPodInstance,attempt):
 					masterPodInstance.save()
 					log.report("Locked masterpod from 5 failed attempts")
 					return "locked"
+
+		#Decrypt the key
+		decryptResult=decrypt(masterPodInstance.checkKey,attempt)
+		#If the result is not None then it was correct
+		if decryptResult:
+			#Add key to master pod for use later on
+			newKeyBox=keyBox(masterPodInstance,attempt)
+			#Reset number of attempts
+			masterPodAttempts[masterPodInstance]=0
+			return True
+		else:
+			#If the master class supports locking
+
 			return None
 
 #====================Testing area====================
