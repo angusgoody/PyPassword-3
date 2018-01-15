@@ -135,32 +135,31 @@ def loadWebsite(address):
 	"""
 	Load a website with a certain address
 	"""
-	print(address)
 	httpCheck=False
 	wwwCheck=False
+	if address:
+		if len(address.split()) > 0:
+			#Check for a prefix
+			if "https://" in address or "http://" in address:
+				httpCheck=True
+			else:
+				if "www." in address:
+					wwwCheck=True
 
-	if len(address.split()) > 0:
-		#Check for a prefix
-		if "https://" in address or "http://" in address:
-			httpCheck=True
-		else:
-			if "www." in address:
-				wwwCheck=True
+			#Add if needed
+			if wwwCheck == False:
+				address="www."+str(address)
+			if httpCheck == False:
+				address="https://"+str(address)
 
-		#Add if needed
-		if wwwCheck == False:
-			address="www."+str(address)
-		if httpCheck == False:
-			address="https://"+str(address)
-
-		#Add the www
-		try:
-			webbrowser.open_new(address)
-		except:
-			showMessage("Error","Could not open address")
-			log.report("Error opening address",tag="Error")
-		else:
-			log.report("Opened web page")
+			#Add the www
+			try:
+				webbrowser.open_new(address)
+			except:
+				showMessage("Error","Could not open address")
+				log.report("Error opening address",tag="Error")
+			else:
+				log.report("Opened web page")
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""
