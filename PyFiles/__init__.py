@@ -300,14 +300,7 @@ def loadMasterPodToLogin():
 		#Show the screen
 		loginScreen.show()
 		#Check if the masterPod is locked
-		if hasattr(currentSelection,"locked"):
-			if type(currentSelection.locked) is datetime:
-				currentTime=getCurrentTime()
-				if currentSelection.locked > currentTime:
-					#Calculate time remaining
-					timeRemaining=calculateTimeRemaining(currentSelection.locked,currentTime,"string")
-					loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-					loginScreen.colour(mainLockedColour)
+		checkTimeRemaining(currentSelection)
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
@@ -326,6 +319,51 @@ def showHint():
 	hint=currentMasterPod.hint
 	#Update the control variable
 	loginAttemptVar.set(hint)
+
+def checkTimeRemaining(masterPodInstance,**kwargs):
+	"""
+	Function that is called
+	to check if the current master
+	pod is still locked. If so
+	change the screen. It is also
+	used to change screen is user
+	failed attempt
+	False = Pod not locked
+	True = Pod is locked
+	
+	resetScreen: False = failed attempt
+	resetScreen: None = do nothing
+	showLocked: True = show messagebox
+	"""
+	#Kwargs that can be specified
+	resetScreen=None
+	resetScreen=kwargs.get("resetScreen",resetScreen)
+	showLocked=None
+	showLocked=kwargs.get("showLocked",showLocked)
+	#Check is valid type
+	if type(masterPodInstance) is masterPod:
+		if hasattr(masterPodInstance,"locked"):
+			#Get the value in the pod and the current time
+			lockedValue=masterPodInstance.locked
+			currentTime=getCurrentTime()
+			if lockedValue > currentTime:
+				#Calculate time remaining
+				timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
+				loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+				loginScreen.colour(mainLockedColour)
+				#Show messagebox if specified
+				if showLocked:
+					showMessage("Locked","This master pod is locked")
+				return True
+
+			elif resetScreen == False:
+				#Add one to the attempt counter
+				loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+				#The password was incorrect
+				loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
+				#Colour the screen incorrect colour
+				loginScreen.colour(mainRedColour)
+				return False
 
 def attemptMasterPodUnlock():
 	"""
@@ -355,21 +393,7 @@ def attemptMasterPodUnlock():
 			podTopVar.set(masterPod.currentMasterPod.masterName+" Accounts")
 
 		else:
-			if unlockAttempt == "locked":
-				timeRemaining=calculateTimeRemaining(masterPod.currentMasterPod.locked,getCurrentTime(),"string")
-				loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-				loginScreen.colour(mainLockedColour)
-				#Should go last because processes will freeze
-				showMessage("Locked","This master pod has been locked for 5 minutes")
-
-			else:
-				#Add one to the attempt counter
-				loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
-				#The password was incorrect
-				loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
-				#Colour the screen incorrect colour
-				loginScreen.colour(mainRedColour)
-
+			checkTimeRemaining(masterPod.currentMasterPod,resetScreen=False,showLocked=True)
 			addDataToWidget(loginEntry,"")
 
 	else:
