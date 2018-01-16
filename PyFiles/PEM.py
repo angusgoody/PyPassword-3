@@ -509,7 +509,6 @@ class masterPod:
 		#Save self to pickle
 		savePickle(self,fileName)
 
-
 	def addPeaPod(self,podName,**kwargs):
 		"""
 		This method allows a pea
@@ -551,15 +550,6 @@ class masterPod:
 			self.checkKey=encrypt("key",encryptionKey)
 		else:
 			log.report("Could not find encryption key")
-
-	def addKey(self,key):
-		"""
-		Used to add a encryption key
-		to the master pod
-		"""
-		#Create a keyBox
-		newBox=keyBox(self,key)
-		log.report("A new master pod encryption key was added for",self.masterName)
 
 	def getKey(self):
 		"""
