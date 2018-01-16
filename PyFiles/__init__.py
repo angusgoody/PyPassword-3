@@ -472,10 +472,21 @@ def createNewPeaPod():
 	pod inside a master pod
 	"""
 	newWindow=dataWindow(window,"Create Pea Pod")
-	#Add the status bar
 	#Add the context buttons
 	newWindow.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
 	newWindow.context.addButton(1,text="Create",enabledColour=mainBlueColour)
+	#Create the ui
+	centerFrame=mainFrame(newWindow)
+	centerFrame.pack(expand=True)
+
+	podNameEntry=advancedEntry(centerFrame,"Pod Name",justify=CENTER,font="Avenir 18")
+	podNameEntry.pack(fill=X)
+
+	podTypeVar=StringVar()
+	podTypeVar.set("Login")
+	podType=OptionMenu(centerFrame,podTypeVar,*podTemplate.templates,)
+	podType.pack(fill=X,pady=10)
+
 
 
 

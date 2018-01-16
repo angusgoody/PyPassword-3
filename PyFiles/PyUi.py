@@ -671,6 +671,7 @@ class advancedEntry(Entry):
 	"""
 	def __init__(self,parent,placeHolder,**kwargs):
 		Entry.__init__(self,parent,**kwargs)
+		self.parent=parent
 
 		#Store Colour info
 		self.placeHolder=placeHolder
@@ -747,7 +748,7 @@ class advancedEntry(Entry):
 		"""
 		if len(self.get().split()) < 1:
 			self.resetEntry()
-		mainVars["window"].focus()
+		self.parent.focus()
 
 class dataWindow(Toplevel):
 	"""
@@ -777,6 +778,7 @@ class dataWindow(Toplevel):
 
 		#Run
 		self.runWindow()
+
 	def runWindow(self):
 		"""
 		Running a window will
@@ -2022,7 +2024,11 @@ cardTemplate.addTab("Advanced")
 cardTemplate.addTemplateSection("Advanced","Pin",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Advanced","Credit limit",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
-
+#=====Password======
+passwordTemplate=podTemplate("Password","#E6BE3E")
+passwordTemplate.addTab("Password")
+passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"])
+passwordTemplate.addTemplateSection("Password","Notes",Text,Text,["Copy"])
 
 
 

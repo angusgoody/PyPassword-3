@@ -710,6 +710,10 @@ newMaster.hint="Frankly"
 newMaster.addPeaPod("Nationwide",template="Credit Card")
 newMaster.addPeaPodData("Nationwide","Card Holder Name","Frank")
 newMaster.addPeaPodData("Nationwide","Pin","12345")
+
+newMaster.addPeaPod("Vault",template="Password")
+newMaster.addPeaPodData("Vault","Password","MePassword")
+newMaster.addPeaPodData("Vault","Notes","Notes about me password")
 newMaster.save()
 """
 
