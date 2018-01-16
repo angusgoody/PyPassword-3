@@ -1151,7 +1151,7 @@ class privateSection(mainFrame):
 
 		#Label
 		self.textVar=StringVar()
-		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13")
+		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13",width=15)
 		self.textLabel.pack(expand=True)
 		#Context bar
 		self.contextKwargs={"font":"Avenir 10","clickedColour":mainBlueColour}
@@ -2010,6 +2010,19 @@ loginTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 secureNoteTemplate=podTemplate("SecureNote","#78C2D2")
 secureNoteTemplate.addTab("Note")
 secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
+
+#=====Card======
+cardTemplate=podTemplate("Credit Card","#EE658A")
+cardTemplate.addTab("Card")
+cardTemplate.addTemplateSection("Card","Card Holder Name",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Card","Bank",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Card","Card Number",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Card","Expire date",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTab("Advanced")
+cardTemplate.addTemplateSection("Advanced","Pin",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Advanced","Credit limit",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
+
 
 
 

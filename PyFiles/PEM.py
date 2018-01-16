@@ -562,6 +562,15 @@ class masterPod:
 			return key
 		else:
 			log.report("Unable to find masterpod key")
+
+	def addKey(self,key):
+		"""
+		Used to add a encryption key
+		to the master pod
+		"""
+		#Create a keyBox
+		newBox=keyBox(self,key)
+		log.report("A new master pod encryption key was added for",self.masterName)
 #====================Core Functions====================
 
 def loadMasterPodFromFile(fileName):
@@ -693,4 +702,15 @@ newMasterPod.addPeaPodData("Github","Website","github.com")
 
 newMasterPod.save()
 
+
+newMaster=masterPod("Frank")
+newMaster.addKey("frankBoi")
+newMaster.hint="Frankly"
+
+newMaster.addPeaPod("Nationwide",template="Credit Card")
+newMaster.addPeaPodData("Nationwide","Card Holder Name","Frank")
+newMaster.addPeaPodData("Nationwide","Pin","12345")
+newMaster.save()
 """
+
+
