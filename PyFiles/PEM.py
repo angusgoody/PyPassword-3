@@ -23,6 +23,8 @@ dataDirectory="PyData"
 logDirectory="PyLogs"
 filesDirectory="PyFiles"
 assetDirectory="PyAssets"
+
+lockedMinutes=5
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 masterPodAttempts={}
@@ -612,10 +614,10 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 	if type(masterPodInstance) == masterPod:
 		#Check for locked values
 		if hasattr(masterPodInstance,"locked"):
+			#If the value has been altered then lock the pod
 			if type(masterPodInstance.locked) is not datetime:
 				log.report("Locked attribute has been changed")
-				masterPodInstance.locked=addTimeToCurrent("minutes",2)
-
+				masterPodInstance.locked=addTimeToCurrent("minutes",lockedMinutes)
 
 			if masterPodInstance.locked < getCurrentTime():
 				currentNumberOfAttempts=0
@@ -643,7 +645,7 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 					masterPodAttempts[masterPodInstance]=currentNumberOfAttempts
 					#Check if limit reached
 					if currentNumberOfAttempts == 5:
-						masterPodInstance.locked=addTimeToCurrent("minutes",2)
+						masterPodInstance.locked=addTimeToCurrent("minutes",lockedMinutes)
 						masterPodAttempts[masterPodInstance]=0
 						masterPodInstance.save()
 						log.report("Pod locked for 5 minutes",masterPodInstance.masterName)
@@ -659,8 +661,6 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 		else:
 			masterPodInstance.locked=getCurrentTime()
 			checkMasterPodPassword(masterPodInstance,attempt)
-
-
 
 
 
