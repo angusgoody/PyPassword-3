@@ -306,6 +306,13 @@ def loadMasterPodToLogin():
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
+def createNewMasterPodWindow():
+	"""
+	Launches a new data window
+	to allow user to create a new
+	master pod
+	"""
+	
 #======Login Screen========
 
 def showHint():
