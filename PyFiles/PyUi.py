@@ -42,6 +42,86 @@ This section is for functions that aid with the user
 interface elements of PyPassword
 """
 #Utility functions
+def searchDataSource2(dataToFind, dataSource, **kwargs):
+	"""
+	This small function will check
+	a data source to see if the nameToCheck
+	appears in there. If it does it will return...
+	True = Found
+	False = Not Found
+	
+	Kwargs
+	capital=False = Don't check for capitals
+	
+	"""
+	#See if capital is needed
+	capital=False
+	capital=kwargs.get("capital",capital)
+	#Iterate through the dataSource
+	for item in dataSource:
+		if str(item).upper() == str(dataToFind).upper() and capital == True:
+			return True
+		elif str(item) == str(dataToFind):
+			return True
+
+		#Search dictionary keys
+		if type(dataSource) is dict:
+			result=searchDataSource(dataToFind, dataSource.values(), **kwargs)
+			if result:
+				return True
+
+	return False
+
+def smallCheck(dataToFind,dataSource,capital):
+	"""
+	The basic search function
+	which will check to see
+	if two parameters are equal
+	"""
+	if type(dataToFind) is str and type(dataSource) is str:
+		if capital:
+			if dataToFind.upper() == dataSource.upper():
+				return True
+			else:
+				return False
+	if dataToFind == dataSource:
+		return True
+	else:
+		return False
+
+def searchDataSource(dataToFind,dataSource,**kwargs):
+	"""
+	Search function
+	for finding data inside
+	a data structure 
+	"""
+	#Check for kwargs
+	capital=False
+	capital=kwargs.get("capital",capital)
+
+	#Iterate through data source
+	for item in dataSource:
+
+		if type(item) == list or type(item) == dict:
+			result=searchDataSource(dataToFind,item,capital=capital)
+			if result:
+				return result
+		if type(dataSource) is dict:
+			result=searchDataSource(dataToFind,dataSource.values(),capital=capital)
+			if result:
+				return result
+		else:
+			result=smallCheck(dataToFind,item,capital)
+			if result:
+				return result
+
+	return False
+
+
+
+
+
+
 
 def runCommand(command,**kwargs):
 	"""
@@ -100,15 +180,17 @@ def getDataFromWidget(widget):
 	Function to get data
 	from a range of widgets 
 	"""
-	validWidgets=[Entry,mainLabel,Text]
+	validWidgets=[Entry,mainLabel,Text,OptionMenu,advancedEntry]
 	widgetType=type(widget)
 	if widgetType in validWidgets:
-		if widgetType == Entry:
+		if widgetType == Entry or widgetType == advancedEntry:
 			return widget.get()
 		elif widgetType == Text:
 			return widget.get("1.0",END)
 		elif widgetType == mainLabel:
 			return widget.textVar.get()
+		elif widgetType == advancedOptionMenu:
+			return widget.var.get()
 	else:
 		log.report("Attempt to get info from non supported widget",widgetType)
 
@@ -669,9 +751,10 @@ class advancedEntry(Entry):
 	Modified entry that can
 	contain placeholders and more
 	"""
-	def __init__(self,parent,placeHolder,**kwargs):
+	def __init__(self,parent,placeHolder,hide,**kwargs):
 		Entry.__init__(self,parent,**kwargs)
 		self.parent=parent
+		self.hide=hide
 
 		#Store Colour info
 		self.placeHolder=placeHolder
@@ -703,7 +786,8 @@ class advancedEntry(Entry):
 			#Change FG
 			self.config(fg=self.defaultColour)
 			#Change show
-			self.config(show="•")
+			if self.hide:
+				self.config(show="•")
 			#Update Variable
 			self.placeHolderActive=False
 
@@ -758,6 +842,7 @@ class dataWindow(Toplevel):
 	and the class will store and return
 	data.
 	"""
+
 	def __init__(self,root,name,**kwargs):
 		Toplevel.__init__(self,root)
 		#Variables
@@ -775,6 +860,16 @@ class dataWindow(Toplevel):
 		self.context=contextBar(self,places=2)
 		self.context.pack(side=BOTTOM,fill=X)
 
+		#Display label
+		self.displayVar=StringVar()
+		self.displayVar.set("Please enter something")
+		self.displayWidget=None
+
+		#Store the inputs
+		self.inputWidgets={}
+		self.inputCannotContain={}
+		self.inputLengths={} #index 0 is min index 1 is max
+		self.inputData={}
 
 		#Run
 		self.runWindow()
@@ -790,7 +885,89 @@ class dataWindow(Toplevel):
 		self.focus_set()
 		self.grab_set()
 		self.transient(self.master)
+		self.resizable(width=False,height=False)
 
+	def addDisplayLabel(self,widget):
+		"""
+		Will add a display label widget
+		to the class and handle
+		string variables and updating etc 
+		"""
+		self.displayWidget=widget
+		widget.config(textvariable=self.displayVar)
+
+	def addDataSource(self,widget,name,**kwargs):
+		"""
+		Add a data source widget to the class
+		"""
+		minLength=1
+		maxLength=30
+		cannotContain=[]
+		minLength=kwargs.get("minLength",minLength)
+		maxLength=kwargs.get("maxLength",maxLength)
+		cannotContain=kwargs.get("cannotContain",cannotContain)
+		#Add a reference
+		self.inputWidgets[name]=widget
+		#Add the kwargs
+		self.inputCannotContain[name]=cannotContain
+		self.inputLengths[name]=[minLength,maxLength]
+		#Bind the widget
+		if type(widget) in [advancedEntry,Entry]:
+			widget.bind("<KeyRelease>",lambda event: self.runCheck(name))
+
+	def runCheck(self,identifier):
+		"""
+		This function will check
+		the contents of a input
+		to validate it against the specified requirements 
+		"""
+		validWidgets=[Entry,advancedEntry]
+		print("Checking",identifier)
+		if identifier in self.inputWidgets:
+			correctWidget=self.inputWidgets[identifier]
+			if type(correctWidget) in validWidgets:
+				#Collect the required data
+				requiredMinLength=self.inputLengths[identifier][0]
+				requiredMaxLength=self.inputLengths[identifier][1]
+				requiredCannotContain=self.inputCannotContain[identifier]
+				#Get the data from the widget
+				widgetData=getDataFromWidget(correctWidget)
+				print("RAW",widgetData)
+				if widgetData:
+					widgetDataLength=len(widgetData)
+					#Check the length
+					if widgetDataLength < requiredMinLength:
+						self.updateCheck("Please enter at least "+requiredMinLength+" characters")
+					if widgetDataLength > requiredMaxLength:
+						self.updateCheck("Please enter at the most "+requiredMaxLength+" characters")
+
+					#Check to see if it contains forbidden items
+					if widgetData in requiredCannotContain:
+						self.updateCheck("Name not available please enter another")
+				else:
+					self.updateCheck("Please enter data")
+
+	def updateCheck(self,message):
+		"""
+		Update the window
+		based on what the user entered
+		"""
+		print(message)
+		if message == True:
+			print("Valid input")
+			self.context.getButton("Create").changeState(True)
+		else:
+			self.displayVar.set(message)
+
+
+class advancedOptionMenu(OptionMenu):
+	"""
+	Option Menu which allows
+	the variable to accessed at any time
+	"""
+	def __init__(self,parent,variable,*values,**kwargs):
+		OptionMenu.__init__(self,parent,variable,*values,**kwargs)
+		self.var=variable
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
@@ -1173,6 +1350,7 @@ class privateSection(mainFrame):
 		self.widgetVar=StringVar()
 		self.widgetVar.set("Widget")
 
+		self.hideData=False #Should data be hidden on startup
 		#-----States-------
 		self.hiddenState=False # False = Showing
 		self.widgetState=None # False = Normal
@@ -1228,7 +1406,7 @@ class privateSection(mainFrame):
 				elif widgetName == Text:
 					newWidget=Text(self.widgetFrame,height=12,font=self.widgetFont,bg="#E2E9F0")
 				elif widgetName == OptionMenu:
-					newWidget=OptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
+					newWidget=advancedOptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
 				#Add the widget to dict
@@ -1360,7 +1538,7 @@ class privateSection(mainFrame):
 					if mainLabel in self.savedWidgetData:
 						widget.textVar.set(self.savedWidgetData[mainLabel])
 					else:
-						print("Could not find data for mainLabel")
+						log.report("No data found to display on mainLabel")
 
 	def toggleHide(self,**kwargs):
 		"""
@@ -1376,6 +1554,7 @@ class privateSection(mainFrame):
 		if self.hiddenState == False:
 			currentCommand=True
 			self.hiddenState=True
+
 		elif self.hiddenState == True:
 			currentCommand=False
 			self.hiddenState=False
@@ -1397,7 +1576,8 @@ class privateSection(mainFrame):
 					self.hideWidget(self.savedWidgets[widget],"Show")
 				#Update the button
 				but=self.context.getButton("Show")
-				but.textVar.set("Hide")
+				if but:
+					but.textVar.set("Hide")
 
 
 			#Hide the data
@@ -1406,7 +1586,8 @@ class privateSection(mainFrame):
 					self.hideWidget(self.savedWidgets[widget],"Hide")
 				#Update the button
 				but=self.context.getButton("Hide")
-				but.textVar.set("Show")
+				if but:
+					but.textVar.set("Show")
 
 	def changeState(self,chosenState):
 		"""
@@ -1428,7 +1609,7 @@ class privateSection(mainFrame):
 				button.changeState(True)
 
 			#Hide the password
-			if self.textVar.get() == "Password":
+			if self.hideData:
 				self.toggleHide(forced=False)
 
 			#Update the var
@@ -1617,12 +1798,14 @@ class podNotebook(advancedNotebook):
 							viewType=section[1]
 							editType=section[2]
 							buttonList=section[3]
+							hideDataValue=section[5]
 							#Create section
 							newPrivateSection=privateSection(newFrame)
 							newPrivateSection.textVar.set(sectionName)
 							newPrivateSection.defaultWidget=viewType
 							newPrivateSection.editWidget=editType
 							newPrivateSection.loadWidget(viewType)
+							newPrivateSection.hideData=hideDataValue
 							#Set context to right length
 							newPrivateSection.context.setPlaceholders(len(buttonList))
 							#Add context buttons to section
@@ -1956,7 +2139,7 @@ class podTemplate:
 	#Store a reference
 	templates={}
 	#Store valid data types
-	validDataTypes=[Entry,advancedEntry,Text,OptionMenu,Label,mainLabel]
+	validDataTypes=[Entry,advancedEntry,Text,advancedOptionMenu,Label,mainLabel]
 
 	def __init__(self,templateName,templateColour):
 		#Name and Colour of template
@@ -1989,8 +2172,11 @@ class podTemplate:
 			#Get section colour
 			sectionColour="#FFFFFF"
 			sectionColour=kwargs.get("colour",sectionColour)
+			#Should the data be hidden when possible
+			hideData=False
+			hideData=kwargs.get("hide",hideData)
 			#Add the data to list
-			dataArray=[sectionName,viewType,editType,buttonList,sectionColour]
+			dataArray=[sectionName,viewType,editType,buttonList,sectionColour,hideData]
 			#Add list to dictionary
 			self.tabs[tabName].append(dataArray)
 
@@ -2002,7 +2188,7 @@ class podTemplate:
 loginTemplate=podTemplate("Login","#A9F955")
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
-loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"])
+loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
 
 loginTemplate.addTab("Advanced")
 loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"])
@@ -2018,16 +2204,16 @@ cardTemplate=podTemplate("Credit Card","#EE658A")
 cardTemplate.addTab("Card")
 cardTemplate.addTemplateSection("Card","Card Holder Name",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Card","Bank",mainLabel,Entry,["Copy","Hide"])
-cardTemplate.addTemplateSection("Card","Card Number",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Card","Card Number",mainLabel,Entry,["Copy","Hide"],hide=True)
 cardTemplate.addTemplateSection("Card","Expire date",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTab("Advanced")
-cardTemplate.addTemplateSection("Advanced","Pin",mainLabel,Entry,["Copy","Hide"])
+cardTemplate.addTemplateSection("Advanced","Pin",mainLabel,Entry,["Copy","Hide"],hide=True)
 cardTemplate.addTemplateSection("Advanced","Credit limit",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 #=====Password======
 passwordTemplate=podTemplate("Password","#E6BE3E")
 passwordTemplate.addTab("Password")
-passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"])
+passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
 passwordTemplate.addTemplateSection("Password","Notes",Text,Text,["Copy"])
 
 

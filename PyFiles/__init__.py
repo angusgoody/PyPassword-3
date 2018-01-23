@@ -124,7 +124,7 @@ loginFileLabel=mainLabel(loginSub,textvariable=loginFileVar,font="Avenir 30")
 loginFileLabel.pack(pady=10)
 
 #Entry to enter password
-loginEntry=advancedEntry(loginSub,"Enter Password",font="Avenir 20",justify=CENTER)
+loginEntry=advancedEntry(loginSub,"Enter Password",True,font="Avenir 20",justify=CENTER)
 loginEntry.pack(fill=X)
 
 
@@ -232,6 +232,8 @@ def closeProgram():
 	else:
 		#Exit the program
 		window.destroy()
+
+
 #======Splash Screen========
 
 #======Open Screen========
@@ -475,19 +477,34 @@ def createNewPeaPod():
 	#Add the context buttons
 	newWindow.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
 	newWindow.context.addButton(1,text="Create",enabledColour=mainBlueColour)
+	#Disable the context button by default
+	but=newWindow.context.getButton("Create")
+	if newWindow:
+		but.changeState(False)
+
+
 	#Create the ui
 	centerFrame=mainFrame(newWindow)
 	centerFrame.pack(expand=True)
 
-	podNameEntry=advancedEntry(centerFrame,"Pod Name",justify=CENTER,font="Avenir 18")
+	#Setup the main entry
+	podNameEntry=advancedEntry(centerFrame,"Pod Name",False,justify=CENTER,font="Avenir 18")
 	podNameEntry.pack(fill=X)
+	#Add reference to class
+	newWindow.addDataSource(podNameEntry,"Name",
+	                        cannotContain=masterPod.currentMasterPod.peas.keys(),
+	                        minLength=1,maxLength=10)
 
 	podTypeVar=StringVar()
 	podTypeVar.set("Login")
-	podType=OptionMenu(centerFrame,podTypeVar,*podTemplate.templates,)
+	podType=advancedOptionMenu(centerFrame,podTypeVar,*podTemplate.templates)
 	podType.pack(fill=X,pady=10)
-
-
+	#Add reference to class
+	newWindow.addDataSource(podType,"PodType")
+	#Create the display label
+	displayLabel=mainLabel(centerFrame,font="Avenir 13")
+	displayLabel.pack(pady=5)
+	newWindow.addDisplayLabel(displayLabel)
 
 
 #====================Button commands====================
