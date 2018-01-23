@@ -42,36 +42,6 @@ This section is for functions that aid with the user
 interface elements of PyPassword
 """
 #Utility functions
-def searchDataSource2(dataToFind, dataSource, **kwargs):
-	"""
-	This small function will check
-	a data source to see if the nameToCheck
-	appears in there. If it does it will return...
-	True = Found
-	False = Not Found
-	
-	Kwargs
-	capital=False = Don't check for capitals
-	
-	"""
-	#See if capital is needed
-	capital=False
-	capital=kwargs.get("capital",capital)
-	#Iterate through the dataSource
-	for item in dataSource:
-		if str(item).upper() == str(dataToFind).upper() and capital == True:
-			return True
-		elif str(item) == str(dataToFind):
-			return True
-
-		#Search dictionary keys
-		if type(dataSource) is dict:
-			result=searchDataSource(dataToFind, dataSource.values(), **kwargs)
-			if result:
-				return True
-
-	return False
-
 def smallCheck(dataToFind,dataSource,capital):
 	"""
 	The basic search function
@@ -96,7 +66,7 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	a data structure 
 	"""
 	#Check for kwargs
-	capital=False
+	capital=True
 	capital=kwargs.get("capital",capital)
 
 	#Iterate through data source
@@ -914,9 +884,14 @@ class dataWindow(Toplevel):
 		#Add the kwargs
 		self.inputCannotContain[name]=cannotContain
 		self.inputLengths[name]=[minLength,maxLength]
+
+		widgetType=type(widget)
 		#Bind the widget
-		if type(widget) in [advancedEntry,Entry]:
+		if widgetType in [advancedEntry,Entry]:
 			widget.bind("<KeyRelease>",lambda event: self.runCheck(name))
+		else:
+			if widgetType is StringVar:
+				self.inputData[name]=widget
 
 	def runCheck(self,identifier):
 		"""
@@ -946,7 +921,7 @@ class dataWindow(Toplevel):
 						#End
 						return False
 					#Check to see if it contains forbidden items
-					if widgetData in requiredCannotContain:
+					if searchDataSource(widgetData,requiredCannotContain,capital=True):
 						self.updateCheck(identifier,"Name not available please enter another")
 						#End
 						return False
@@ -988,6 +963,17 @@ class dataWindow(Toplevel):
 		input areas of the data window
 		"""
 		return self.inputData
+
+	def storeWidgetData(self,widgetName):
+		"""
+		Method is used to
+		store the data
+		from a widget inside the class
+		"""
+		if widgetName in self.inputWidgets:
+			data=getDataFromWidget(self.inputWidgets[widgetName])
+			self.inputData[widgetName]=data
+
 class advancedOptionMenu(OptionMenu):
 	"""
 	Option Menu which allows

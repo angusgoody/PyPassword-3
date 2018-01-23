@@ -493,7 +493,7 @@ def createNewPeaPodWindow():
 	#Add reference to class
 	newWindow.addDataSource(podNameEntry,"Name",
 	                        cannotContain=masterPod.currentMasterPod.peas.keys(),
-	                        minLength=1,maxLength=10)
+	                        minLength=1,maxLength=20)
 
 	#Option menu to select template
 	podTypeVar=StringVar()
@@ -501,7 +501,7 @@ def createNewPeaPodWindow():
 	podType=advancedOptionMenu(centerFrame,podTypeVar,*podTemplate.templates)
 	podType.pack(fill=X,pady=10)
 	#Add reference to class
-	newWindow.addDataSource(podType,"PodType")
+	newWindow.addDataSource(podTypeVar,"PodType")
 
 def initiatePeaPodInstance(dataWindowInstance):
 	"""
@@ -509,10 +509,26 @@ def initiatePeaPodInstance(dataWindowInstance):
 	the value from the
 	data window that the user
 	entered and creates a pod
+
+	The names given to input sources
+	in the createWindow function must
+	match the names in this function
 	"""
 	#Gather the data
 	data=dataWindowInstance.getData()
-	print(data)
+	if "Name" in data and "PodType" in data:
+		peaName=data["Name"]
+		podType=data["PodType"].get()
+		#Create the peaPod for the currently loaded pod
+		newPeaPod=masterPod.currentMasterPod.addPeaPod(peaName,template=podType)
+		#Add to listbox
+		podListbox.addObject(peaName,newPeaPod)
+		#Disable the popup window
+		dataWindowInstance.quit()
+		#Report to log
+		log.report("Created a new pea pod",peaName)
+		print("Creating pea pod")
+
 
 
 

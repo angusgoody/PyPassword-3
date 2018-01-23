@@ -661,12 +661,7 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 			masterPodInstance.locked=getCurrentTime()
 			checkMasterPodPassword(masterPodInstance,attempt)
 
-def createNewPeaPod(masterPodInstance,peaName,template):
-	"""
-	This function will allow a
-	new pea pod to be created
-	"""
-	pass
+
 
 #====================Testing area====================
 
