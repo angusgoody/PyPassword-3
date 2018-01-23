@@ -850,7 +850,7 @@ class dataWindow(Toplevel):
 		self.name=name
 		#Configure window
 		self.title=self.name
-		self.geometry("300x200")
+		self.geometry("400x200")
 		#Status
 		self.status=mainLabel(self,font="Avenir 15")
 		self.status.pack(side=BOTTOM,fill=X)
@@ -859,10 +859,13 @@ class dataWindow(Toplevel):
 		#Context bar
 		self.context=contextBar(self,places=2)
 		self.context.pack(side=BOTTOM,fill=X)
-
+		self.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
+		self.context.addButton(1,text="Create",enabledColour=mainBlueColour)
+		self.context.getButton("Create").changeState(False)
+		self.context.updateContextButton(0,command=lambda: self.quit())
 		#Display label
 		self.displayVar=StringVar()
-		self.displayVar.set("Please enter something")
+		self.displayVar.set("Please enter data")
 		self.displayWidget=None
 
 		#Store the inputs
@@ -922,7 +925,6 @@ class dataWindow(Toplevel):
 		to validate it against the specified requirements 
 		"""
 		validWidgets=[Entry,advancedEntry]
-		print("Checking",identifier)
 		if identifier in self.inputWidgets:
 			correctWidget=self.inputWidgets[identifier]
 			if type(correctWidget) in validWidgets:
@@ -932,34 +934,60 @@ class dataWindow(Toplevel):
 				requiredCannotContain=self.inputCannotContain[identifier]
 				#Get the data from the widget
 				widgetData=getDataFromWidget(correctWidget)
-				print("RAW",widgetData)
 				if widgetData:
 					widgetDataLength=len(widgetData)
 					#Check the length
 					if widgetDataLength < requiredMinLength:
-						self.updateCheck("Please enter at least "+requiredMinLength+" characters")
+						self.updateCheck(identifier,"Please enter at least "+str(requiredMinLength)+" characters")
+						#End
+						return False
 					if widgetDataLength > requiredMaxLength:
-						self.updateCheck("Please enter at the most "+requiredMaxLength+" characters")
-
+						self.updateCheck(identifier,"Please enter at the most "+str(requiredMaxLength)+" characters")
+						#End
+						return False
 					#Check to see if it contains forbidden items
 					if widgetData in requiredCannotContain:
-						self.updateCheck("Name not available please enter another")
+						self.updateCheck(identifier,"Name not available please enter another")
+						#End
+						return False
 				else:
-					self.updateCheck("Please enter data")
+					self.updateCheck(identifier,"Please enter data")
+					#End
+					return False
 
-	def updateCheck(self,message):
+			#If the data is valid
+			self.updateCheck(identifier,True)
+
+	def updateCheck(self,identifier,message):
 		"""
 		Update the window
 		based on what the user entered
 		"""
-		print(message)
 		if message == True:
-			print("Valid input")
+			#Enable the button to continue
+			self.displayVar.set("Valid name")
 			self.context.getButton("Create").changeState(True)
+			#Store the data
+			self.inputData[identifier]=getDataFromWidget(self.inputWidgets[identifier])
 		else:
+			#Disable the button to continue
+			self.context.getButton("Create").changeState(False)
 			self.displayVar.set(message)
 
+	def quit(self):
+		"""
+		The quit method which
+		will destroy the window
+		and any saving etc.
+		"""
+		self.destroy()
 
+	def getData(self):
+		"""
+		Function to return the stored data in the
+		input areas of the data window
+		"""
+		return self.inputData
 class advancedOptionMenu(OptionMenu):
 	"""
 	Option Menu which allows

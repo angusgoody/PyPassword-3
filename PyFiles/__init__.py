@@ -468,43 +468,52 @@ def exitPod():
 	#Show the correct frame
 	openScreen.show()
 
-def createNewPeaPod():
+def createNewPeaPodWindow():
 	"""
-	Function to create a new pea
-	pod inside a master pod
+	Function to launch the window
+	to allow the user to enter
+	name and details for a new peaPod
 	"""
 	newWindow=dataWindow(window,"Create Pea Pod")
-	#Add the context buttons
-	newWindow.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
-	newWindow.context.addButton(1,text="Create",enabledColour=mainBlueColour)
-	#Disable the context button by default
-	but=newWindow.context.getButton("Create")
-	if newWindow:
-		but.changeState(False)
-
-
 	#Create the ui
 	centerFrame=mainFrame(newWindow)
 	centerFrame.pack(expand=True)
 
+	#Bind the context command to the correct function when user clicks "Create"
+	newWindow.context.updateContextButton(1,command=lambda: initiatePeaPodInstance(newWindow))
 	#Setup the main entry
 	podNameEntry=advancedEntry(centerFrame,"Pod Name",False,justify=CENTER,font="Avenir 18")
 	podNameEntry.pack(fill=X)
+
+	#Create the display label
+	displayLabel=mainLabel(centerFrame,font="Avenir 12")
+	displayLabel.pack(pady=2)
+	newWindow.addDisplayLabel(displayLabel)
+
 	#Add reference to class
 	newWindow.addDataSource(podNameEntry,"Name",
 	                        cannotContain=masterPod.currentMasterPod.peas.keys(),
 	                        minLength=1,maxLength=10)
 
+	#Option menu to select template
 	podTypeVar=StringVar()
 	podTypeVar.set("Login")
 	podType=advancedOptionMenu(centerFrame,podTypeVar,*podTemplate.templates)
 	podType.pack(fill=X,pady=10)
 	#Add reference to class
 	newWindow.addDataSource(podType,"PodType")
-	#Create the display label
-	displayLabel=mainLabel(centerFrame,font="Avenir 13")
-	displayLabel.pack(pady=5)
-	newWindow.addDisplayLabel(displayLabel)
+
+def initiatePeaPodInstance(dataWindowInstance):
+	"""
+	This function takes
+	the value from the
+	data window that the user
+	entered and creates a pod
+	"""
+	#Gather the data
+	data=dataWindowInstance.getData()
+	print(data)
+
 
 
 #====================Button commands====================
@@ -519,7 +528,7 @@ loginScreen.updateCommand(2,command=lambda: openScreen.show())
 loginScreen.updateCommand(0,command=lambda: showHint())
 loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
-podScreen.updateCommand(0,command=createNewPeaPod)
+podScreen.updateCommand(0, command=createNewPeaPodWindow)
 podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
 #View Pod screen
