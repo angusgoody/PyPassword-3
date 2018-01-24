@@ -43,6 +43,8 @@ screen.privateMenu=privateMenu
 log=logClass("Main")
 #====================Variables====================
 mainFrame.windowColour=window.cget("bg")
+#Boolean for processing the language for search
+processLanguageOn=True
 
 #====================User Interface====================
 
@@ -239,6 +241,26 @@ def closeProgram():
 	else:
 		#Exit the program
 		window.destroy()
+
+def processSearchLanguage(dataField):
+	"""
+	This function will process the
+	data from a data source and
+	check for any natural language
+	"""
+	validCommands=["FILTER","TYPE","ORDER"]
+	rawData=getDataFromWidget(dataField)
+	#Split the data
+	splitData=rawData.split("=")
+	if len(splitData) > 1:
+		command=splitData[0]
+		commandData=splitData[1]
+		if len(commandData.split()) > 0:
+			commandName=str(command).upper()
+			if commandName in validCommands:
+				#Filter
+				if commandName == "FILTER" or commandName == "TYPE":
+					filterPodListbox(commandData)
 
 
 #======Splash Screen========
@@ -556,6 +578,7 @@ def runSearch():
 	This function is called when the user
 	types into the search bar
 	"""
+	global processLanguageOn
 	dataToFind=getDataFromWidget(podSearchEntry)
 	#Search through the keys otherwise data changes
 	dataSource=podListbox.data.keys()
@@ -571,6 +594,9 @@ def runSearch():
 	for item in results:
 		podListbox.addExisting(item)
 
+	if processLanguageOn:
+		processSearchLanguage(podSearchEntry)
+
 def clearSearch():
 	"""
 	Remove data from entry
@@ -581,6 +607,48 @@ def clearSearch():
 	runSearch()
 
 
+
+
+#======Other functions========
+
+def filterPodListbox(templateType):
+	"""
+	Will filter the contents of
+	the pod listbox to contain
+	only one kind of template type
+	"""
+
+	#Check the name is valid first
+	found=False
+	templateType=templateType.upper()
+	for template in podTemplate.templates:
+		if template.upper() == templateType:
+			found=True
+
+	#if the template type is valid then find matching pods
+	if found:
+		peas=findPeasWithTemplate(templateType)
+		if len(peas) > 0:
+			for pea in peas:
+				if type(pea) is peaPod:
+					podListbox.addExisting(pea.peaName)
+				elif type(pea) is str:
+					podListbox.addExisting(pea)
+
+def findPeasWithTemplate(templateType):
+	"""
+	Function to find peas with a certain
+	template name
+	"""
+	templateType=templateType.upper()
+	results=[]
+	#Search through the currently loaded master pod
+	for peaName in masterPod.currentMasterPod.peas:
+		peaObject=masterPod.currentMasterPod.peas[peaName]
+		#If the attribute matches then add to results
+		if peaObject.templateType.upper() == templateType:
+			results.append(peaObject)
+	return results
 
 #====================Button commands====================
 
