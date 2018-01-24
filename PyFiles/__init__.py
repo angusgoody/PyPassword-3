@@ -168,6 +168,13 @@ podTopVar.set("Select a pod")
 podTopLabel=topLabel(podScreen,textvariable=podTopVar)
 podTopLabel.pack(side=TOP,fill=X)
 
+#Create the search bar
+podSearchEntry=advancedEntry(podScreen,"Search",False,justify=CENTER,font="Avenir 14")
+podSearchEntry.pack(fill=X,side=TOP)
+
+#Search context
+podSearchContext=contextBar(podScreen,places=3,font="Avenir 11")
+podSearchContext.pack(fill=X,side=TOP)
 #Create the listbox
 podListbox=advancedListbox(podScreen,font="Avenir 25")
 podListbox.pack(expand=True,fill=BOTH)
@@ -438,6 +445,9 @@ def loadPodsToScreen():
 		#Add to listbox
 		podListbox.addObject(pod,podInstance,colour=podColour)
 
+	#Clear the search so it resets when loading screen
+	clearSearch()
+
 def openPod():
 	"""
 	This function is run
@@ -530,12 +540,45 @@ def initiatePeaPodInstance(dataWindowInstance):
 		newPeaPod=masterPod.currentMasterPod.addPeaPod(peaName,template=podType)
 		#Add to listbox
 		podListbox.addObject(peaName,newPeaPod)
+		#Refresh the listbox
+		loadPodsToScreen()
 		#Disable the popup window
 		dataWindowInstance.quit()
+
+		#todo save to file here
+
 		#Report to log
 		log.report("Created a new pea pod",peaName)
 		print("Creating pea pod")
 
+def runSearch():
+	"""
+	This function is called when the user
+	types into the search bar
+	"""
+	dataToFind=getDataFromWidget(podSearchEntry)
+	#Search through the keys otherwise data changes
+	dataSource=podListbox.data.keys()
+	#Store the results of the search
+	results=[]
+	#Search the data source
+	for item in dataSource:
+		if searchDataSource(dataToFind,[item],capital=True,full=False):
+			results.append(item)
+
+	#Add the results to screen
+	podListbox.delete(0,END)
+	for item in results:
+		podListbox.addExisting(item)
+
+def clearSearch():
+	"""
+	Remove data from entry
+	and being an emppty
+	search to return data
+	"""
+	podSearchEntry.delete(0,END)
+	runSearch()
 
 
 
@@ -554,6 +597,7 @@ loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 podScreen.updateCommand(0, command=createNewPeaPodWindow)
 podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
+
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
@@ -567,6 +611,10 @@ loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #Pod Screen
 podScreen.addScreenCommand(lambda: loadPodsToScreen())
+#====================Context====================
+podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7")
+podSearchContext.updateContextButton(1,text="Sort by name")
+podSearchContext.updateContextButton(2,text="Clear search",command=lambda: clearSearch(),enabledColour="#DCE9E7")
 
 #====================Bindings====================
 #System
@@ -580,6 +628,7 @@ recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,
 recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
+recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #====================Testing Area====================
 
 #====================Initial Loaders====================

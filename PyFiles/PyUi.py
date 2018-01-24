@@ -42,22 +42,37 @@ This section is for functions that aid with the user
 interface elements of PyPassword
 """
 #Utility functions
-def smallCheck(dataToFind,dataSource,capital):
+def smallCheck(dataToFind,dataSource,capital,fullCheck):
 	"""
 	The basic search function
 	which will check to see
 	if two parameters are equal
+	
+	capital = True = ignore case
+	fullCheck = True = exact matches
 	"""
 	if type(dataToFind) is str and type(dataSource) is str:
 		if capital:
-			if dataToFind.upper() == dataSource.upper():
-				return True
+			if fullCheck:
+				if dataToFind.upper() == dataSource.upper():
+					return True
+				else:
+					return False
 			else:
-				return False
-	if dataToFind == dataSource:
-		return True
+				if dataToFind.upper() in dataSource.upper():
+					return True
+				else:
+					return False
+	if fullCheck:
+		if dataToFind == dataSource:
+			return True
+		else:
+			return False
 	else:
-		return False
+		if dataToFind in dataSource:
+			return True
+		else:
+			return False
 
 def searchDataSource(dataToFind,dataSource,**kwargs):
 	"""
@@ -68,6 +83,8 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	#Check for kwargs
 	capital=True
 	capital=kwargs.get("capital",capital)
+	fullCheck=True
+	fullCheck=kwargs.get("full",fullCheck)
 
 	#Iterate through data source
 	for item in dataSource:
@@ -81,7 +98,7 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 			if result:
 				return result
 		else:
-			result=smallCheck(dataToFind,item,capital)
+			result=smallCheck(dataToFind,item,capital,fullCheck)
 			if result:
 				return result
 
@@ -214,10 +231,10 @@ def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	all the children of the widget
 	will also be binded to the same function
 	"""
+	#Bind the parent
+	parent.bind(bindButton,bindFunction)
 	#Check if the parent has children
 	if "winfo_children" in dir(parent):
-		#Bind the parent
-		parent.bind(bindButton,bindFunction)
 		#Bind the children
 		for child in parent.winfo_children():
 			recursiveBind(child,bindButton,bindFunction)
@@ -709,6 +726,20 @@ class advancedListbox(Listbox):
 		self.data.clear()
 		#Clear screen
 		self.delete(0,END)
+
+	def addExisting(self,objectKey):
+		"""
+		This function adds 
+		an existing object back
+		into the listbox with just
+		a name.
+		"""
+		if objectKey in self.data:
+			self.insert(END,objectKey)
+			#Update the colour
+			if objectKey in self.colourData:
+				self.itemconfig(END,bg=self.colourData[objectKey])
+
 
 class advancedEntry(Entry):
 	"""
