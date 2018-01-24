@@ -740,6 +740,13 @@ class advancedListbox(Listbox):
 			if objectKey in self.colourData:
 				self.itemconfig(END,bg=self.colourData[objectKey])
 
+	def restoreData(self):
+		"""
+		Restore all the data back to the screen
+		"""
+		self.delete(0,END)
+		for item in self.data:
+			self.addExisting(item)
 
 class advancedEntry(Entry):
 	"""

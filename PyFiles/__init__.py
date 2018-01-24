@@ -248,7 +248,7 @@ def processSearchLanguage(dataField):
 	data from a data source and
 	check for any natural language
 	"""
-	validCommands=["FILTER","TYPE","ORDER"]
+	validCommands=["FILTER","TYPE","ORDER","SORT"]
 	rawData=getDataFromWidget(dataField)
 	#Split the data
 	splitData=rawData.split("=")
@@ -261,7 +261,8 @@ def processSearchLanguage(dataField):
 				#Filter
 				if commandName == "FILTER" or commandName == "TYPE":
 					filterPodListbox(commandData)
-
+				elif commandName == "ORDER" or commandName == "SORT":
+					orderPodListbox(commandData)
 
 #======Splash Screen========
 
@@ -650,6 +651,39 @@ def findPeasWithTemplate(templateType):
 			results.append(peaObject)
 	return results
 
+def orderPodListbox(orderMethod):
+	"""
+	Will order the data inside
+	the pod listbox
+	"""
+	validOrderMethods=["NAME","TYPE"]
+	orderMethod=str(orderMethod).upper()
+	newList=[]
+	#Add the current data dictionary into list for sorting
+	for item in podListbox.data.keys():
+		newList.append(item)
+
+	#Check the order method is valid
+	if orderMethod in validOrderMethods:
+		if orderMethod == "NAME":
+			newList=orderList(newList)
+
+		elif orderMethod == "TYPE":
+			print("Can not sort by type yet")
+
+		#Add the original data
+		podListbox.delete(0,END)
+		for item in newList:
+			podListbox.addExisting(item)
+
+
+
+def orderList(dataSource,**kwargs):
+	"""
+	Will order a list in a certain way
+	"""
+	return sorted(dataSource)
+
 #====================Button commands====================
 
 #Splash Screen
@@ -680,8 +714,8 @@ loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod
 #Pod Screen
 podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #====================Context====================
-podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7")
-podSearchContext.updateContextButton(1,text="Sort by name")
+podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
+podSearchContext.updateContextButton(1,text="Sort by name",command=lambda: orderPodListbox("Name"))
 podSearchContext.updateContextButton(2,text="Clear search",command=lambda: clearSearch(),enabledColour="#DCE9E7")
 
 #====================Bindings====================
