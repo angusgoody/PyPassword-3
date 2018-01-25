@@ -223,6 +223,24 @@ def loadWebsite(address):
 				log.report("Error opening address",tag="Error")
 			else:
 				log.report("Opened web page")
+
+def copyToClipboard(data):
+	"""
+	Will copy data to
+	the computers clipboard
+	ready to paste anywhere
+	"""
+
+	if len(str(data).split()) > 0:
+		if "window" in mainVars:
+			mainWindow=mainVars["window"]
+			mainWindow.clipboard_clear()
+			mainWindow.clipboard_append(data)
+			log.report("Added data to clipboard")
+			showMessage("Data copied","Data copied to clipboard")
+	else:
+		showMessage("No data","No data to copy")
+
 #Recursion
 def recursiveBind(parent,bindButton,bindFunction,**kwargs):
 	"""

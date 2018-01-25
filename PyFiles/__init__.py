@@ -39,6 +39,9 @@ mainVars["privateMenu"]=publicMenu
 screen.publicMenu=publicMenu
 screen.privateMenu=privateMenu
 
+#Create private menus
+privateFileMenu=Menu(privateMenu)
+privateMenu.add_cascade(label="File",menu=privateFileMenu)
 #====================Log====================
 log=logClass("Main")
 #====================Variables====================
@@ -209,6 +212,9 @@ viewPodNotebook=podNotebook(viewPodScreen)
 viewPodNotebook.pack(expand=True,fill=BOTH)
 
 #endregion
+#======Generate Password screen======
+genPasswordScreen=screen(window,"Generate",protected=True)
+
 #====================Functions====================
 
 
@@ -731,6 +737,14 @@ recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
+
+#====================MENUS===================
+
+#----Private Menus----
+
+#File
+privateFileMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
+
 #====================Testing Area====================
 
 #====================Initial Loaders====================
