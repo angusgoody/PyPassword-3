@@ -716,7 +716,7 @@ podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
 podSearchContext.updateContextButton(1,text="Sort by name",command=lambda: orderPodListbox("Name"))
-podSearchContext.updateContextButton(2,text="Clear search",command=lambda: clearSearch(),enabledColour="#DCE9E7")
+podSearchContext.updateContextButton(2,text="Reset",command=lambda: clearSearch(),enabledColour="#DCE9E7")
 
 #====================Bindings====================
 #System

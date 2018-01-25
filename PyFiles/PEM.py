@@ -610,6 +610,9 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 	and will return a value based on if
 	the attempt is correct or not
 	"""
+	#Maximum attempts before lock
+	maximumAttempts=5
+
 	if type(masterPodInstance) == masterPod:
 		#Check for locked values
 		if hasattr(masterPodInstance,"locked"):
@@ -643,7 +646,7 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 					currentNumberOfAttempts+=1
 					masterPodAttempts[masterPodInstance]=currentNumberOfAttempts
 					#Check if limit reached
-					if currentNumberOfAttempts == 5:
+					if currentNumberOfAttempts >= maximumAttempts:
 						masterPodInstance.locked=addTimeToCurrent("minutes",lockedMinutes)
 						masterPodAttempts[masterPodInstance]=0
 						masterPodInstance.save()

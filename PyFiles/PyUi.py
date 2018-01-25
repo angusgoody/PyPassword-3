@@ -1455,10 +1455,14 @@ class privateSection(mainFrame):
 					newWidget=advancedOptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
+
+				#Colour to match background colour
+				basicChangeColour(newWidget,self.cget("bg"))
 				#Add the widget to dict
 				self.savedWidgets[widgetName]=newWidget
 				#Display
 				self.displayWidget(newWidget)
+
 			#Update variable
 			self.loadedWidget=widgetName
 		else:
