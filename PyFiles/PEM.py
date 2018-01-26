@@ -621,7 +621,7 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 				log.report("Locked attribute has been changed")
 				masterPodInstance.locked=addTimeToCurrent("minutes",lockedMinutes)
 
-			if masterPodInstance.locked < getCurrentTime():
+			elif masterPodInstance.locked < getCurrentTime():
 				currentNumberOfAttempts=0
 				#Check for a stored number of attempts
 				if masterPodInstance in masterPodAttempts:
@@ -652,10 +652,6 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 						masterPodInstance.save()
 						log.report("Pod locked for 5 minutes",masterPodInstance.masterName)
 						return "locked"
-
-
-
-
 			else:
 				return "locked"
 

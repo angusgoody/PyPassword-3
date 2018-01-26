@@ -402,8 +402,14 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				return True
 
 			elif resetScreen == False:
-				#Add one to the attempt counter
-				loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+
+				#Attempt to get number of attempts from dict
+				if masterPodInstance in masterPodAttempts:
+					loginAttemptNumberVar.set(masterPodAttempts[masterPodInstance])
+				#If not just add one
+				else:
+					loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+
 				#The password was incorrect
 				loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
 				#Colour the screen incorrect colour
@@ -681,8 +687,6 @@ def orderPodListbox(orderMethod):
 		podListbox.delete(0,END)
 		for item in newList:
 			podListbox.addExisting(item)
-
-
 
 def orderList(dataSource,**kwargs):
 	"""
