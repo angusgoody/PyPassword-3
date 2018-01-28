@@ -619,7 +619,29 @@ def clearSearch():
 	podSearchEntry.delete(0,END)
 	runSearch()
 
+#======View Pod Screen========
 
+def deletePod(peaPodInstance,**kwargs):
+	"""
+	Will delete peaPod
+	from a masterPod class
+	"""
+	returnToHome=True
+	returnToHome=kwargs.get("returnToHome",returnToHome)
+
+	choice=messagebox.askokcancel("Sure","Are you sure you want to delete this pod?")
+	if choice:
+		currentMaster=masterPod.currentMasterPod
+		for pea in currentMaster.peas:
+			currentPeaPod=currentMaster.peas[pea]
+			if currentPeaPod == peaPodInstance:
+				del currentMaster.peas[pea]
+				break
+		#Save
+		currentMaster.save()
+
+	if returnToHome:
+		goHome()
 
 
 #======Other functions========
@@ -709,10 +731,10 @@ loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 podScreen.updateCommand(0, command=createNewPeaPodWindow)
 podScreen.updateCommand(2,command=lambda: exitPod())
 podScreen.updateCommand(1,command=lambda: openPod())
-
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
+viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterPod.currentPeaPod))
 
 #====================Screen commands====================
 #Login Screen
