@@ -11,10 +11,10 @@ PyPassword 3
 """
 
 #====================Imports====================
-from tkinter import *
+from tkinter.ttk import Scale
 from PyUi import *
 from PEM import *
-
+import random
 #====================Window====================
 """
 This is where the basic window
@@ -48,7 +48,9 @@ log=logClass("Main")
 mainFrame.windowColour=window.cget("bg")
 #Boolean for processing the language for search
 processLanguageOn=True
-
+testScale=Scale(window)
+scaleColour=testScale.cget("bg")
+print(scaleColour)
 #====================User Interface====================
 
 #======Status and context======
@@ -213,8 +215,60 @@ viewPodNotebook.pack(expand=True,fill=BOTH)
 
 #endregion
 #======Generate Password screen======
+#region generate
 genPasswordScreen=screen(window,"Generate",protected=True)
+genPasswordScreen.context=context
 
+genPasswordNotebook=advancedNotebook(genPasswordScreen)
+genPasswordNotebook.pack(fill=BOTH,expand=True)
+
+genPasswordFrame=mainFrame(genPasswordNotebook)
+genPasswordFrame.pack(fill=BOTH,expand=True)
+
+genPasswordNotebook.addPage("Generate",genPasswordFrame)
+
+#Generate section
+genPasswordCenter=mainFrame(genPasswordFrame)
+genPasswordCenter.pack(expand=True)
+
+genPasswordVar=StringVar()
+genPasswordVar.set("Password")
+genPasswordLabel=mainLabel(genPasswordCenter,textvariable=genPasswordVar,font="Avenir 19")
+genPasswordLabel.pack(fill=X,pady=5)
+
+#Notebook for characters or words
+genPasswordCenterNotebook=advancedNotebook(genPasswordCenter)
+genPasswordCenterNotebook.pack(expand=True,fill=BOTH)
+
+#Characters
+genPasswordCharFrame=mainFrame(genPasswordCenterNotebook)
+genPasswordCharFrame.pack(pady=5)
+genPasswordCenterNotebook.addPage("Characters", genPasswordCharFrame)
+
+genPasswordCharLengthSlider=advancedSlider(genPasswordCharFrame, "Length", from_=7, to=50, value=random.randint(7, 50))
+genPasswordCharLengthSlider.pack(fill=X)
+
+genPasswordSymbolsSlider=advancedSlider(genPasswordCharFrame, "Symbols", from_=0, to=20, value=random.randint(0, 20))
+genPasswordSymbolsSlider.pack(fill=X)
+
+genPasswordDigitsSlider=advancedSlider(genPasswordCharFrame, "Digits", from_=0, to=20, value=random.randint(0, 20))
+genPasswordDigitsSlider.pack(fill=X)
+
+#Words
+genPasswordWordsFrame=mainFrame(genPasswordCenterNotebook)
+genPasswordCenterNotebook.addPage("Words",genPasswordWordsFrame)
+
+genPasswordWordsLengthSlider=advancedSlider(genPasswordWordsFrame,"Number of words",from_=2, to=12,value=random.randint(2,12))
+genPasswordWordsLengthSlider.pack()
+
+genPasswordWordsHiphenChecked=Radiobutton(genPasswordWordsFrame)
+genPasswordWordsHiphenChecked.pack()
+
+genPasswordWordsStopChecked=Radiobutton(genPasswordWordsFrame)
+genPasswordWordsStopChecked.pack()
+
+genPasswordFrame.colour("#E7E7E7")
+#endregion
 #====================Functions====================
 
 

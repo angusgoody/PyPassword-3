@@ -12,6 +12,7 @@ are created and used.
 
 #====================Imports====================
 from tkinter import *
+from tkinter import ttk
 from PEM import *
 from random import randint
 import webbrowser
@@ -282,7 +283,7 @@ def recursiveColour(parent, colour, **kwargs):
 	recursively
 	"""
 	#Items to exclude
-	excludeItems=[]
+	excludeItems=[ttk.Scale]
 
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:
@@ -1729,6 +1730,7 @@ class advancedNotebook(mainFrame):
 		self.tabFrame.pack(side=TOP,fill=X)
 		self.tabFrame.colour("#BDC7C5")
 
+
 		#Selection bar
 		self.selectionBar=selectionBar(self.tabFrame)
 		self.selectionBar.pack(expand=True)
@@ -2188,6 +2190,68 @@ class selectionBar(mainFrame):
 				self.removePlace(x-counter)
 				counter+=1
 
+class advancedSlider(mainFrame):
+	"""
+	This class is a modified scale widget.
+	It will add more customization and 
+	a label kwarg which adds a label to the widget
+	"""
+
+
+	def __init__(self,parent,text,*extra,**kwargs):
+
+		mainFrame.__init__(self,parent)
+
+		#Important
+		self.text=text
+		self.outputVar=StringVar()
+		self.commands=[]
+
+		#UI
+		self.label=mainLabel(self,text=self.text)
+		self.label.pack()
+
+		self.sliderContainer=mainFrame(self)
+		self.sliderContainer.pack()
+
+		self.slider=ttk.Scale(self.sliderContainer,length=150,**kwargs)
+		self.slider.grid(row=0,column=0)
+
+		self.outputLabel=mainLabel(self.sliderContainer,textvariable=self.outputVar,width=5)
+		self.outputLabel.grid(row=0,column=1)
+
+		#Update label
+		self.outputVar.set(self.getValue())
+
+		#Adds command run
+		self.slider.config(command=self.run)
+
+	def addCommand(self,command):
+		"""
+		Will add a command to the list to execute
+		when slider moves
+		"""
+		if command not in self.commands:
+			self.commands.append(command)
+
+	def run(self,value):
+		"""
+		THis is the method called every time the slider
+		moves
+		"""
+
+		value=round(float(value))
+		#Run the commands
+		for command in self.commands:
+			try:
+				command()
+			except:
+				log.report("Error running command","(Slider)",tag="Error",system=True)
+		#Update label
+		self.outputVar.set(value)
+
+	def getValue(self):
+		return int(float(self.slider.get()))
 
 #====================Non UI Classes====================
 """
