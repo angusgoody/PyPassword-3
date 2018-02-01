@@ -2091,8 +2091,6 @@ class selectionBar(mainFrame):
 			#Remove the ref
 			del self.tabList[index]
 
-
-
 	def addTab(self,tabName,**kwargs):
 		"""
 		This method will add

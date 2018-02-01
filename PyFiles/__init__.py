@@ -48,9 +48,8 @@ log=logClass("Main")
 mainFrame.windowColour=window.cget("bg")
 #Boolean for processing the language for search
 processLanguageOn=True
-testScale=Scale(window)
-scaleColour=testScale.cget("bg")
-print(scaleColour)
+#Current type of password generator
+currentGenPasswordMethod=StringVar()
 #====================User Interface====================
 
 #======Status and context======
@@ -219,6 +218,11 @@ viewPodNotebook.pack(expand=True,fill=BOTH)
 genPasswordScreen=screen(window,"Generate",protected=True)
 genPasswordScreen.context=context
 
+#Context
+genPasswordScreen.addContextInfo(0,text="Copy")
+genPasswordScreen.addContextInfo(1,text="Regnerate")
+genPasswordScreen.addContextInfo(2,text="Back")
+
 genPasswordNotebook=advancedNotebook(genPasswordScreen)
 genPasswordNotebook.pack(fill=BOTH,expand=True)
 
@@ -227,13 +231,13 @@ genPasswordFrame.pack(fill=BOTH,expand=True)
 
 genPasswordNotebook.addPage("Generate",genPasswordFrame)
 
-#Generate section
+#---Generate section---
 genPasswordCenter=mainFrame(genPasswordFrame)
 genPasswordCenter.pack(expand=True)
 
 genPasswordVar=StringVar()
 genPasswordVar.set("Password")
-genPasswordLabel=mainLabel(genPasswordCenter,textvariable=genPasswordVar,font="Avenir 19")
+genPasswordLabel=mainLabel(genPasswordCenter,textvariable=genPasswordVar,font="Avenir 19",width=35)
 genPasswordLabel.pack(fill=X,pady=5)
 
 #Notebook for characters or words
@@ -259,15 +263,25 @@ genPasswordWordsFrame=mainFrame(genPasswordCenterNotebook)
 genPasswordCenterNotebook.addPage("Words",genPasswordWordsFrame)
 
 genPasswordWordsLengthSlider=advancedSlider(genPasswordWordsFrame,"Number of words",from_=2, to=12,value=random.randint(2,12))
-genPasswordWordsLengthSlider.pack()
+genPasswordWordsLengthSlider.pack(pady=5)
 
-genPasswordWordsHiphenChecked=Radiobutton(genPasswordWordsFrame)
-genPasswordWordsHiphenChecked.pack()
+mainLabel(genPasswordWordsFrame,text="Seperator",font="Avenir 13").pack(anchor=W,pady=6)
 
-genPasswordWordsStopChecked=Radiobutton(genPasswordWordsFrame)
-genPasswordWordsStopChecked.pack()
+genPasswordWordsSeperatorVar=StringVar()
+genPasswordWordsSeperatorVar.set("-")
+
+genPasswordWordsHiphenChecked=Radiobutton(genPasswordWordsFrame,text="Hiphen",variable=genPasswordWordsSeperatorVar,value=genPasswordWordsSeperatorVar.get())
+genPasswordWordsHiphenChecked.pack(anchor=W)
+
+genPasswordWordsStopChecked=Radiobutton(genPasswordWordsFrame,text="Full stop",variable=genPasswordWordsSeperatorVar,value=".")
+genPasswordWordsStopChecked.pack(anchor=W)
 
 genPasswordFrame.colour("#E7E7E7")
+
+#---Review section---
+genReviewFrame=mainFrame(genPasswordNotebook)
+#genPasswordNotebook.addPage("Review",genReviewFrame)
+
 #endregion
 #====================Functions====================
 
@@ -694,8 +708,30 @@ def deletePod(peaPodInstance,**kwargs):
 		#Save
 		currentMaster.save()
 
-	if returnToHome:
-		goHome()
+		if returnToHome:
+			goHome()
+
+#======Generate Screen========
+
+def genPassword(charOrWords):
+	"""
+	The function called when
+	a password needs to be generated 
+	"""
+	currentGenPasswordMethod.set(charOrWords)
+	if charOrWords == "words":
+		#Get the data from sliders etc
+		numberOfWords=genPasswordWordsLengthSlider.getValue()
+		seperator=genPasswordWordsSeperatorVar.get()
+		password=generateWordPassword(numberOfWords,seperator)
+	else:
+		#Get the length and amount of symbols etc
+		numberOfCharacters=genPasswordCharLengthSlider.getValue()
+		numberOfDigits=genPasswordDigitsSlider.getValue()
+		numberOfSymbols=genPasswordSymbolsSlider.getValue()
+		#Generate the password
+		password=generatePassword(numberOfCharacters,numberOfSymbols,numberOfDigits)
+	genPasswordVar.set(password)
 
 
 #======Other functions========
@@ -789,7 +825,9 @@ podScreen.updateCommand(1,command=lambda: openPod())
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
 viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterPod.currentPeaPod))
-
+#Generate screen
+genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPasswordMethod.get()))
+genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -818,6 +856,11 @@ recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 
+#====================Slider commands====================
+genPasswordCharLengthSlider.addCommand(lambda:genPassword("char"))
+genPasswordDigitsSlider.addCommand(lambda: genPassword("char"))
+genPasswordSymbolsSlider.addCommand(lambda: genPassword("char"))
+genPasswordWordsLengthSlider.addCommand(lambda: genPassword("words"))
 #====================MENUS===================
 
 #----Private Menus----
@@ -831,6 +874,7 @@ privateFileMenu.add_command(label="Generate Password",command=lambda: genPasswor
 
 runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
+genPassword("char")
 #====================END====================
 
 window.mainloop()

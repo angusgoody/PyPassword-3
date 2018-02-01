@@ -14,10 +14,11 @@ data takes place here.
 import pickle
 from datetime import datetime,timedelta
 import os
+import string
 from random import choice
 from tkinter import PhotoImage,messagebox
 from Crypto.Cipher import AES
-
+import random
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
@@ -28,6 +29,12 @@ lockedMinutes=5
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 masterPodAttempts={}
+symbols=['!', '"', '#', '$', '%', '&', "'", '()',
+         '*', '+', ',', '-', '.', '/', ':', ';',
+         '<', '=', '>', '?', '@', '[', ']', '^', '_',
+         '`', '{', '|', '}', '~', "'"]
+letters=string.ascii_letters
+
 #====================Log====================
 class logClass:
 	"""
@@ -324,6 +331,63 @@ def calculateTimeRemaining(time1,time2,stringOrRaw):
 		seconds=timeList[2].split(".")[0]
 		timeRemainingString=hours+":"+minutes+":"+seconds
 		return timeRemainingString
+
+#Password functions
+def mash(length,letterList,symbolList,digitList):
+	"""
+	The mash function is an essential part of the
+	generate password function. It mashes together all
+	the random symbols and letters etc and returns
+	the new password itself
+	"""
+	mergedList=letterList+symbolList+digitList
+	mashedList=[]
+	for x in range(length):
+		mashedList.append(mergedList.pop(random.randint(0,len(mergedList)-1)))
+
+	return"".join(mashedList)
+
+def generatePassword(length,symbolAmount,digitAmount):
+
+	"""
+	This function is used to generate a password
+	using the given parameters. It will generate
+	the required characters then use the mash function
+	to distibute the characters randomly
+	"""
+	#Generate letters
+	charAmount=length-(symbolAmount+digitAmount)
+	charList=[]
+	for x in range(charAmount):
+		charList.append(random.choice(letters))
+
+	#Genetate symbols list
+	symbolList=[]
+	for x in range(symbolAmount):
+		symbolList.append(random.choice(symbols))
+
+	#Generate digit
+	digitList=[]
+	for x in range(digitAmount):
+		digitList.append(str(random.randint(0,9)))
+
+
+	mashed=mash(length,charList,symbolList,digitList)
+	return mashed
+
+def generateWordPassword(numberOfWords,seperator):
+	"""
+	Will generate a password
+	containing only words seperated
+	by a string such as a hiphen etc
+	"""
+	global randomWords
+	newPassword=""
+	for x in range(numberOfWords):
+		newPassword+=random.choice(randomWords)
+		if x != numberOfWords-1:
+			newPassword+=str(seperator)
+	return newPassword
 
 #====================Core Classes====================
 """
@@ -662,7 +726,13 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 			masterPodInstance.locked=getCurrentTime()
 			checkMasterPodPassword(masterPodInstance,attempt)
 
+#====================Initial loaders====================
 
+filesFound=findFiles(getWorkingDirectory(),".txt")
+for file in filesFound:
+	if "randomWords" in file:
+		randomWords=openPickle(file)
+		break
 
 #====================Testing area====================
 
