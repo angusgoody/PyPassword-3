@@ -2222,7 +2222,7 @@ class advancedSlider(mainFrame):
 		self.outputVar.set(self.getValue())
 
 		#Adds command run
-		self.slider.config(command=self.run)
+		self.slider.config(command=lambda event: self.run(event))
 
 	def addCommand(self,command):
 		"""
@@ -2238,7 +2238,8 @@ class advancedSlider(mainFrame):
 		moves
 		"""
 
-		value=round(float(value))
+		value=int(float(value))
+
 		#Run the commands
 		for command in self.commands:
 			try:

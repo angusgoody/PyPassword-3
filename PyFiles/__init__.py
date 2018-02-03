@@ -219,9 +219,9 @@ genPasswordScreen=screen(window,"Generate",protected=True)
 genPasswordScreen.context=context
 
 #Context
-genPasswordScreen.addContextInfo(0,text="Copy")
-genPasswordScreen.addContextInfo(1,text="Regnerate")
-genPasswordScreen.addContextInfo(2,text="Back")
+genPasswordScreen.addContextInfo(0,text="Copy",enabledColour=mainBlueColour)
+genPasswordScreen.addContextInfo(1,text="Regnerate",enabledColour=mainGreenColour)
+genPasswordScreen.addContextInfo(2,text="Back",enabledColour=mainRedColour)
 
 genPasswordNotebook=advancedNotebook(genPasswordScreen)
 genPasswordNotebook.pack(fill=BOTH,expand=True)
@@ -265,17 +265,23 @@ genPasswordCenterNotebook.addPage("Words",genPasswordWordsFrame)
 genPasswordWordsLengthSlider=advancedSlider(genPasswordWordsFrame,"Number of words",from_=2, to=12,value=random.randint(2,12))
 genPasswordWordsLengthSlider.pack(pady=5)
 
-mainLabel(genPasswordWordsFrame,text="Seperator",font="Avenir 13").pack(anchor=W,pady=6)
+
+genPasswordWordsSeperatorContainer=mainFrame(genPasswordWordsFrame)
+genPasswordWordsSeperatorContainer.pack()
+
+mainLabel(genPasswordWordsSeperatorContainer,text="Seperator",font="Avenir 13").pack(anchor=W,pady=6)
 
 genPasswordWordsSeperatorVar=StringVar()
 genPasswordWordsSeperatorVar.set("-")
 
-genPasswordWordsHiphenChecked=Radiobutton(genPasswordWordsFrame,text="Hiphen",variable=genPasswordWordsSeperatorVar,value=genPasswordWordsSeperatorVar.get())
+genPasswordWordsHiphenChecked=Radiobutton(genPasswordWordsSeperatorContainer,text="Hiphen",variable=genPasswordWordsSeperatorVar,value=genPasswordWordsSeperatorVar.get())
 genPasswordWordsHiphenChecked.pack(anchor=W)
 
-genPasswordWordsStopChecked=Radiobutton(genPasswordWordsFrame,text="Full stop",variable=genPasswordWordsSeperatorVar,value=".")
+genPasswordWordsStopChecked=Radiobutton(genPasswordWordsSeperatorContainer,text="Full stop",variable=genPasswordWordsSeperatorVar,value=".")
 genPasswordWordsStopChecked.pack(anchor=W)
 
+genPasswordUnderChecked=Radiobutton(genPasswordWordsSeperatorContainer,text="Underscore",variable=genPasswordWordsSeperatorVar,value="_")
+genPasswordUnderChecked.pack(anchor=W)
 genPasswordFrame.colour("#E7E7E7")
 
 #---Review section---
