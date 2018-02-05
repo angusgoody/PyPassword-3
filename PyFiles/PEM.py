@@ -19,13 +19,15 @@ from random import choice
 from tkinter import PhotoImage,messagebox
 from Crypto.Cipher import AES
 import random
+import re
+
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
 filesDirectory="PyFiles"
 assetDirectory="PyAssets"
 
-lockedMinutes=10
+lockedMinutes=5
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 masterPodAttempts={}
@@ -388,6 +390,71 @@ def generateWordPassword(numberOfWords,seperator):
 		if x != numberOfWords-1:
 			newPassword+=str(seperator)
 	return newPassword
+
+def calculatePasswordStrength(password):
+	"""
+	Verify the strength of 'password'
+	Returns a dict indicating the wrong criteria
+	A password is considered strong if:
+		12 characters length or more
+		1 digit or more
+		1 symbol or more
+		1 uppercase letter or more
+		1 lowercase letter or more
+	a false result means it passed
+	"""
+
+	# calculating the length
+	length_error = len(password) < 8
+	reallyLong = len(password) < 14
+
+	# searching for digits
+	digit_error = re.search(r"\d", password) is None
+
+	# searching for uppercase
+	uppercase_error = re.search(r"[A-Z]", password) is None
+
+	# searching for lowercase
+	lowercase_error = re.search(r"[a-z]", password) is None
+
+	# searching for symbols
+	symbol_error = re.search(r"[ !#$%&'(@)*+,-./[\\\]^_`{|}~"+r'"]', password) is None
+
+	# overall result
+	overall = not ( length_error or digit_error or uppercase_error or lowercase_error or symbol_error )
+
+	results={
+		'At least 8 characters' : length_error,
+		'At least 14 characters': reallyLong,
+		'At least 1 digit' : digit_error,
+		'At least 1 Uppercase' : uppercase_error,
+		'At least 1 lowercase' : lowercase_error,
+		'At least 1 symbol' : symbol_error,
+	}
+
+	#Calculate weights for these fields
+	weights={'At least 8 characters': 10,
+	         'At least 14 characters': 9,
+	         'At least 1 digit': 1,
+	         'At least 1 Uppercase': 4,
+	         'At least 1 lowercase': 4,
+	         'At least 1 symbol': 6,
+	         }
+
+	#Track number of fails and pass
+	fails=0
+	success=0
+	fields=len(results)
+	weightedScore=0
+	for item in results:
+		if results[item]:
+			fails+=1
+		else:
+			success+=1
+			weightedScore+=weights[item]
+
+	#Return results
+	return [success,fails,fields,results,weightedScore]
 
 #====================Core Classes====================
 """

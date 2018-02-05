@@ -229,8 +229,8 @@ genPasswordNotebook.pack(fill=BOTH,expand=True)
 genPasswordFrame=mainFrame(genPasswordNotebook)
 genPasswordFrame.pack(fill=BOTH,expand=True)
 
-genPasswordNotebook.addPage("Generate",genPasswordFrame)
 
+genPasswordNotebook.addPage("Generate",genPasswordFrame)
 #---Generate section---
 genPasswordCenter=mainFrame(genPasswordFrame)
 genPasswordCenter.pack(expand=True)
@@ -239,6 +239,10 @@ genPasswordVar=StringVar()
 genPasswordVar.set("Password")
 genPasswordLabel=mainLabel(genPasswordCenter,textvariable=genPasswordVar,font="Avenir 19",width=35)
 genPasswordLabel.pack(fill=X,pady=5)
+
+genPasswordStrengthVar=StringVar()
+genPasswordStrengthLabel=mainLabel(genPasswordCenter,textvariable=genPasswordStrengthVar,font="Avenir 12")
+genPasswordStrengthLabel.pack(pady=5)
 
 #Notebook for characters or words
 genPasswordCenterNotebook=advancedNotebook(genPasswordCenter)
@@ -286,7 +290,27 @@ genPasswordFrame.colour("#E7E7E7")
 
 #---Review section---
 genReviewFrame=mainFrame(genPasswordNotebook)
-#genPasswordNotebook.addPage("Review",genReviewFrame)
+genPasswordNotebook.addPage("Review",genReviewFrame)
+
+genReviewTopFrame=mainFrame(genReviewFrame)
+genReviewTopFrame.pack(side=TOP,fill=X)
+
+genReviewEntry=Entry(genReviewTopFrame,font="Avenir 20",width=25,justify=CENTER)
+genReviewEntry.pack(fill=X)
+
+genReviewMainFrame=mainFrame(genReviewFrame)
+genReviewMainFrame.pack(expand=True,fill=BOTH)
+
+genReviewTree=advancedTree(genReviewMainFrame,["Field","Report"])
+genReviewTree.pack(expand=True,fill=BOTH)
+
+#Config the tree
+
+genReviewTree.addSection("Field")
+genReviewTree.addSection("Report")
+
+genReviewTree.addTag("Pass", "#66CD84")
+genReviewTree.addTag("Fail", "#CD426C")
 
 #endregion
 #====================Functions====================
@@ -739,6 +763,22 @@ def genPassword(charOrWords):
 		#Generate the password
 		password=generatePassword(numberOfCharacters,numberOfSymbols,numberOfDigits)
 	genPasswordVar.set(password)
+
+	#Calculate password strength
+	passwordStrength=calculatePasswordStrength(password)
+	passwordWeight=passwordStrength[4]
+	if passwordWeight >= 27:
+		genPasswordStrengthVar.set("Strong password")
+		genPasswordLabel.config(fg="#66BC15")
+
+	elif passwordWeight >= 17:
+		genPasswordStrengthVar.set("Medium password")
+		genPasswordLabel.config(fg=mainOrangeColour)
+
+	else:
+		genPasswordStrengthVar.set("Weak password")
+		genPasswordLabel.config(fg=mainRedColour)
+
 
 
 #======Other functions========

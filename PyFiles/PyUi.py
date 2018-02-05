@@ -1045,6 +1045,42 @@ class advancedOptionMenu(OptionMenu):
 	def __init__(self,parent,variable,*values,**kwargs):
 		OptionMenu.__init__(self,parent,variable,*values,**kwargs)
 		self.var=variable
+
+class advancedTree(ttk.Treeview):
+	"""
+	The advanced Tree class
+	is a modified tree class
+	which allows better control
+	over colours and storing data
+	etc
+	"""
+	def __init__(self,parent,columns,**kwargs):
+		ttk.Treeview.__init__(self,parent,show="headings",columns=columns)
+		self.columns=columns
+
+		#Add the scrollbar
+		self.scroll=Scrollbar(self)
+		self.scroll.pack(side=RIGHT,fill=Y)
+
+		self.scroll.config(command=self.yview)
+		self.config(yscrollcommand=self.scroll.set)
+
+	def addSection(self,sectionName):
+		"""
+		Add a section to the tree
+		"""
+		self.column(sectionName,width=10,minwidth=45)
+		self.heading(sectionName,text=sectionName)
+
+	def insertData(self,values,tags):
+		"""
+		Method to insert data into the treeview
+		"""
+		self.insert("" , 0,values=values,tags=tags)
+
+	def addTag(self,tag,colour):
+		self.tag_configure(tag,background=colour)
+
 #====================Secondary Classes====================
 """
 Secondary classes are classes that inherit from the core classes
