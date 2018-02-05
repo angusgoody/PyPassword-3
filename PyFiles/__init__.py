@@ -464,31 +464,32 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 		if hasattr(masterPodInstance,"locked"):
 			#Get the value in the pod and the current time
 			lockedValue=masterPodInstance.locked
-			currentTime=getCurrentTime()
-			if lockedValue > currentTime:
-				#Calculate time remaining
-				timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-				loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-				loginScreen.colour(mainLockedColour)
-				#Show messagebox if specified
-				if showLocked:
-					showMessage("Locked","This master pod is locked")
-				return True
+			if lockedValue is not None:
+				currentTime=getCurrentTime()
+				if lockedValue > currentTime:
+					#Calculate time remaining
+					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
+					loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+					loginScreen.colour(mainLockedColour)
+					#Show messagebox if specified
+					if showLocked:
+						showMessage("Locked","This master pod is locked")
+					return True
 
-			elif resetScreen == False:
+				elif resetScreen == False:
 
-				#Attempt to get number of attempts from dict
-				if masterPodInstance in masterPodAttempts:
-					loginAttemptNumberVar.set(masterPodAttempts[masterPodInstance])
-				#If not just add one
-				else:
-					loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
+					#Attempt to get number of attempts from dict
+					if masterPodInstance in masterPodAttempts:
+						loginAttemptNumberVar.set(masterPodAttempts[masterPodInstance])
+					#If not just add one
+					else:
+						loginAttemptNumberVar.set(loginAttemptNumberVar.get()+1)
 
-				#The password was incorrect
-				loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
-				#Colour the screen incorrect colour
-				loginScreen.colour(mainRedColour)
-				return False
+					#The password was incorrect
+					loginAttemptVar.set("Incorrect Password "+"("+str(loginAttemptNumberVar.get())+")")
+					#Colour the screen incorrect colour
+					loginScreen.colour(mainRedColour)
+					return False
 
 def attemptMasterPodUnlock():
 	"""

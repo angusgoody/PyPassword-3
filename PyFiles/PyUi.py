@@ -52,18 +52,25 @@ def smallCheck(dataToFind,dataSource,capital,fullCheck):
 	capital = True = ignore case
 	fullCheck = True = exact matches
 	"""
+	#If both dataToFind and source are string
 	if type(dataToFind) is str and type(dataSource) is str:
+		#If capitals do not matter
 		if capital:
+			#If exact matches are needed
 			if fullCheck:
 				if dataToFind.upper() == dataSource.upper():
 					return True
 				else:
 					return False
+			#If exact matches are not needed
 			else:
+				#By using "in" can find matches in parts of words
 				if dataToFind.upper() in dataSource.upper():
 					return True
 				else:
 					return False
+
+	#Comparison for non string values such as objects etc
 	if fullCheck:
 		if dataToFind == dataSource:
 			return True
@@ -90,14 +97,19 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	#Iterate through data source
 	for item in dataSource:
 
+		#If the type is dictionary or list
 		if type(item) == list or type(item) == dict:
+			#Search the items in the list or dictionary keys
 			result=searchDataSource(dataToFind,item,capital=capital)
 			if result:
 				return result
+		#If dictionary
 		if type(dataSource) is dict:
+			#Search the values in the dictionary instead of just keys
 			result=searchDataSource(dataToFind,dataSource.values(),capital=capital)
 			if result:
 				return result
+		#If recursion is not possible just do a simple compairsion
 		else:
 			result=smallCheck(dataToFind,item,capital,fullCheck)
 			if result:
@@ -973,7 +985,7 @@ class dataWindow(Toplevel):
 						return False
 					#Check to see if it contains forbidden items
 					if searchDataSource(widgetData,requiredCannotContain,capital=True):
-						self.updateCheck(identifier,"Name not available please enter another")
+						self.updateCheck(identifier,"Name is taken, please enter another")
 						#End
 						return False
 				else:
@@ -2234,10 +2246,9 @@ class advancedSlider(mainFrame):
 
 	def run(self,value):
 		"""
-		THis is the method called every time the slider
+		This is the method called every time the slider
 		moves
 		"""
-
 		value=int(float(value))
 
 		#Run the commands
