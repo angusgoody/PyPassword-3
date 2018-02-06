@@ -783,6 +783,10 @@ def genPassword(charOrWords):
 		genPasswordStrengthVar.set("Weak password")
 		genPasswordLabel.config(fg=mainRedColour)
 
+	#Add to the review screen
+	addDataToWidget(genReviewEntry,password)
+	reviewPassword()
+
 def reviewPassword():
 	"""
 	The function to 
