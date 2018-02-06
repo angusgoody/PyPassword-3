@@ -27,21 +27,28 @@ window.geometry("570x450")
 mainVars["window"]=window
 #====================Menus====================
 
+#---------Menu setup--------
+
 #Menu when locked
 publicMenu=Menu(window)
 mainVars["publicMenu"]=publicMenu
 
 #Menu inside the program
 privateMenu=Menu(window)
-mainVars["privateMenu"]=publicMenu
+mainVars["privateMenu"]=privateMenu
 
 #Update the screen class menus
 screen.publicMenu=publicMenu
 screen.privateMenu=privateMenu
 
+#---------Menu Submenus--------
+
 #Create private menus
 privateFileMenu=Menu(privateMenu)
-privateMenu.add_cascade(label="File",menu=privateFileMenu)
+
+#Public Menus
+publicFileMenu=Menu(publicMenu)
+
 #====================Log====================
 log=logClass("Main")
 #====================Variables====================
@@ -224,7 +231,7 @@ genPasswordScreen.context=context
 #Context
 genPasswordScreen.addContextInfo(0,text="Copy",enabledColour=mainBlueColour)
 genPasswordScreen.addContextInfo(1,text="Regnerate",enabledColour=mainGreenColour)
-genPasswordScreen.addContextInfo(2,text="Back",enabledColour=mainRedColour)
+genPasswordScreen.addContextInfo(2,text="Home",enabledColour=mainRedColour)
 
 genPasswordNotebook=advancedNotebook(genPasswordScreen)
 genPasswordNotebook.pack(fill=BOTH,expand=True)
@@ -317,6 +324,11 @@ genReviewTree.addTag("Pass", "#66CD84")
 genReviewTree.addTag("Fail", "#CD426C")
 
 #endregion
+#======Log screen======
+logScreen=screen(window,"Log")
+logScreen.context=context
+
+
 #====================Functions====================
 
 
@@ -616,10 +628,11 @@ def exitPod():
 	user wants to exit a pod.
 	The pod is secured and saved
 	"""
-	#Save
-	masterPod.currentMasterPod.save()
-	#Remove the key from box
-	del keyBox.keyHoles[masterPod.currentMasterPod]
+	if masterPod.currentMasterPod:
+		#Save
+		masterPod.currentMasterPod.save()
+		#Remove the key from box
+		del keyBox.keyHoles[masterPod.currentMasterPod]
 	#Show the correct frame
 	openScreen.show()
 
@@ -919,6 +932,7 @@ viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterP
 #Generate screen
 genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPasswordMethod.get()))
 genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
+genPasswordScreen.updateCommand(2,command=lambda: goHome())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -959,11 +973,19 @@ genPasswordSymbolsSlider.addCommand(lambda: genPassword("char"))
 genPasswordWordsLengthSlider.addCommand(lambda: genPassword("words"))
 #====================MENUS===================
 
+
 #----Private Menus----
+#Add cascades
+privateMenu.add_cascade(label="File",menu=privateFileMenu)
 
 #File
 privateFileMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
 
+#----Public menu----
+#Add cascades
+publicMenu.add_cascade(label="File",menu=publicFileMenu)
+
+#File
 #====================Testing Area====================
 
 #====================Initial Loaders====================
