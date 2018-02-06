@@ -1785,6 +1785,7 @@ class advancedNotebook(mainFrame):
 
 		#Store a dictionary of tabs and frames
 		self.pages={}
+		self.pageCommands={}
 
 		#Store tab counter
 		self.tabCounter=-1
@@ -1826,6 +1827,20 @@ class advancedNotebook(mainFrame):
 		#Set as current
 		self.currentFrame=frameToLoad
 
+		#Run any commands or functions
+		if tabName in self.pageCommands:
+			for item in self.pageCommands[tabName]:
+				runCommand(item)
+
+	def addScreenCommand(self,tabName,command):
+		"""
+		Add a command to be run when the tab
+		is loaded
+		"""
+		if tabName in self.pageCommands:
+			self.pageCommands[tabName].append(command)
+		else:
+			self.pageCommands[tabName]=[command]
 class podNotebook(advancedNotebook):
 	"""
 	The pod notebook is a special

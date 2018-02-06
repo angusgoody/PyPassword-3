@@ -48,8 +48,11 @@ log=logClass("Main")
 mainFrame.windowColour=window.cget("bg")
 #Boolean for processing the language for search
 processLanguageOn=True
+
 #Current type of password generator
 currentGenPasswordMethod=StringVar()
+currentGeneratedPasswordString=StringVar()
+currentGeneratedReviewPasswordString=StringVar()
 #====================User Interface====================
 
 #======Status and context======
@@ -231,6 +234,7 @@ genPasswordFrame.pack(fill=BOTH,expand=True)
 
 
 genPasswordNotebook.addPage("Generate",genPasswordFrame)
+
 #---Generate section---
 genPasswordCenter=mainFrame(genPasswordFrame)
 genPasswordCenter.pack(expand=True)
@@ -779,6 +783,42 @@ def genPassword(charOrWords):
 		genPasswordStrengthVar.set("Weak password")
 		genPasswordLabel.config(fg=mainRedColour)
 
+def reviewPassword():
+	"""
+	The function to 
+	review a password
+	and tell the user
+	how to improve
+	the password
+	"""
+	#Collect data
+	passwordData=genReviewEntry.get()
+	strength=calculatePasswordStrength(passwordData)
+	results=strength[3]
+	#Clear tree
+	genReviewTree.delete(*genReviewTree.get_children())
+	#Add the data to the tree
+	for item in results:
+		value=results[item]
+		if value:
+			tag="Fail"
+			message="Incomplete"
+		else:
+			tag="Pass"
+			message="Complete"
+		genReviewTree.insertData((item, message), tag)
+
+def changeGenerateType(indicator):
+	"""
+	Function is called when user
+	switches from generate to review
+	to know what data to copy to clipboard
+	"""
+	if indicator == "Review":
+		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
+	else:
+		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
+
 
 
 #======Other functions========
@@ -884,6 +924,10 @@ loginScreen.addScreenCommand(lambda: loginAttemptVar.set(""))
 loginScreen.addScreenCommand(lambda: loginFileVar.set(masterPod.currentMasterPod.masterName))
 #Pod Screen
 podScreen.addScreenCommand(lambda: loadPodsToScreen())
+#Generate screen
+genPasswordNotebook.addScreenCommand("Generate",lambda:changeGenerateType("Generate") )
+genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review") )
+
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
 podSearchContext.updateContextButton(1,text="Sort by name",command=lambda: orderPodListbox("Name"))
@@ -902,7 +946,8 @@ recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
 recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
-
+#Generate password
+genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())
 #====================Slider commands====================
 genPasswordCharLengthSlider.addCommand(lambda:genPassword("char"))
 genPasswordDigitsSlider.addCommand(lambda: genPassword("char"))
@@ -922,6 +967,7 @@ privateFileMenu.add_command(label="Generate Password",command=lambda: genPasswor
 runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 genPassword("char")
+changeGenerateType("Generate")
 #====================END====================
 
 window.mainloop()
