@@ -45,6 +45,7 @@ screen.privateMenu=privateMenu
 
 #Create private menus
 privateFileMenu=Menu(privateMenu)
+privatePasswordMenu=Menu(privateMenu)
 
 #Public Menus
 publicFileMenu=Menu(publicMenu)
@@ -328,6 +329,26 @@ genReviewTree.addSection("Report")
 
 genReviewTree.addTag("Pass", "#66CD84")
 genReviewTree.addTag("Fail", "#CD426C")
+
+#endregion
+#======Password screen======
+#region passwordScreen
+passwordScreen=screen(window,"Password data",protected=True)
+passwordScreen.context=context
+
+#Top
+passwordTopFrame=mainFrame(passwordScreen)
+passwordTopFrame.pack(side=TOP,fill=X)
+
+passwordSearchEntry=advancedEntry(passwordTopFrame,"Search",False,font="Avenir 19",justify=CENTER)
+passwordSearchEntry.pack(fill=X)
+
+#Middle
+passwordMainFrame=mainFrame(passwordScreen)
+passwordMainFrame.pack(fill=BOTH,expand=True)
+
+passwordDataListbox=advancedListbox(passwordMainFrame,font="Avenir 20")
+passwordDataListbox.pack(expand=True,fill=BOTH)
 
 #endregion
 #======Log screen======
@@ -843,7 +864,19 @@ def changeGenerateType(indicator):
 	else:
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
 
+#======Password Screen========
 
+def loadCommonPasswords():
+	"""
+	Will load the common passwords to the screen
+	"""
+	counter=0
+	for word in commonPasswords:
+		counter+=1
+		if counter % 2 == 0:
+			passwordDataListbox.addObject(word,word,colour="#FFFFFF")
+		else:
+			passwordDataListbox.addObject(word,word,colour="#EAE9EB")
 
 #======Other functions========
 
@@ -952,7 +985,7 @@ podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #Generate screen
 genPasswordNotebook.addScreenCommand("Generate",lambda:changeGenerateType("Generate") )
 genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review") )
-
+#Password screen
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
 podSearchContext.updateContextButton(1,text="Sort by name",command=lambda: orderPodListbox("Name"))
@@ -984,10 +1017,13 @@ genPasswordWordsLengthSlider.addCommand(lambda: genPassword("words"))
 #----Private Menus----
 #Add cascades
 privateMenu.add_cascade(label="File",menu=privateFileMenu)
+privateMenu.add_cascade(label="Password",menu=privatePasswordMenu)
 
 #File
-privateFileMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
 
+#Password
+privatePasswordMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
+privatePasswordMenu.add_command(label="View common passwords",command=lambda: passwordScreen.show())
 #----Public menu----
 #Add cascades
 publicMenu.add_cascade(label="File",menu=publicFileMenu)
@@ -1001,6 +1037,7 @@ runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 genPassword("char")
 changeGenerateType("Generate")
+loadCommonPasswords()
 #====================END====================
 
 window.mainloop()
