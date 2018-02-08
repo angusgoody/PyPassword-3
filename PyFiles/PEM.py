@@ -20,7 +20,6 @@ from tkinter import PhotoImage,messagebox
 from Crypto.Cipher import AES
 import random
 import re
-
 #====================Variables====================
 dataDirectory="PyData"
 logDirectory="PyLogs"
@@ -377,21 +376,27 @@ def generatePassword(length,symbolAmount,digitAmount):
 	mashed=mash(length,charList,symbolList,digitList)
 	return mashed
 
-def generateWordPassword(numberOfWords,seperator):
+def generateWordPassword(numberOfWords,seperator,commonWordVar):
 	"""
 	Will generate a password
 	containing only words seperated
 	by a string such as a hiphen etc
+	
+	commonWordVar False = use common words
+	commonWordVar True = use filtered words
 	"""
 	global randomWords
 	newPassword=""
 	for x in range(numberOfWords):
-		newPassword+=random.choice(randomWords)
+		if commonWordVar:
+			newPassword+=random.choice(randomFilterWords)
+		else:
+			newPassword+=random.choice(randomWords)
 		if x != numberOfWords-1:
 			newPassword+=str(seperator)
 	return newPassword
 
-def calculatePasswordStrength(password):
+def calculatePasswordStrength(password,**kwargs):
 	"""
 	Verify the strength of 'password'
 	Returns a dict indicating the wrong criteria
@@ -423,6 +428,28 @@ def calculatePasswordStrength(password):
 	# overall result
 	overall = not ( length_error or digit_error or uppercase_error or lowercase_error or symbol_error )
 
+	#Search through common words
+	splitVar=None
+	splitVar=kwargs.get("split",splitVar)
+	commonWord=False
+
+	if splitVar:
+		words=password.split(splitVar)
+		for word in words:
+			if word in commonPasswords:
+				commonWord=True
+				break
+	else:
+		for splitVar in ["-","."," "]:
+			words=password.split(splitVar)
+			for word in words:
+				if word in commonPasswords:
+					commonWord=True
+					break
+			if commonWord:
+				break
+
+
 	results={
 		'At least 8 characters' : length_error,
 		'At least 14 characters': reallyLong,
@@ -430,6 +457,8 @@ def calculatePasswordStrength(password):
 		'At least 1 Uppercase' : uppercase_error,
 		'At least 1 lowercase' : lowercase_error,
 		'At least 1 symbol' : symbol_error,
+		"No common words": commonWord
+
 	}
 
 	#Calculate weights for these fields
@@ -439,6 +468,7 @@ def calculatePasswordStrength(password):
 	         'At least 1 Uppercase': 4,
 	         'At least 1 lowercase': 4,
 	         'At least 1 symbol': 6,
+	         "No common words":9
 	         }
 
 	#Track number of fails and pass
@@ -796,10 +826,19 @@ def checkMasterPodAttempt(masterPodInstance,attempt):
 #====================Initial loaders====================
 
 filesFound=findFiles(getWorkingDirectory(),".txt")
+randomWords=[]
+commonPasswords=[]
+randomFilterWords=[]
 for file in filesFound:
 	if "randomWords" in file:
 		randomWords=openPickle(file)
-		break
+	if "commonPasswords" in file:
+		commonPasswords=openPickle(file)
+	if "randomFilterWords" in file:
+		randomFilterWords=openPickle(file)
+
+
+
 
 #====================Testing area====================
 

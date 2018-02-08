@@ -60,6 +60,7 @@ processLanguageOn=True
 currentGenPasswordMethod=StringVar()
 currentGeneratedPasswordString=StringVar()
 currentGeneratedReviewPasswordString=StringVar()
+
 #====================User Interface====================
 
 #======Status and context======
@@ -280,7 +281,12 @@ genPasswordCenterNotebook.addPage("Words",genPasswordWordsFrame)
 genPasswordWordsLengthSlider=advancedSlider(genPasswordWordsFrame,"Number of words",from_=2, to=12,value=random.randint(2,12))
 genPasswordWordsLengthSlider.pack(pady=5)
 
+#Check button
+genPasswordWordCommonVar=BooleanVar()
+genPasswordWordsCommonCheckButton=Checkbutton(genPasswordWordsFrame,text="Non common words",variable=genPasswordWordCommonVar)
+genPasswordWordsCommonCheckButton.pack()
 
+#Seperator
 genPasswordWordsSeperatorContainer=mainFrame(genPasswordWordsFrame)
 genPasswordWordsSeperatorContainer.pack()
 
@@ -771,7 +777,8 @@ def genPassword(charOrWords):
 		#Get the data from sliders etc
 		numberOfWords=genPasswordWordsLengthSlider.getValue()
 		seperator=genPasswordWordsSeperatorVar.get()
-		password=generateWordPassword(numberOfWords,seperator)
+		commonWords=genPasswordWordCommonVar.get()
+		password=generateWordPassword(numberOfWords,seperator,genPasswordWordCommonVar.get())
 	else:
 		#Get the length and amount of symbols etc
 		numberOfCharacters=genPasswordCharLengthSlider.getValue()
@@ -782,7 +789,7 @@ def genPassword(charOrWords):
 	genPasswordVar.set(password)
 
 	#Calculate password strength
-	passwordStrength=calculatePasswordStrength(password)
+	passwordStrength=calculatePasswordStrength(password,split=genPasswordWordsSeperatorVar.get())
 	passwordWeight=passwordStrength[4]
 	if passwordWeight >= 27:
 		genPasswordStrengthVar.set("Strong password")
