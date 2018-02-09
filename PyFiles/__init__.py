@@ -336,12 +336,20 @@ genReviewTree.addTag("Fail", "#CD426C")
 passwordScreen=screen(window,"Password data",protected=True)
 passwordScreen.context=context
 
+passwordScreen.addContextInfo(0,text="Copy",enabledColour=mainBlueColour)
+passwordScreen.addContextInfo(1,text="Home",enabledColour=mainRedColour)
+
 #Top
 passwordTopFrame=mainFrame(passwordScreen)
 passwordTopFrame.pack(side=TOP,fill=X)
 
 passwordSearchEntry=advancedEntry(passwordTopFrame,"Search",False,font="Avenir 19",justify=CENTER)
 passwordSearchEntry.pack(fill=X)
+
+passwordScreenTopContext=contextBar(passwordTopFrame,places=1,font="Avenir 11")
+passwordScreenTopContext.pack(fill=X)
+
+passwordScreenTopContext.addButton(0,text="Clear",enabledColour="#D6DDDD")
 
 #Middle
 passwordMainFrame=mainFrame(passwordScreen)
@@ -623,7 +631,7 @@ def loadPodsToScreen():
 		podListbox.addObject(pod,podInstance,colour=podColour)
 
 	#Clear the search so it resets when loading screen
-	clearSearch()
+	resetSearch(podSearchEntry,runSearch)
 
 def openPod():
 	"""
@@ -753,14 +761,6 @@ def runSearch():
 	if processLanguageOn:
 		processSearchLanguage(podSearchEntry)
 
-def clearSearch():
-	"""
-	Remove data from entry
-	and being an emppty
-	search to return data
-	"""
-	podSearchEntry.delete(0,END)
-	runSearch()
 
 #======View Pod Screen========
 
@@ -866,17 +866,34 @@ def changeGenerateType(indicator):
 
 #======Password Screen========
 
-def loadCommonPasswords():
-	"""
-	Will load the common passwords to the screen
-	"""
+def addCommonPasswordToListbox(dataList):
+	dataList=sorted(dataList)
 	counter=0
-	for word in commonPasswords:
+	passwordDataListbox.delete(0,END)
+	for word in dataList:
 		counter+=1
 		if counter % 2 == 0:
 			passwordDataListbox.addObject(word,word,colour="#FFFFFF")
 		else:
 			passwordDataListbox.addObject(word,word,colour="#EAE9EB")
+
+def searchCommonPasswords():
+	"""
+	Search the common passwords
+	"""
+	userRequest=passwordSearchEntry.getData()
+	if userRequest is None:
+		userRequest=""
+
+
+	dataSource=passwordDataListbox.data.keys()
+	results=[]
+	for item in dataSource:
+		if searchDataSource(userRequest,[item],capital=True,full=False):
+			results.append(item)
+	#Add to listbox
+	addCommonPasswordToListbox(results)
+
 
 #======Other functions========
 
@@ -950,6 +967,14 @@ def orderList(dataSource,**kwargs):
 	"""
 	return sorted(dataSource)
 
+def resetSearch(entry,searchCommand):
+	"""
+	Will clear an entry
+	and run a search command
+	to reseet search 
+	"""
+	addDataToWidget(entry,"")
+	runCommand(searchCommand)
 #====================Button commands====================
 
 #Splash Screen
@@ -973,6 +998,8 @@ viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterP
 genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPasswordMethod.get()))
 genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
 genPasswordScreen.updateCommand(2,command=lambda: goHome())
+#Password screen
+
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -988,9 +1015,10 @@ genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review"
 #Password screen
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
-podSearchContext.updateContextButton(1,text="Sort by name",command=lambda: orderPodListbox("Name"))
-podSearchContext.updateContextButton(2,text="Reset",command=lambda: clearSearch(),enabledColour="#DCE9E7")
-
+podSearchContext.updateContextButton(1,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))
+podSearchContext.updateContextButton(2,text="Reset",command=lambda: resetSearch(podSearchEntry,runSearch),enabledColour="#DCE9E7")
+#Password screen
+passwordScreenTopContext.updateContextButton(0,command=lambda: resetSearch(passwordSearchEntry,searchCommonPasswords))
 #====================Bindings====================
 #System
 window.protocol('WM_DELETE_WINDOW', lambda: closeProgram())
@@ -1006,6 +1034,8 @@ recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #Generate password
 genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())
+#Password screen
+passwordSearchEntry.bind("<KeyRelease>",lambda event: searchCommonPasswords())
 #====================Slider commands====================
 genPasswordCharLengthSlider.addCommand(lambda:genPassword("char"))
 genPasswordDigitsSlider.addCommand(lambda: genPassword("char"))
@@ -1037,7 +1067,7 @@ runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 genPassword("char")
 changeGenerateType("Generate")
-loadCommonPasswords()
+addCommonPasswordToListbox(commonPasswords)
 #====================END====================
 
 window.mainloop()

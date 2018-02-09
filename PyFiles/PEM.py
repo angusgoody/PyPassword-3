@@ -440,7 +440,7 @@ def calculatePasswordStrength(password,**kwargs):
 				commonWord=True
 				break
 	else:
-		for splitVar in ["-","."," "]:
+		for splitVar in ["-","."," ","/"]:
 			words=password.split(splitVar)
 			for word in words:
 				if word in commonPasswords:
