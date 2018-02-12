@@ -999,7 +999,7 @@ genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPassword
 genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
 genPasswordScreen.updateCommand(2,command=lambda: goHome())
 #Password screen
-
+passwordScreen.updateCommand(1,command=lambda: goHome())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))
@@ -1012,7 +1012,6 @@ podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #Generate screen
 genPasswordNotebook.addScreenCommand("Generate",lambda:changeGenerateType("Generate") )
 genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review") )
-#Password screen
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
 podSearchContext.updateContextButton(1,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))

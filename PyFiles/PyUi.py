@@ -1618,7 +1618,7 @@ class privateSection(mainFrame):
 		"""
 		#Copy to clipboard command
 		if buttonName == "Copy":
-			self.context.addButton(index,text=buttonName,**self.contextKwargs)
+			self.context.addButton(index,text=buttonName,command=lambda: copyToClipboard(self.getData(stored=True)),**self.contextKwargs)
 		#Hide data
 		elif buttonName == "Hide":
 			self.context.addButton(index,text=buttonName,command=lambda: self.toggleHide(),**self.contextKwargs)
