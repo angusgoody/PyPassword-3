@@ -11,7 +11,7 @@ PyPassword 3
 """
 
 #====================Imports====================
-from tkinter.ttk import Scale
+
 from PyUi import *
 from PEM import *
 import random
@@ -497,6 +497,32 @@ def createNewMasterPodWindow():
 	to allow user to create a new
 	master pod
 	"""
+	newWindow=dataWindow(window,"Create Master Pod")
+
+	#Create the ui
+	centerFrame=mainFrame(newWindow)
+	centerFrame.pack(expand=True)
+
+	masterPodNameEntry=advancedEntry(centerFrame,"Name",False,font="Avenir 18",justify=CENTER)
+	masterPodNameEntry.pack(pady=5)
+
+	masterPodPasswordEntry=advancedEntry(centerFrame,"Password",True,font="Avenir 18",justify=CENTER)
+	masterPodPasswordEntry.pack(pady=5)
+
+	masterPodHintEntry=advancedEntry(centerFrame,"Hint",False,font="Avenir 18",justify=CENTER)
+	masterPodHintEntry.pack(pady=5)
+
+	masterDisplayLabel=mainLabel(centerFrame,font="Avenir 12")
+	masterDisplayLabel.pack(pady=5)
+	newWindow.addDisplayLabel(masterDisplayLabel)
+
+	#Add reference to class
+	newWindow.addDataSource(masterPodNameEntry,"Name",
+	                        cannotContain=masterPod.loadedPods.keys(),
+	                        minLength=1,maxLength=20)
+
+	newWindow.addDataSource(masterPodPasswordEntry,"Password",minLength=5,maxLength=50)
+	newWindow.addDataSource(masterPodHintEntry,"Hint")
 	
 #======Login Screen========
 
@@ -981,6 +1007,7 @@ def resetSearch(entry,searchCommand):
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: closeProgram())
 #Open Screen
+openScreen.updateCommand(0,command=lambda: createNewMasterPodWindow())
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
 #Login Screen
 loginScreen.updateCommand(2,command=lambda: openScreen.show())
@@ -1062,11 +1089,13 @@ publicMenu.add_cascade(label="File",menu=publicFileMenu)
 
 #====================Initial Loaders====================
 
-runCommand(lambda: splashScreen.show(),name="Splash loader")
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
 genPassword("char")
 changeGenerateType("Generate")
 addCommonPasswordToListbox(commonPasswords)
+
+#Last call
+runCommand(lambda: splashScreen.show(),name="Splash loader")
 #====================END====================
 
 window.mainloop()
