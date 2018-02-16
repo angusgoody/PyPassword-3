@@ -1037,6 +1037,62 @@ class dataWindow(Toplevel):
 			data=getDataFromWidget(self.inputWidgets[widgetName])
 			self.inputData[widgetName]=data
 
+class labelWindow(Toplevel):
+	"""
+	The label window class
+	is a popup window that 
+	displays a string value to 
+	the user and will be go
+	when user clicks off
+	"""
+	def __init__(self,root):
+		Toplevel.__init__(self,root)
+
+		#Configure window
+		self.title="Data window"
+		self.statusVar=StringVar()
+		self.statusVar.set("Data")
+		self.status=mainLabel(self,textvariable=self.statusVar)
+		self.status.pack(side=BOTTOM,fill=X)
+		self.status.colour("#45655F")
+
+		#Add a context
+		self.context=contextBar(self,places=2)
+		self.context.pack(side=BOTTOM,fill=X)
+		self.context.addButton(0,text="Copy",enabledColour=mainBlueColour)
+		self.context.addButton(1,text="Exit",enabledColour=mainRedColour)
+
+		self.centerFrame=mainFrame(self)
+		self.centerFrame.pack(expand=True)
+
+		#Add the labels
+		self.title=StringVar()
+		self.titleLabel=mainLabel(self.centerFrame,textvariable=self.title,font="Arial_bold 26")
+		self.titleLabel.pack(pady=10)
+
+		self.data=StringVar()
+		self.dataLabel=mainLabel(self.centerFrame,textvariable=self.data,font="Avenir 23")
+		self.dataLabel.pack(pady=5)
+
+		#Context commands
+		self.context.updateContextButton(0,command=lambda: copyToClipboard(self.data.get()))
+		self.context.updateContextButton(1,command=lambda: self.destroy())
+
+
+	def run(self):
+		self.focus_set()
+		self.grab_set()
+		self.transient(self.master)
+
+	def addName(self,name):
+		self.statusVar.set(name)
+		self.title.set(name)
+	def addData(self,data):
+		"""
+		Add data to the window
+		"""
+		self.data.set(data)
+
 class advancedOptionMenu(OptionMenu):
 	"""
 	Option Menu which allows

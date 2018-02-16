@@ -890,6 +890,18 @@ def changeGenerateType(indicator):
 	else:
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
 
+def showPasswordDetail():
+	"""
+	Will launch a labelWindow
+	and show the password
+	in detail
+	"""
+	newWindow=labelWindow(window)
+
+	newWindow.addName("Password")
+	newWindow.data.set(genPasswordVar.get())
+	newWindow.run()
+
 #======Password Screen========
 
 def addCommonPasswordToListbox(dataList):
@@ -1060,6 +1072,7 @@ recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #Generate password
 genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())
+genPasswordLabel.bind("<Double-Button-1>",lambda event: showPasswordDetail())
 #Password screen
 passwordSearchEntry.bind("<KeyRelease>",lambda event: searchCommonPasswords())
 #====================Slider commands====================
