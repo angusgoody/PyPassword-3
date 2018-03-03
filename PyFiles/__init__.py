@@ -15,6 +15,7 @@ PyPassword 3
 from PyUi import *
 from PEM import *
 import random
+import threading
 #====================Window====================
 """
 This is where the basic window
@@ -49,6 +50,8 @@ privatePasswordMenu=Menu(privateMenu)
 
 #Public Menus
 publicFileMenu=Menu(publicMenu)
+#====================Threading controllers====================
+mainThreadController=threadController("Main")
 
 #====================Log====================
 log=logClass("Main")
@@ -491,6 +494,7 @@ def loadMasterPodToLogin():
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
+
 def createNewMasterPodWindow():
 	"""
 	Launches a new data window
@@ -498,31 +502,10 @@ def createNewMasterPodWindow():
 	master pod
 	"""
 	newWindow=dataWindow(window,"Create Master Pod")
+	#Add the sections
 
-	#Create the ui
-	centerFrame=mainFrame(newWindow)
-	centerFrame.pack(expand=True)
 
-	masterPodNameEntry=advancedEntry(centerFrame,"Name",False,font="Avenir 18",justify=CENTER)
-	masterPodNameEntry.pack(pady=5)
 
-	masterPodPasswordEntry=advancedEntry(centerFrame,"Password",True,font="Avenir 18",justify=CENTER)
-	masterPodPasswordEntry.pack(pady=5)
-
-	masterPodHintEntry=advancedEntry(centerFrame,"Hint",False,font="Avenir 18",justify=CENTER)
-	masterPodHintEntry.pack(pady=5)
-
-	masterDisplayLabel=mainLabel(centerFrame,font="Avenir 12")
-	masterDisplayLabel.pack(pady=5)
-	newWindow.addDisplayLabel(masterDisplayLabel)
-
-	#Add reference to class
-	newWindow.addDataSource(masterPodNameEntry,"Name",
-	                        cannotContain=masterPod.loadedPods.keys(),
-	                        minLength=1,maxLength=20)
-
-	newWindow.addDataSource(masterPodPasswordEntry,"Password",minLength=5,maxLength=50)
-	newWindow.addDataSource(masterPodHintEntry,"Hint")
 	
 #======Login Screen========
 
@@ -539,6 +522,13 @@ def showHint():
 	hint=currentMasterPod.hint
 	#Update the control variable
 	loginAttemptVar.set(hint)
+
+def runCountdown(timeRemaining,lockedValue):
+	print("HERE BOI")
+	while calculateTimeRemaining(lockedValue,getCurrentTime(),"string") != "0.0":
+		#print("X")
+		loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+		timeRemaining=calculateTimeRemaining(lockedValue,getCurrentTime(),"string")
 
 def checkTimeRemaining(masterPodInstance,**kwargs):
 	"""
@@ -570,7 +560,8 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				if lockedValue > currentTime:
 					#Calculate time remaining
 					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-					loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+					#loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+					mainThreadController.runThread("runCountdown",timeRemaining=timeRemaining,lockedValue=lockedValue)
 					loginScreen.colour(mainLockedColour)
 					#Show messagebox if specified
 					if showLocked:
@@ -704,33 +695,6 @@ def createNewPeaPodWindow():
 	name and details for a new peaPod
 	"""
 	newWindow=dataWindow(window,"Create Pea Pod")
-	#Create the ui
-	centerFrame=mainFrame(newWindow)
-	centerFrame.pack(expand=True)
-
-	#Bind the context command to the correct function when user clicks "Create"
-	newWindow.context.updateContextButton(1,command=lambda: initiatePeaPodInstance(newWindow))
-	#Setup the main entry
-	podNameEntry=advancedEntry(centerFrame,"Pod Name",False,justify=CENTER,font="Avenir 18")
-	podNameEntry.pack(fill=X)
-
-	#Create the display label
-	displayLabel=mainLabel(centerFrame,font="Avenir 12")
-	displayLabel.pack(pady=2)
-	newWindow.addDisplayLabel(displayLabel)
-
-	#Add reference to class
-	newWindow.addDataSource(podNameEntry,"Name",
-	                        cannotContain=masterPod.currentMasterPod.peas.keys(),
-	                        minLength=1,maxLength=20)
-
-	#Option menu to select template
-	podTypeVar=StringVar()
-	podTypeVar.set("Login")
-	podType=advancedOptionMenu(centerFrame,podTypeVar,*podTemplate.templates)
-	podType.pack(fill=X,pady=10)
-	#Add reference to class
-	newWindow.addDataSource(podTypeVar,"PodType")
 
 def initiatePeaPodInstance(dataWindowInstance):
 	"""
@@ -890,17 +854,6 @@ def changeGenerateType(indicator):
 	else:
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
 
-def showPasswordDetail():
-	"""
-	Will launch a labelWindow
-	and show the password
-	in detail
-	"""
-	newWindow=labelWindow(window)
-
-	newWindow.addName("Password")
-	newWindow.data.set(genPasswordVar.get())
-	newWindow.run()
 
 #======Password Screen========
 
@@ -919,6 +872,7 @@ def searchCommonPasswords():
 	"""
 	Search the common passwords
 	"""
+	global threadRunning
 	userRequest=passwordSearchEntry.getData()
 	if userRequest is None:
 		userRequest=""
@@ -929,8 +883,10 @@ def searchCommonPasswords():
 	for item in dataSource:
 		if searchDataSource(userRequest,[item],capital=True,full=False):
 			results.append(item)
+
 	#Add to listbox
 	addCommonPasswordToListbox(results)
+
 
 
 #======Other functions========
@@ -1013,6 +969,10 @@ def resetSearch(entry,searchCommand):
 	"""
 	addDataToWidget(entry,"")
 	runCommand(searchCommand)
+
+#====================Thread commands====================
+mainThreadController.createThread("runCountdown",runCountdown)
+
 #====================Button commands====================
 
 #Splash Screen
@@ -1072,9 +1032,10 @@ recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #Generate password
 genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())
-genPasswordLabel.bind("<Double-Button-1>",lambda event: showPasswordDetail())
+genPasswordLabel.bind("<Double-Button-1>",lambda event: genPasswordLabel.expandText())
 #Password screen
 passwordSearchEntry.bind("<KeyRelease>",lambda event: searchCommonPasswords())
+
 #====================Slider commands====================
 genPasswordCharLengthSlider.addCommand(lambda:genPassword("char"))
 genPasswordDigitsSlider.addCommand(lambda: genPassword("char"))
@@ -1089,7 +1050,7 @@ privateMenu.add_cascade(label="File",menu=privateFileMenu)
 privateMenu.add_cascade(label="Password",menu=privatePasswordMenu)
 
 #File
-
+privateFileMenu.add_command(label="Show threads",command=lambda: print(mainThreadController))
 #Password
 privatePasswordMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
 privatePasswordMenu.add_command(label="View common passwords",command=lambda: passwordScreen.show())

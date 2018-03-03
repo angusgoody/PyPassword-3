@@ -16,6 +16,9 @@ from tkinter import ttk
 from PEM import *
 from random import randint
 import webbrowser
+import threading
+import time
+from multiprocessing import Process
 #====================Log====================
 
 log=logClass("User Interface")
@@ -295,8 +298,7 @@ def recursiveColour(parent, colour, **kwargs):
 	recursively
 	"""
 	#Items to exclude
-	excludeItems=[ttk.Scale]
-
+	excludeItems=[ttk.Scale,Toplevel,labelWindow]
 	#Check to see if any widgets should be excluded
 	if "exclude" in kwargs:
 		#Add new items to exclude
@@ -399,6 +401,77 @@ def generateHexColour():
 		hexLeng=len(hexValue)
 	return hexValue
 
+#====================Thread Classes====================
+"""
+Classes responsible for organising and managing threads
+"""
+def lagMe():
+	for x in range(100):
+		time.sleep(0.2)
+		print(str(x)+"% complete")
+
+class threadController:
+	"""
+	The thread controller class
+	controls the threads for a whole
+	program and ensures they run smoothly
+	"""
+	def __init__(self,name):
+		self.name=name
+		#Store the commands
+		self.threadCommands={}
+		#Store if the thread is running currently or not
+		self.threadLocks={}
+		#Store the thread objects
+		self.threadObjects={}
+
+	def createThread(self,threadName,command):
+		"""
+		Initiate a thread and store the info about
+		the thread.
+		"""
+		#Store the thread value
+		self.threadCommands[threadName]=command
+		self.threadLocks[threadName]=False
+
+	def runThread(self,threadName,**args):
+		"""
+		Run a thread and start the process
+		"""
+		if threadName in self.threadLocks and threadName in self.threadCommands:
+			#First check if running
+			if self.threadLocks[threadName] is True:
+				print("Thread in progress")
+				log.report("Thread is currently in progress")
+				#Check if thread object has ended
+				if threadName in self.threadObjects:
+					if self.threadObjects[threadName].isAlive() is not True:
+						self.threadLocks[threadName]=False
+						log.report("Thread has ended and being recreated")
+						#Call function again to create new thread
+						self.runThread(threadName,**args)
+
+			else:
+				#Create and run the thread and store value as True
+				newThread=threading.Thread(target=self.threadCommands[threadName],kwargs=args)
+				#Ensure the thread can be killed when program ends
+				newThread.daemon=True
+				self.threadLocks[threadName]=True
+				self.threadObjects[threadName]=newThread
+				newThread.start()
+				log.report("A new thread has been created")
+
+	def __str__(self):
+		"""
+		Will give an overview of what is happening
+		in the thread controller class
+		"""
+		print("\n===========Thread controller("+self.name+")=========")
+		print("Current number of threads: ",len(self.threadObjects))
+		print("Active threads...")
+		for thread in self.threadLocks:
+			print(thread,":",self.threadLocks[thread])
+		return ""
 #====================Core Classes====================
 """
 Core Classes are the core custom classes in PyPassword
@@ -626,7 +699,6 @@ class mainLabel(Label):
 		self.width=None
 		#Initiate update
 		self.update(**kwargs)
-
 	def update(self,**kwargs):
 		"""
 		The update method will allow the
@@ -656,6 +728,15 @@ class mainLabel(Label):
 		"""
 		self.config(bg=background)
 		self.config(fg=getColourForBackground(background))
+
+	def expandText(self):
+		"""
+		Method to open text in larger window to view
+		"""
+		newWindow=labelWindow(self)
+		#newWindow.addName("Label")
+		newWindow.data.set(self.textVar.get())
+		newWindow.run()
 
 class advancedListbox(Listbox):
 	"""
@@ -896,16 +977,17 @@ class dataWindow(Toplevel):
 		self.context.addButton(1,text="Create",enabledColour=mainBlueColour)
 		self.context.getButton("Create").changeState(False)
 		self.context.updateContextButton(0,command=lambda: self.quit())
+		#Content area
+		self.contentArea=mainFrame(self)
+		self.contentArea.pack(expand=True)
 		#Display label
 		self.displayVar=StringVar()
 		self.displayVar.set("Please enter data")
-		self.displayWidget=None
+		self.displayLabel=mainLabel(self.contentArea,textvariable=self.displayVar)
+		self.displayLabel.pack(side=BOTTOM)
 
 		#Store the inputs
 		self.inputWidgets={}
-		self.inputCannotContain={}
-		self.inputLengths={} #index 0 is min index 1 is max
-		self.inputData={}
 
 		#Run
 		self.runWindow()
@@ -923,38 +1005,26 @@ class dataWindow(Toplevel):
 		self.transient(self.master)
 		self.resizable(width=False,height=False)
 
-	def addDisplayLabel(self,widget):
-		"""
-		Will add a display label widget
-		to the class and handle
-		string variables and updating etc 
-		"""
-		self.displayWidget=widget
-		widget.config(textvariable=self.displayVar)
-
-	def addDataSource(self,widget,name,**kwargs):
+	def addDataSource(self,widgetType,name,**kwargs):
 		"""
 		Add a data source widget to the class
 		"""
-		minLength=1
-		maxLength=30
-		cannotContain=[]
-		minLength=kwargs.get("minLength",minLength)
-		maxLength=kwargs.get("maxLength",maxLength)
-		cannotContain=kwargs.get("cannotContain",cannotContain)
-		#Add a reference
-		self.inputWidgets[name]=widget
-		#Add the kwargs
-		self.inputCannotContain[name]=cannotContain
-		self.inputLengths[name]=[minLength,maxLength]
+		minLength=kwargs.get("minLength",0)
+		maxLength=kwargs.get("maxLength",50)
+		cannotContain=kwargs.get("cannotContain",[])
+		mustBe=kwargs.get("mustBe",None)
 
-		widgetType=type(widget)
-		#Bind the widget
-		if widgetType in [advancedEntry,Entry]:
-			widget.bind("<KeyRelease>",lambda event: self.runCheck(name))
-		else:
-			if widgetType is StringVar:
-				self.inputData[name]=widget
+		#Create the data section
+		newDataSource=dataSection(self.contentArea,widgetType,name,**kwargs)
+		newDataSource.pack(expand=True,fill=X,pady=5)
+		#Add a reference
+		self.inputWidgets[name]=newDataSource
+		#Add the kwargs
+		newDataSource.cannotContain=cannotContain
+		newDataSource.minLength=minLength
+		newDataSource.maxLength=maxLength
+		newDataSource.mustBe=mustBe
+
 
 	def runCheck(self,identifier):
 		"""
@@ -962,39 +1032,7 @@ class dataWindow(Toplevel):
 		the contents of a input
 		to validate it against the specified requirements 
 		"""
-		validWidgets=[Entry,advancedEntry]
-		if identifier in self.inputWidgets:
-			correctWidget=self.inputWidgets[identifier]
-			if type(correctWidget) in validWidgets:
-				#Collect the required data
-				requiredMinLength=self.inputLengths[identifier][0]
-				requiredMaxLength=self.inputLengths[identifier][1]
-				requiredCannotContain=self.inputCannotContain[identifier]
-				#Get the data from the widget
-				widgetData=getDataFromWidget(correctWidget)
-				if widgetData:
-					widgetDataLength=len(widgetData)
-					#Check the length
-					if widgetDataLength < requiredMinLength:
-						self.updateCheck(identifier,"Please enter at least "+str(requiredMinLength)+" characters")
-						#End
-						return False
-					if widgetDataLength > requiredMaxLength:
-						self.updateCheck(identifier,"Please enter at the most "+str(requiredMaxLength)+" characters")
-						#End
-						return False
-					#Check to see if it contains forbidden items
-					if searchDataSource(widgetData,requiredCannotContain,capital=True):
-						self.updateCheck(identifier,"Name is taken, please enter another")
-						#End
-						return False
-				else:
-					self.updateCheck(identifier,"Please enter data")
-					#End
-					return False
-
-			#If the data is valid
-			self.updateCheck(identifier,True)
+		print("Ready to run check")
 
 	def updateCheck(self,identifier,message):
 		"""
@@ -1019,23 +1057,6 @@ class dataWindow(Toplevel):
 		and any saving etc.
 		"""
 		self.destroy()
-
-	def getData(self):
-		"""
-		Function to return the stored data in the
-		input areas of the data window
-		"""
-		return self.inputData
-
-	def storeWidgetData(self,widgetName):
-		"""
-		Method is used to
-		store the data
-		from a widget inside the class
-		"""
-		if widgetName in self.inputWidgets:
-			data=getDataFromWidget(self.inputWidgets[widgetName])
-			self.inputData[widgetName]=data
 
 class labelWindow(Toplevel):
 	"""
@@ -1197,7 +1218,6 @@ class screen(mainFrame):
 	statusVar=None
 	#Store protected screens
 	protectedScreens=[]
-
 	#Store the menus to load
 	publicMenu=None
 	privateMenu=None
@@ -1501,6 +1521,7 @@ class privateSection(mainFrame):
 		self.textVar=StringVar()
 		self.textLabel=mainLabel(self.labelFrame,textvariable=self.textVar,font="Avenir 13",width=15)
 		self.textLabel.pack(expand=True)
+
 		#Context bar
 		self.contextKwargs={"font":"Avenir 10","clickedColour":mainBlueColour}
 		self.context=contextBar(self.buttonFrame,**self.contextKwargs)
@@ -1578,6 +1599,7 @@ class privateSection(mainFrame):
 					newWidget=advancedOptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
+					newWidget.bind("<Double-Button-1>",lambda event: newWidget.expandText())
 
 				#Colour to match background colour
 				basicChangeColour(newWidget,self.cget("bg"))
@@ -1897,6 +1919,7 @@ class advancedNotebook(mainFrame):
 			self.pageCommands[tabName].append(command)
 		else:
 			self.pageCommands[tabName]=[command]
+
 class podNotebook(advancedNotebook):
 	"""
 	The pod notebook is a special
@@ -2370,6 +2393,63 @@ class advancedSlider(mainFrame):
 	def getValue(self):
 		return int(float(self.slider.get()))
 
+class dataSection(mainFrame):
+	"""
+	The data section class
+	will be used to store data
+	that meets certain requirements
+	and check if its valid.
+	"""
+	def __init__(self,parent,widgetType,dataName,**kwargs):
+		mainFrame.__init__(self,parent)
+		print("New data section with",kwargs)
+		#Main attributes
+		self.shouldCheck=True
+		self.minLength=0
+		self.maxLength=50
+		self.cannotContain=[]
+		self.mustBe=None
+		#Get needed kwargs
+		self.placeHolder=kwargs.get("placeholder","Enter Data")
+		self.hideData=kwargs.get("hideData",False)
+		self.optionVar=kwargs.get("optionVar",StringVar())
+		self.optionList=kwargs.get("optionList",[])
+
+
+		#Create the containers
+		if widgetType == advancedEntry:
+			self.dataWidget=advancedEntry(self,self.placeHolder,self.hideData,**kwargs)
+		elif widgetType == advancedOptionMenu:
+			self.dataWidget=advancedOptionMenu(self,self.optionVar,self.optionList,**kwargs)
+			self.shouldCheck=False
+		else:
+			self.dataWidget=Entry(self,**kwargs)
+		self.dataWidget.pack(fill=BOTH,expand=True)
+
+	def check(self):
+		"""
+		Method used to check the data
+		to see if it meets the requirements
+		"""
+		if self.shouldCheck:
+			#Get the data from the widget
+			rawData=getDataFromWidget(self.dataWidget)
+			#Check length
+			dataLength=len(rawData)
+			if dataLength < self.minLength:
+				return False
+			if dataLength > self.maxLength:
+				return False
+			#Check cannot contain
+			for word in self.cannotContain:
+				if searchDataSource(word,rawData):
+					return False
+			#Check must be
+			if self.mustBe:
+				if rawData != self.mustBe:
+					return False
+		#Return True
+		return True
 #====================Non UI Classes====================
 """
 The non ui classes are classes that are not based on 
