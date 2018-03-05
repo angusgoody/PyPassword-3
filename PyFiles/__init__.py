@@ -523,13 +523,21 @@ def showHint():
 	#Update the control variable
 	loginAttemptVar.set(hint)
 
-def runCountdown(timeRemaining,lockedValue):
-	print("HERE BOI")
-	while calculateTimeRemaining(lockedValue,getCurrentTime(),"string") != "0.0":
-		#print("X")
-		loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-		timeRemaining=calculateTimeRemaining(lockedValue,getCurrentTime(),"string")
-
+def runCountdown(lockedValue):
+	"""
+	Will run the countdown timer on the login
+	screen 
+	"""
+	currentTime=getCurrentTime()
+	while lockedValue > currentTime:
+		currentTime=getCurrentTime()
+		if lockedValue > currentTime:
+			timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
+			loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+		else:
+			print("Timer done")
+			loginAttemptVar.set("Timer done")
+		time.sleep(0.1)
 def checkTimeRemaining(masterPodInstance,**kwargs):
 	"""
 	Function that is called
@@ -561,7 +569,7 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 					#Calculate time remaining
 					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
 					#loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-					mainThreadController.runThread("runCountdown",timeRemaining=timeRemaining,lockedValue=lockedValue)
+					mainThreadController.runThread("runCountdown",lockedValue=lockedValue)
 					loginScreen.colour(mainLockedColour)
 					#Show messagebox if specified
 					if showLocked:

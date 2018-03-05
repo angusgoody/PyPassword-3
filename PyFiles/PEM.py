@@ -26,7 +26,7 @@ logDirectory="PyLogs"
 filesDirectory="PyFiles"
 assetDirectory="PyAssets"
 
-lockedMinutes=5
+lockedMinutes=1
 #====================Arrays====================
 masterPodColours=["#0DE5D5","#81AFBA","#2E467B","#06486F","#CBF8FC"]
 masterPodAttempts={}

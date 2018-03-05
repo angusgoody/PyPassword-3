@@ -71,10 +71,13 @@ def startTimer():
 		if currentTime < futureTime:
 			timeRemaining=calculateTimeRemaining(futureTime,currentTime,"string")
 			mainLabelVar.set(timeRemaining)
+			time.sleep(0.2)
 		else:
 			mainLabelVar.set("Timer complete!")
 
 
+def startNewTimer(minutes):
+	futureTime
 root=Tk()
 root.geometry("400x300")
 root.title("Countdown")
