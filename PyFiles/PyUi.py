@@ -434,11 +434,37 @@ class threadController:
 		self.threadCommands[threadName]=command
 		self.threadLocks[threadName]=False
 
+	def createRawThread(self,threadName,**kwargs):
+		"""
+		Method to create a raw thread object 
+		"""
+		#Create and run the thread and store value as True
+		newThread=threading.Thread(target=self.threadCommands[threadName],kwargs=kwargs)
+		#Ensure the thread can be killed when program ends
+		newThread.daemon=True
+		self.threadLocks[threadName]=True
+		self.threadObjects[threadName]=newThread
+		newThread.start()
+		log.report("A new raw thread has been created")
+
 	def runThread(self,threadName,**args):
 		"""
 		Run a thread and start the process
+		
+		Forcerun is used to force create multiple
+		threads under the same identifer
 		"""
+		#Get forcerun kwargs
+		forceRun=False
+		if "forceRun" in args:
+			forceRun=args.pop("forceRun")
+
 		if threadName in self.threadLocks and threadName in self.threadCommands:
+
+			#Force create thread
+			if forceRun:
+				self.createRawThread(threadName,**args)
+
 			#First check if running
 			if self.threadLocks[threadName] is True:
 				print("Thread in progress")
@@ -452,14 +478,7 @@ class threadController:
 						self.runThread(threadName,**args)
 
 			else:
-				#Create and run the thread and store value as True
-				newThread=threading.Thread(target=self.threadCommands[threadName],kwargs=args)
-				#Ensure the thread can be killed when program ends
-				newThread.daemon=True
-				self.threadLocks[threadName]=True
-				self.threadObjects[threadName]=newThread
-				newThread.start()
-				log.report("A new thread has been created")
+				self.createRawThread(threadName,**args)
 
 	def __str__(self):
 		"""

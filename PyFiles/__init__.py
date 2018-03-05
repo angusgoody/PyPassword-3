@@ -319,6 +319,9 @@ genReviewTopFrame.pack(side=TOP,fill=X)
 genReviewEntry=Entry(genReviewTopFrame,font="Avenir 20",width=25,justify=CENTER)
 genReviewEntry.pack(fill=X)
 
+genReviewEntryToggleHide=Checkbutton(genReviewTopFrame)
+genReviewEntryToggleHide.pack(fill=X,side=RIGHT)
+
 genReviewMainFrame=mainFrame(genReviewFrame)
 genReviewMainFrame.pack(expand=True,fill=BOTH)
 
@@ -523,7 +526,7 @@ def showHint():
 	#Update the control variable
 	loginAttemptVar.set(hint)
 
-def runCountdown(lockedValue):
+def runCountdown(lockedValue,masterPodInstance):
 	"""
 	Will run the countdown timer on the login
 	screen 
@@ -533,18 +536,19 @@ def runCountdown(lockedValue):
 		currentTime=getCurrentTime()
 		if lockedValue > currentTime:
 			timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-			loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
+			loginAttemptVar.set(masterPodInstance.masterName+" pod has been locked\nTime remaining: "+timeRemaining)
 		else:
-			print("Timer done")
-			loginAttemptVar.set("Timer done")
+			checkTimeRemaining(masterPodInstance)
+			loginAttemptVar.set(masterPodInstance.masterName+" pod has been unlocked")
 		time.sleep(0.1)
+
 def checkTimeRemaining(masterPodInstance,**kwargs):
 	"""
 	Function that is called
 	to check if the current master
 	pod is still locked. If so
 	change the screen. It is also
-	used to change screen is user
+	used to change screen if user
 	failed attempt
 	False = Pod not locked
 	True = Pod is locked
@@ -568,8 +572,7 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				if lockedValue > currentTime:
 					#Calculate time remaining
 					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-					#loginAttemptVar.set("Master pod has been locked\nTime remaining: "+timeRemaining)
-					mainThreadController.runThread("runCountdown",lockedValue=lockedValue)
+					mainThreadController.runThread("runCountdown",lockedValue=lockedValue,masterPodInstance=masterPodInstance)
 					loginScreen.colour(mainLockedColour)
 					#Show messagebox if specified
 					if showLocked:
@@ -591,6 +594,9 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 					loginScreen.colour(mainRedColour)
 					return False
 
+				elif lockedValue < currentTime:
+					#Reset the screen
+					loginScreen.colour(mainFrame.windowColour)
 def attemptMasterPodUnlock():
 	"""
 	This function gets the user input
