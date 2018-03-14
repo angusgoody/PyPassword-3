@@ -315,12 +315,15 @@ genPasswordNotebook.addPage("Review",genReviewFrame)
 
 genReviewTopFrame=mainFrame(genReviewFrame)
 genReviewTopFrame.pack(side=TOP,fill=X)
+genReviewTopFrame.columnconfigure(0,weight=1)
 
 genReviewEntry=Entry(genReviewTopFrame,font="Avenir 20",width=25,justify=CENTER)
-genReviewEntry.pack(fill=X)
+genReviewEntry.grid(row=0,column=0,columnspan=2,sticky=EW)
 
-genReviewEntryToggleHide=Checkbutton(genReviewTopFrame)
-genReviewEntryToggleHide.pack(fill=X,side=RIGHT)
+genHideEntryVar=BooleanVar()
+genHideEntryVar.set(False)
+genReviewEntryToggleHide=Checkbutton(genReviewTopFrame,text="Hide",variable=genHideEntryVar,)
+genReviewEntryToggleHide.grid(row=0,column=2,padx=10)
 
 genReviewMainFrame=mainFrame(genReviewFrame)
 genReviewMainFrame.pack(expand=True,fill=BOTH)
@@ -497,7 +500,6 @@ def loadMasterPodToLogin():
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
-
 def createNewMasterPodWindow():
 	"""
 	Launches a new data window
@@ -540,7 +542,7 @@ def runCountdown(lockedValue,masterPodInstance):
 		else:
 			checkTimeRemaining(masterPodInstance)
 			loginAttemptVar.set(masterPodInstance.masterName+" pod has been unlocked")
-		time.sleep(0.1)
+		time.sleep(0.2)
 
 def checkTimeRemaining(masterPodInstance,**kwargs):
 	"""
@@ -842,6 +844,7 @@ def reviewPassword():
 	"""
 	#Collect data
 	passwordData=genReviewEntry.get()
+
 	strength=calculatePasswordStrength(passwordData)
 	results=strength[3]
 	#Clear tree
@@ -867,6 +870,19 @@ def changeGenerateType(indicator):
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
 	else:
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
+
+def toggleGenerateEntry():
+	"""
+	Function to hide and show
+	the contents of the review
+	password entry
+	"""
+	if genHideEntryVar.get() == True:
+		genReviewEntry.config(show="•")
+		genReviewEntryToggleHide.config(text="Show")
+	else:
+		genReviewEntry.config(show="")
+		genReviewEntryToggleHide.config(text="Hide")
 
 
 #======Password Screen========
@@ -1046,7 +1062,7 @@ recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #Generate password
 genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())
-genPasswordLabel.bind("<Double-Button-1>",lambda event: genPasswordLabel.expandText())
+genPasswordLabel.bind("<Double-Button-1>",lambda event: genPasswordLabel.expandText("Password"))
 #Password screen
 passwordSearchEntry.bind("<KeyRelease>",lambda event: searchCommonPasswords())
 
@@ -1055,6 +1071,10 @@ genPasswordCharLengthSlider.addCommand(lambda:genPassword("char"))
 genPasswordDigitsSlider.addCommand(lambda: genPassword("char"))
 genPasswordSymbolsSlider.addCommand(lambda: genPassword("char"))
 genPasswordWordsLengthSlider.addCommand(lambda: genPassword("words"))
+#====================Checkbutton commands====================
+
+genReviewEntryToggleHide.config(command=toggleGenerateEntry)
+
 #====================MENUS===================
 
 

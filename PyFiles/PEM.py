@@ -414,7 +414,7 @@ def calculatePasswordStrength(password,**kwargs):
 	reallyLong = len(password) < 14
 
 	# searching for digits
-	digit_error = re.search(r"\d", password) is None
+	digit_error = re.search("\d", password) is None
 
 	# searching for uppercase
 	uppercase_error = re.search(r"[A-Z]", password) is None

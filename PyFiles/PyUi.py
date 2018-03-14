@@ -18,7 +18,7 @@ from random import randint
 import webbrowser
 import threading
 import time
-from multiprocessing import Process
+
 #====================Log====================
 
 log=logClass("User Interface")
@@ -405,10 +405,6 @@ def generateHexColour():
 """
 Classes responsible for organising and managing threads
 """
-def lagMe():
-	for x in range(100):
-		time.sleep(0.2)
-		print(str(x)+"% complete")
 
 class threadController:
 	"""
@@ -748,12 +744,13 @@ class mainLabel(Label):
 		self.config(bg=background)
 		self.config(fg=getColourForBackground(background))
 
-	def expandText(self):
+	def expandText(self,displayName):
 		"""
 		Method to open text in larger window to view
+		displayname is for the title of the window
 		"""
 		newWindow=labelWindow(self)
-		#newWindow.addName("Label")
+		newWindow.addName(displayName)
 		newWindow.data.set(self.textVar.get())
 		newWindow.run()
 
@@ -1118,7 +1115,6 @@ class labelWindow(Toplevel):
 		self.context.updateContextButton(0,command=lambda: copyToClipboard(self.data.get()))
 		self.context.updateContextButton(1,command=lambda: self.destroy())
 
-
 	def run(self):
 		self.focus_set()
 		self.grab_set()
@@ -1127,6 +1123,7 @@ class labelWindow(Toplevel):
 	def addName(self,name):
 		self.statusVar.set(name)
 		self.title.set(name)
+
 	def addData(self,data):
 		"""
 		Add data to the window
@@ -1212,16 +1209,6 @@ class topLabel(mainFrame):
 		self.textVar=kwargs.get("textvariable",self.textVar)
 		#Update
 		self.textLabel.update(textvariable=self.textVar)
-
-class masterScreen:
-	"""
-	The master screen class
-	is a class which is a parent
-	for a screen it will store the 
-	children and screen info.
-	"""
-	def __init__(self):
-		self.lastScreen=None
 
 class screen(mainFrame):
 	"""
@@ -1618,7 +1605,7 @@ class privateSection(mainFrame):
 					newWidget=advancedOptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
-					newWidget.bind("<Double-Button-1>",lambda event: newWidget.expandText())
+					newWidget.bind("<Double-Button-1>",lambda event: newWidget.expandText(self.textVar.get()))
 
 				#Colour to match background colour
 				basicChangeColour(newWidget,self.cget("bg"))
