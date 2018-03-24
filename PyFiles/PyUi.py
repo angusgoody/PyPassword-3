@@ -1187,21 +1187,58 @@ class table(mainFrame):
 	def __init__(self,parent,tableName):
 		mainFrame.__init__(self,parent)
 		self.tableName=tableName
+		self.alternateColour="#F0EFF1"
 		#Containers
 		self.titleFrame=mainFrame(self)
 		self.titleFrame.pack(side=TOP,fill=X)
 		self.dataFrame=mainFrame(self)
-		self.dataFrame.pack(expand=True,fill=BOTH)
+		self.dataFrame.pack(expand=True,fill=BOTH,side=TOP)
 		#Title
-		self.titleLabel=mainLabel(self.titleFrame,text=self.tableName,font="Avenir 20")
+		self.titleLabel=mainLabel(self.titleFrame,text=self.tableName,font="Avenir 25")
 		self.titleLabel.pack(expand=True)
 		#Section counter
+		self.sectionCount=0
+
+		#Colour
+		self.titleFrame.colour(self.alternateColour)
+
+		#Store info
+		self.rowInfo={}
+
 	def addRow(self,rowText,data,dataColour):
 		"""
 		Will add a row to the table
 		to display on screen
 		"""
-		newSection=pass
+		self.sectionCount+=1
+		#Create a new frame
+		newSection=mainFrame(self.dataFrame)
+		newSection.pack(fill=X)
+		newSectionCenter=mainFrame(newSection)
+		newSectionCenter.pack(expand=True)
+		#Display the description
+		newSectionText=mainLabel(newSectionCenter,text=rowText,font="Avenir 16")
+		newSectionText.config(width=18,anchor="w")
+		newSectionText.pack(fill=X,expand=True,side=LEFT)
+		#Create a space
+		newSpacer=mainLabel(newSectionCenter,text=(" "*5))
+		newSpacer.pack(fill=X,expand=True,side=LEFT)
+		#Display the data
+		newSectionData=mainLabel(newSectionCenter,text=data,fg=dataColour,font="Avenir 15",width=16)
+		newSectionData.pack(fill=X,expand=True,side=LEFT)
+		#Colour
+		if self.sectionCount % 2 == 0:
+			newSection.colour(self.alternateColour)
+
+		#Add to dict
+		self.rowInfo[rowText]=newSectionData
+	def updateRow(self,rowText,newData,**kwargs):
+		"""
+		used to update the data in a table
+		"""
+		if rowText in self.rowInfo:
+			myLabel=self.rowInfo[rowText]
+			myLabel.config(text=newData)
 class topLabel(mainFrame):
 	"""
 	The top strip class

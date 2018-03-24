@@ -372,9 +372,15 @@ passwordDataListbox.pack(expand=True,fill=BOTH)
 auditScreen=screen(window,"Audit")
 auditScreen.context=context
 
+#auditScreen.rowconfigure(0,weight=1)
+auditScreen.rowconfigure(2,weight=5)
+
+auditScreen.columnconfigure(0,weight=3)
+
 #Top section
 auditTopSection=mainFrame(auditScreen)
-auditTopSection.pack(fill=X,side=TOP)
+#auditTopSection.pack(fill=X,side=TOP)
+auditTopSection.grid(row=0,column=0,columnspan=2,sticky=EW)
 
 auditTopSectionSub=mainFrame(auditTopSection)
 auditTopSectionSub.pack(expand=True)
@@ -387,6 +393,21 @@ auditScoreVar.set("0")
 auditScoreLabel=mainLabel(auditTopSectionSub,textvariable=auditScoreVar,font="Helvetica 45",fg=mainRedColour)
 auditScoreLabel.pack(pady=10)
 
+auditScreen.colour("#D8589B")
+#Table
+auditTable=table(auditScreen,"Stats")
+#auditTable.pack(expand=True,fill=X,side=TOP,anchor=W)
+auditTable.grid(row=1,column=0,columnspan=2,sticky=EW)
+auditTable.addRow("All accounts","0","#88D832")
+auditTable.addRow("Strong Passwords","0","#88D832")
+auditTable.addRow("Weak Passwords","0","#D86F76")
+auditTable.addRow("Duplicates","0","#D86F76")
+auditTable.addRow("Old","0","#D89F24")
+
+#Results Tree
+resultsTree=advancedTree(auditScreen,["Pod Name","Security"])
+#resultsTree.pack(expand=True,fill=BOTH,side=TOP)
+resultsTree.grid(row=2,column=0,columnspan=2,rowspan=2,sticky=NSEW)
 
 #======Log screen======
 logScreen=screen(window,"Log")
