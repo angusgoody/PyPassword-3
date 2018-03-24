@@ -368,6 +368,26 @@ passwordDataListbox=advancedListbox(passwordMainFrame,font="Avenir 20")
 passwordDataListbox.pack(expand=True,fill=BOTH)
 
 #endregion
+#======Audit screen======
+auditScreen=screen(window,"Audit")
+auditScreen.context=context
+
+#Top section
+auditTopSection=mainFrame(auditScreen)
+auditTopSection.pack(fill=X,side=TOP)
+
+auditTopSectionSub=mainFrame(auditTopSection)
+auditTopSectionSub.pack(expand=True)
+
+auditTitleLabel=mainLabel(auditTopSectionSub,text="Your Security score..",font="Avenir 30")
+auditTitleLabel.pack(pady=7)
+
+auditScoreVar=StringVar()
+auditScoreVar.set("0")
+auditScoreLabel=mainLabel(auditTopSectionSub,textvariable=auditScoreVar,font="Helvetica 45",fg=mainRedColour)
+auditScoreLabel.pack(pady=10)
+
+
 #======Log screen======
 logScreen=screen(window,"Log")
 logScreen.context=context
@@ -1088,6 +1108,8 @@ privateFileMenu.add_command(label="Show threads",command=lambda: print(mainThrea
 #Password
 privatePasswordMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
 privatePasswordMenu.add_command(label="View common passwords",command=lambda: passwordScreen.show())
+privatePasswordMenu.add_command(label="Security Audit",command=lambda: auditScreen.show())
+
 #----Public menu----
 #Add cascades
 publicMenu.add_cascade(label="File",menu=publicFileMenu)

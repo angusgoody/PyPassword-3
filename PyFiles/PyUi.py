@@ -1041,7 +1041,6 @@ class dataWindow(Toplevel):
 		newDataSource.maxLength=maxLength
 		newDataSource.mustBe=mustBe
 
-
 	def runCheck(self,identifier):
 		"""
 		This function will check
@@ -1180,6 +1179,29 @@ Secondary classes are classes that inherit from the core classes
 and are more program specific.
 """
 
+class table(mainFrame):
+	"""
+	The table class will be a neat way
+	to display labels and information to the user
+	"""
+	def __init__(self,parent,tableName):
+		mainFrame.__init__(self,parent)
+		self.tableName=tableName
+		#Containers
+		self.titleFrame=mainFrame(self)
+		self.titleFrame.pack(side=TOP,fill=X)
+		self.dataFrame=mainFrame(self)
+		self.dataFrame.pack(expand=True,fill=BOTH)
+		#Title
+		self.titleLabel=mainLabel(self.titleFrame,text=self.tableName,font="Avenir 20")
+		self.titleLabel.pack(expand=True)
+		#Section counter
+	def addRow(self,rowText,data,dataColour):
+		"""
+		Will add a row to the table
+		to display on screen
+		"""
+		newSection=pass
 class topLabel(mainFrame):
 	"""
 	The top strip class
