@@ -372,14 +372,12 @@ passwordDataListbox.pack(expand=True,fill=BOTH)
 auditScreen=screen(window,"Audit")
 auditScreen.context=context
 
-#auditScreen.rowconfigure(0,weight=1)
+#Configure weights
 auditScreen.rowconfigure(2,weight=5)
-
 auditScreen.columnconfigure(0,weight=3)
 
 #Top section
 auditTopSection=mainFrame(auditScreen)
-#auditTopSection.pack(fill=X,side=TOP)
 auditTopSection.grid(row=0,column=0,columnspan=2,sticky=EW)
 
 auditTopSectionSub=mainFrame(auditTopSection)
@@ -393,22 +391,27 @@ auditScoreVar.set("0")
 auditScoreLabel=mainLabel(auditTopSectionSub,textvariable=auditScoreVar,font="Helvetica 45",fg=mainRedColour)
 auditScoreLabel.pack(pady=10)
 
-auditScreen.colour("#D8589B")
 #Table
-auditTable=table(auditScreen,"Stats")
-#auditTable.pack(expand=True,fill=X,side=TOP,anchor=W)
+auditTable=table(auditScreen,"Stats",True)
 auditTable.grid(row=1,column=0,columnspan=2,sticky=EW)
 auditTable.addRow("All accounts","0","#88D832")
 auditTable.addRow("Strong Passwords","0","#88D832")
 auditTable.addRow("Weak Passwords","0","#D86F76")
+auditTable.addRow("Average Passwords","0","#D89F24")
 auditTable.addRow("Duplicates","0","#D86F76")
-auditTable.addRow("Old","0","#D89F24")
 
 #Results Tree
-resultsTree=advancedTree(auditScreen,["Pod Name","Security"])
-#resultsTree.pack(expand=True,fill=BOTH,side=TOP)
-resultsTree.grid(row=2,column=0,columnspan=2,rowspan=2,sticky=NSEW)
+resultsTreeFrame=mainFrame(auditScreen)
+resultsTreeFrame.grid(row=2,column=0,columnspan=2,rowspan=2,sticky=NSEW)
 
+resultsTreeLabel=mainLabel(resultsTreeFrame,text="Pods",font="Avenir 27")
+resultsTreeLabel.pack()
+
+auditResultsTree=advancedTree(resultsTreeFrame,["Pod Name","Security"])
+auditResultsTree.pack(expand=True,fill=BOTH)
+#Add Tree Sections
+auditResultsTree.addSection("Pod Name")
+auditResultsTree.addSection("Security")
 #======Log screen======
 logScreen=screen(window,"Log")
 logScreen.context=context
@@ -859,11 +862,13 @@ def genPassword(charOrWords):
 	#Calculate password strength
 	passwordStrength=calculatePasswordStrength(password,split=genPasswordWordsSeperatorVar.get())
 	passwordWeight=passwordStrength[4]
-	if passwordWeight >= 27:
+	passwordScoreString=passwordStrength[5]
+	#Show labels
+	if passwordScoreString == "Strong":
 		genPasswordStrengthVar.set("Strong password")
 		genPasswordLabel.config(fg="#66BC15")
 
-	elif passwordWeight >= 17:
+	elif passwordScoreString == "Medium":
 		genPasswordStrengthVar.set("Medium password")
 		genPasswordLabel.config(fg=mainOrangeColour)
 
@@ -959,6 +964,29 @@ def searchCommonPasswords():
 	addCommonPasswordToListbox(results)
 
 
+#======Audit Screen========
+
+def displayAudit():
+	"""
+	Will dislpay the results from an audit
+	"""
+	auditResults=runAudit(masterPod.currentMasterPod)
+	if "Overall" in auditResults:
+		auditScoreVar.set(str(auditResults["Overall"])+"%")
+	#Go through the results
+	for itemName in auditTable.rowInfo:
+		if itemName in auditResults:
+			#Update the label
+			print("Update",auditResults[itemName])
+			auditTable.updateRow(itemName,auditResults[itemName])
+
+def showAuditResults(resultsDict):
+	"""
+	This function will show the results 
+	from the audit. The parameter is 
+	a dict. key = podName value = stength
+	"""
+	pass
 
 #======Other functions========
 
@@ -1082,6 +1110,8 @@ podScreen.addScreenCommand(lambda: loadPodsToScreen())
 #Generate screen
 genPasswordNotebook.addScreenCommand("Generate",lambda:changeGenerateType("Generate") )
 genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review") )
+#Audit screen
+auditScreen.addScreenCommand(lambda: displayAudit())
 #====================Context====================
 podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
 podSearchContext.updateContextButton(1,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))

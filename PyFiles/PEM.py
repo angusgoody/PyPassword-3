@@ -410,8 +410,8 @@ def calculatePasswordStrength(password,**kwargs):
 	"""
 
 	# calculating the length
-	length_error = len(password) < 8
-	reallyLong = len(password) < 14
+	length_error = len(password) < 10
+	reallyLong = len(password) < 15
 
 	# searching for digits
 	digit_error = re.search("\d", password) is None
@@ -451,8 +451,8 @@ def calculatePasswordStrength(password,**kwargs):
 
 
 	results={
-		'At least 8 characters' : length_error,
-		'At least 14 characters': reallyLong,
+		'At least 10 characters' : length_error,
+		'At least 15 characters': reallyLong,
 		'At least 1 digit' : digit_error,
 		'At least 1 Uppercase' : uppercase_error,
 		'At least 1 lowercase' : lowercase_error,
@@ -462,8 +462,8 @@ def calculatePasswordStrength(password,**kwargs):
 	}
 
 	#Calculate weights for these fields
-	weights={'At least 8 characters': 10,
-	         'At least 14 characters': 9,
+	weights={'At least 10 characters': 8,
+	         'At least 15 characters': 10,
 	         'At least 1 digit': 1,
 	         'At least 1 Uppercase': 4,
 	         'At least 1 lowercase': 4,
@@ -475,7 +475,9 @@ def calculatePasswordStrength(password,**kwargs):
 	fails=0
 	success=0
 	fields=len(results)
+	#Track weighted score and what strength password is
 	weightedScore=0
+	strengthString="Weak"
 	for item in results:
 		if results[item]:
 			fails+=1
@@ -483,8 +485,92 @@ def calculatePasswordStrength(password,**kwargs):
 			success+=1
 			weightedScore+=weights[item]
 
+	#Calculate string score
+	if weightedScore >= 27:
+		strengthString="Strong"
+	elif weightedScore >= 17:
+		strengthString="Medium"
+	else:
+		strengthString="Weak"
 	#Return results
-	return [success,fails,fields,results,weightedScore]
+	return [success,fails,fields,results,weightedScore,strengthString]
+
+#Audit functions
+
+def runAudit(masterPodInstance):
+	"""
+	The runAudit function will run a security
+	audit on a masterPod and return stats 
+	on the security of passwords etc
+	
+	Best score is 42
+	"""
+	if type(masterPodInstance) is masterPod:
+
+		#-------Get Stats--------
+		mainScore=0
+		runningTotal=0
+		numberOfPods=len(masterPodInstance.peas)
+		duplicates=0
+		strongPasswords=0
+		averagePasswords=0
+		weakPasswords=0
+		results={}
+		allPasswords=[]
+		#--------Calculate Passwords--------
+		#Iterate through pod passwords
+		for pea in masterPodInstance.peas:
+			peaInstance=masterPodInstance.peas[pea]
+			#Check if the pea has a password
+			peaInstance.unlockVault("Unlock")
+			if "Password" in peaInstance.vault:
+				#Get the raw data
+				passwordData=peaInstance.vault["Password"]
+				#Calculate the strength
+				passwordStrength=calculatePasswordStrength(passwordData)
+				strengthValue=passwordStrength[5]
+				strengthScore=passwordStrength[4]
+				#Add password and strength to results dict
+				results[peaInstance]=[passwordData,strengthScore,strengthValue]
+
+				#-----Add some stats-----
+				#Add to running total
+				runningTotal+=strengthScore
+				#Check duplicates
+				if passwordData in allPasswords:
+					duplicates+=1
+				else:
+					allPasswords.append(passwordData)
+				if strengthValue == "Strong":
+					strongPasswords+=1
+				elif strengthValue == "Medium":
+					averagePasswords+=1
+				elif strengthValue == "Weak":
+					weakPasswords+=1
+
+				print("Pea has password: ",passwordData,"Strength: ",strengthValue)
+
+		#--------Calculate main score-------------
+		"""
+		We calculate the main score as a percentage
+		out of a perfect score for every password. A password
+		can have a best score of 42. So best overall would be 
+		42*numberOfPasswords
+		Percentage = totalScores/(42*numberOfPasswords)*100
+		"""
+		mainScore=round(runningTotal/(42*len(allPasswords))*100,2)
+		print("Total score is",mainScore)
+		#--------Results end-------------
+		returnDict={"Overall":mainScore,
+		            "Strong Passwords":strongPasswords,
+		            "Average Passwords":averagePasswords,
+		            "Weak Passwords":weakPasswords,
+		            "Duplicates":duplicates,
+		            "All accounts":numberOfPods,
+		            "ResultDict":results}
+		return returnDict
+
+
 
 #====================Core Classes====================
 """
@@ -618,6 +704,17 @@ class peaPod:
 		else:
 			log.report("Could not save data to pod because currently locked")
 
+	def getData(self,itemName):
+		"""
+		Will get the data from inside the valut 
+		"""
+		#Unlock Vault
+		if self.vaultState:
+			self.unlockVault("Unlock")
+		if itemName in self.vault:
+			return self.vault[itemName]
+		else:
+			return None
 class masterPod:
 	"""
 	The master peaPod class is the class
@@ -626,13 +723,14 @@ class masterPod:
 	"""
 	currentMasterPod=None
 	loadedPods={}
+	mainCheckKey="key"
 	def __init__(self,name):
 		#Name of the master peaPod
 		self.masterName=name
 		self.masterColour=choice(masterPodColours)
 		self.baseName=self.masterName+".mp"
 		#Key used for checking master key
-		self.checkKey="key"
+		self.checkKey=masterPod.mainCheckKey
 		#Store the hint
 		self.hint="No Hint Available"
 		#Where the pods are stored

@@ -287,7 +287,12 @@ def basicChangeColour(widget,colour):
 		widget.config(highlightbackground=colour)
 	elif type(widget) in labelItems:
 		widget.config(bg=colour)
-		widget.config(fg=getColourForBackground(colour))
+		change=True
+		if type(widget) is mainLabel:
+			if widget.preserveLabelColour==True:
+				change=False
+		if change:
+			widget.config(fg=getColourForBackground(colour))
 	else:
 		widget.config(bg=colour)
 
@@ -704,6 +709,7 @@ class mainLabel(Label):
 	def __init__(self,parent,**kwargs):
 		Label.__init__(self,parent)
 		self.parent=parent
+		self.preserveLabelColour=kwargs.get("preserveColour",False)
 		#Store text data
 		self.textVar=StringVar()
 		self.textVar.set("mainLabel")
@@ -1184,10 +1190,11 @@ class table(mainFrame):
 	The table class will be a neat way
 	to display labels and information to the user
 	"""
-	def __init__(self,parent,tableName):
+	def __init__(self,parent,tableName,showButtons):
 		mainFrame.__init__(self,parent)
 		self.tableName=tableName
 		self.alternateColour="#F0EFF1"
+		self.showButtons=showButtons
 		#Containers
 		self.titleFrame=mainFrame(self)
 		self.titleFrame.pack(side=TOP,fill=X)
@@ -1205,7 +1212,11 @@ class table(mainFrame):
 		#Store info
 		self.rowInfo={}
 
-	def addRow(self,rowText,data,dataColour):
+		#If table has buttons
+		if self.showButtons:
+			self.buttonInfo={}
+
+	def addRow(self,rowText,data,dataColour,):
 		"""
 		Will add a row to the table
 		to display on screen
@@ -1224,11 +1235,22 @@ class table(mainFrame):
 		newSpacer=mainLabel(newSectionCenter,text=(" "*5))
 		newSpacer.pack(fill=X,expand=True,side=LEFT)
 		#Display the data
-		newSectionData=mainLabel(newSectionCenter,text=data,fg=dataColour,font="Avenir 15",width=16)
+		newSectionData=mainLabel(newSectionCenter,text=data,fg=dataColour,
+		                         font="Avenir 20",width=16,preserveColour=True)
 		newSectionData.pack(fill=X,expand=True,side=LEFT)
+		if self.showButtons:
+			#Create button
+			newShowButton=mainButton(newSectionCenter,text="View")
+			newShowButton.preserveColour=False
+			newShowButton.pack(fill=X,expand=True,side=LEFT)
+			#Store
+			self.buttonInfo[rowText]=newShowButton
 		#Colour
 		if self.sectionCount % 2 == 0:
 			newSection.colour(self.alternateColour)
+			#Update buttons colour also
+			if self.showButtons:
+				self.buttonInfo[rowText].updateButton(enabledColour=self.alternateColour)
 
 		#Add to dict
 		self.rowInfo[rowText]=newSectionData
@@ -1238,7 +1260,7 @@ class table(mainFrame):
 		"""
 		if rowText in self.rowInfo:
 			myLabel=self.rowInfo[rowText]
-			myLabel.config(text=newData)
+			myLabel.update(text=newData)
 class topLabel(mainFrame):
 	"""
 	The top strip class
