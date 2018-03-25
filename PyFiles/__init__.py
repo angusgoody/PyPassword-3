@@ -375,6 +375,7 @@ auditScreen.context=context
 #Configure weights
 auditScreen.rowconfigure(2,weight=5)
 auditScreen.columnconfigure(0,weight=3)
+auditScreen.protected=True
 
 #Top section
 auditTopSection=mainFrame(auditScreen)
@@ -971,8 +972,10 @@ def displayAudit():
 	Will dislpay the results from an audit
 	"""
 	auditResults=runAudit(masterPod.currentMasterPod)
-	if "Overall" in auditResults:
-		auditScoreVar.set(str(auditResults["Overall"])+"%")
+	allResults=auditResults["ResultDict"]
+	duplicateResults=auditResults["DuplicateDict"]
+	auditScoreVar.set(str(auditResults["Overall"])+"%")
+
 	#Go through the results
 	for itemName in auditTable.rowInfo:
 		if itemName in auditResults:
@@ -980,13 +983,44 @@ def displayAudit():
 			print("Update",auditResults[itemName])
 			auditTable.updateRow(itemName,auditResults[itemName])
 
+
+	#Update the buttons to they update on clicks
+	for rowText in auditTable.buttonInfo:
+		if rowText == "All accounts":
+			auditTable.updateButtonCommand(rowText,lambda: showAuditResults(allResults))
+		elif rowText == "Strong Passwords":
+			sendResults={}
+			filterResults=[k for k,v in allResults.items() if v == 'Strong']
+			for i in filterResults:
+				sendResults[i]=allResults[i]
+			auditTable.updateButtonCommand(rowText,lambda s=sendResults: showAuditResults(s))
+
+		elif rowText == "Average Passwords":
+			sendResults={}
+			filterResults=[k for k,v in allResults.items() if v == 'Medium']
+			for i in filterResults:
+				sendResults[i]=allResults[i]
+			auditTable.updateButtonCommand(rowText,lambda s=sendResults : showAuditResults(s))
+
+		elif rowText == "Weak Passwords":
+			sendResults={}
+			filterResults=[k for k,v in allResults.items() if v == 'Weak']
+			for i in filterResults:
+				sendResults[i]=allResults[i]
+			auditTable.updateButtonCommand(rowText,lambda s=sendResults: showAuditResults(s))
+
+
 def showAuditResults(resultsDict):
 	"""
 	This function will show the results 
 	from the audit. The parameter is 
 	a dict. key = podName value = stength
 	"""
-	pass
+	#Clear the tree
+	auditResultsTree.delete(*auditResultsTree.get_children())
+	#Add the results
+	for item in resultsDict:
+		auditResultsTree.insertData((item.peaName,resultsDict[item]),[])
 
 #======Other functions========
 

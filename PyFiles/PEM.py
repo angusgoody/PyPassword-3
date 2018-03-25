@@ -510,12 +510,14 @@ def runAudit(masterPodInstance):
 		#-------Get Stats--------
 		mainScore=0
 		runningTotal=0
-		numberOfPods=len(masterPodInstance.peas)
+		numberOfPods=0
 		duplicates=0
 		strongPasswords=0
 		averagePasswords=0
 		weakPasswords=0
+
 		results={}
+		duplicateDict={}
 		allPasswords=[]
 		#--------Calculate Passwords--------
 		#Iterate through pod passwords
@@ -530,17 +532,20 @@ def runAudit(masterPodInstance):
 				passwordStrength=calculatePasswordStrength(passwordData)
 				strengthValue=passwordStrength[5]
 				strengthScore=passwordStrength[4]
-				#Add password and strength to results dict
-				results[peaInstance]=[passwordData,strengthScore,strengthValue]
 
+				#Store pod with score
+				results[peaInstance]=strengthValue
 				#-----Add some stats-----
+
 				#Add to running total
 				runningTotal+=strengthScore
 				#Check duplicates
 				if passwordData in allPasswords:
 					duplicates+=1
+					duplicateDict[peaInstance]=strengthValue
 				else:
 					allPasswords.append(passwordData)
+				#Store results about strength
 				if strengthValue == "Strong":
 					strongPasswords+=1
 				elif strengthValue == "Medium":
@@ -548,7 +553,6 @@ def runAudit(masterPodInstance):
 				elif strengthValue == "Weak":
 					weakPasswords+=1
 
-				print("Pea has password: ",passwordData,"Strength: ",strengthValue)
 
 		#--------Calculate main score-------------
 		"""
@@ -559,7 +563,7 @@ def runAudit(masterPodInstance):
 		Percentage = totalScores/(42*numberOfPasswords)*100
 		"""
 		mainScore=round(runningTotal/(42*len(allPasswords))*100,2)
-		print("Total score is",mainScore)
+		numberOfPods=len(results)
 		#--------Results end-------------
 		returnDict={"Overall":mainScore,
 		            "Strong Passwords":strongPasswords,
@@ -567,7 +571,8 @@ def runAudit(masterPodInstance):
 		            "Weak Passwords":weakPasswords,
 		            "Duplicates":duplicates,
 		            "All accounts":numberOfPods,
-		            "ResultDict":results}
+		            "ResultDict":results,
+		            "DuplicateDict":duplicateDict}
 		return returnDict
 
 

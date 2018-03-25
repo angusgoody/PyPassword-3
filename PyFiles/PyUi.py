@@ -1254,6 +1254,7 @@ class table(mainFrame):
 
 		#Add to dict
 		self.rowInfo[rowText]=newSectionData
+
 	def updateRow(self,rowText,newData,**kwargs):
 		"""
 		used to update the data in a table
@@ -1261,6 +1262,15 @@ class table(mainFrame):
 		if rowText in self.rowInfo:
 			myLabel=self.rowInfo[rowText]
 			myLabel.update(text=newData)
+
+	def updateButtonCommand(self,rowText,command):
+		"""
+		Will update the button command if the table 
+		contains buttons
+		"""
+		if self.showButtons:
+			if rowText in self.buttonInfo:
+				self.buttonInfo[rowText].updateButton(command=command)
 class topLabel(mainFrame):
 	"""
 	The top strip class
@@ -1353,8 +1363,8 @@ class screen(mainFrame):
 
 			#Run any commands the screen has saved
 			for command in self.screenCommands:
-				runCommand(command,name="Screen Class")
-
+				#runCommand(command,name="Screen Class")
+				command()
 			#Update the menu
 			if self.protected == True:
 				#Load the private menu
