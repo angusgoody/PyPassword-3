@@ -90,6 +90,7 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	Search function
 	for finding data inside
 	a data structure 
+	False = No data
 	"""
 	#Check for kwargs
 	capital=True
@@ -896,6 +897,7 @@ class advancedEntry(Entry):
 		self.placeHolder=placeHolder
 		self.placeHolderColour="#BEC0B8"
 		self.defaultColour="#000000"
+		self.defaultBackgroundColour="#FFFFFF"
 
 		#Set up the placeholder
 		self.placeHolderActive=True
@@ -953,6 +955,7 @@ class advancedEntry(Entry):
 		self.delete(0,END)
 		#Change colour
 		self.config(fg=self.placeHolderColour)
+		self.config(bg=self.defaultBackgroundColour)
 		#Change show
 		self.config(show="")
 		#Add placeholder
@@ -988,9 +991,10 @@ class dataWindow(Toplevel):
 		self.title=self.name
 		self.geometry("400x200")
 		#Status
-		self.status=mainLabel(self,font="Avenir 15")
+		self.statusVar=StringVar()
+		self.status=mainLabel(self,font="Avenir 15",textvariable=self.statusVar)
 		self.status.pack(side=BOTTOM,fill=X)
-		self.status.textVar.set(self.name)
+		self.statusVar.set(self.name)
 		self.status.colour("#3F5B65")
 		#Context bar
 		self.context=contextBar(self,places=2)
@@ -1003,13 +1007,10 @@ class dataWindow(Toplevel):
 		self.contentArea=mainFrame(self)
 		self.contentArea.pack(expand=True)
 		#Display label
-		self.displayVar=StringVar()
-		self.displayVar.set("Please enter data")
-		self.displayLabel=mainLabel(self.contentArea,textvariable=self.displayVar)
-		self.displayLabel.pack(side=BOTTOM)
+		self.statusVar.set("Please enter data")
 
-		#Store the inputs
-		self.inputWidgets={}
+		#Storage
+		self.sectionData={}
 
 		#Run
 		self.runWindow()
@@ -1027,50 +1028,6 @@ class dataWindow(Toplevel):
 		self.transient(self.master)
 		self.resizable(width=False,height=False)
 
-	def addDataSource(self,widgetType,name,**kwargs):
-		"""
-		Add a data source widget to the class
-		"""
-		minLength=kwargs.get("minLength",0)
-		maxLength=kwargs.get("maxLength",50)
-		cannotContain=kwargs.get("cannotContain",[])
-		mustBe=kwargs.get("mustBe",None)
-
-		#Create the data section
-		newDataSource=dataSection(self.contentArea,widgetType,name,**kwargs)
-		newDataSource.pack(expand=True,fill=X,pady=5)
-		#Add a reference
-		self.inputWidgets[name]=newDataSource
-		#Add the kwargs
-		newDataSource.cannotContain=cannotContain
-		newDataSource.minLength=minLength
-		newDataSource.maxLength=maxLength
-		newDataSource.mustBe=mustBe
-
-	def runCheck(self,identifier):
-		"""
-		This function will check
-		the contents of a input
-		to validate it against the specified requirements 
-		"""
-		print("Ready to run check")
-
-	def updateCheck(self,identifier,message):
-		"""
-		Update the window
-		based on what the user entered
-		"""
-		if message == True:
-			#Enable the button to continue
-			self.displayVar.set("Valid name")
-			self.context.getButton("Create").changeState(True)
-			#Store the data
-			self.inputData[identifier]=getDataFromWidget(self.inputWidgets[identifier])
-		else:
-			#Disable the button to continue
-			self.context.getButton("Create").changeState(False)
-			self.displayVar.set(message)
-
 	def quit(self):
 		"""
 		The quit method which
@@ -1078,6 +1035,138 @@ class dataWindow(Toplevel):
 		and any saving etc.
 		"""
 		self.destroy()
+
+	def addDataSection(self,sectionClass):
+		"""
+		Store the data section in the class
+		"""
+		self.sectionData[sectionClass.displayText]=sectionClass
+		#Store the window class inside the section class
+		sectionClass.masterWindow=self
+
+	def checkAll(self):
+		"""
+		Will check all of the data sources
+		and check if they meet the criteria
+		"""
+		valid=True
+		for section in self.sectionData:
+			currentSection=self.sectionData[section]
+			print("Checking section data for",currentSection.displayText,currentSection.dataValid)
+			if currentSection.dataValid != True:
+				valid=False
+
+		print("Ending valid is",valid)
+		if valid == True:
+			self.context.getButton("Create").changeState(True)
+		else:
+			self.context.getButton("Create").changeState(False)
+
+
+class dataSection(mainFrame):
+	"""
+	The dataSection class is 
+	a class to store information
+	when the user enters it in a data window
+	it will automatically check and fetch data
+	"""
+	def __init__(self,parent,widgetType,placeholderText,**kwargs):
+		mainFrame.__init__(self,parent)
+		#Key info
+		self.widgetType=widgetType
+		self.parent=parent
+		self.displayText=placeholderText
+		self.masterWindow=None
+		#Store current state
+		self.dataValid=False
+		#Organise screen
+		self.contentSection=mainFrame(self)
+		self.contentSection.pack(expand=True)
+		#Defaults
+		self.defaultFont="Avenir 17"
+
+		#Store info
+		self.mainWidget=None
+		self.dataVar=StringVar()
+		self.dataVar.set(self.displayText)
+		self.values=kwargs.get("values",[])
+		self.hideOrNot=kwargs.get("hide",False)
+		#OptionMenu
+		if widgetType == advancedOptionMenu:
+			#Add a label
+			self.label=mainLabel(self.contentSection,text=self.displayText,font="Avenir 13")
+			self.label.pack()
+			self.mainWidget=advancedOptionMenu(self.contentSection,self.dataVar,*self.values)
+			self.mainWidget.config(width=15)
+			self.mainWidget.pack(pady=6)
+			#Update var because option menu doesnt need validation
+			self.dataValid=True
+
+		else:
+			self.mainWidget=advancedEntry(self.contentSection,self.displayText,self.hideOrNot,font=self.defaultFont)
+			self.mainWidget.bind("<KeyRelease>",lambda event: self.check())
+			self.mainWidget.pack(pady=6)
+
+		#Store requirements
+		self.checkNeeded=kwargs.get("checkNeeded",True)
+		self.minLength=kwargs.get("minLength",1)
+		self.maxLength=kwargs.get("maxLength",50)
+		self.cannotContain=kwargs.get("cannotContain",[])
+		self.mustContain=kwargs.get("mustContain",None)
+		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
+		#Store explanation for invalid data
+		self.invalidExplanation=StringVar()
+
+	def check(self):
+		"""
+		This method runs and will check
+		if the data user has entered meets the requirements
+		"""
+		valid=True
+		if self.checkNeeded:
+			rawData=getDataFromWidget(self.mainWidget)
+			#Check length
+			if len(rawData.split()) < 1:
+				valid=False
+				self.invalidExplanation.set("Please enter data")
+			if len(rawData) < self.minLength or len(rawData) > self.maxLength:
+				valid=False
+				self.invalidExplanation.set("Invalid Length")
+			#Check cannot contain
+			for item in self.cannotContain:
+				if searchDataSource(item,[rawData]) != False:
+					valid=False
+					self.invalidExplanation.set("Contains blocked data")
+			#Check must contain
+			if self.mustContain:
+				if self.mustContain != rawData:
+					valid=False
+					self.invalidExplanation.set("Value not correct")
+			#Check same as
+			if self.mustBeSameAs:
+				#Get data from other widget
+				if type(self.mustBeSameAs) is dataSection:
+					if rawData != self.mustBeSameAs.getDataFromWidget():
+						valid=False
+						self.invalidExplanation.set("Data does not match")
+
+		#Update colour depending on outcome
+		if valid:
+			self.mainWidget.config(bg=mainGreenColour)
+			self.dataValid=True
+		else:
+			self.mainWidget.config(bg=mainRedColour)
+			self.dataValid=False
+			print("Invalid because",self.invalidExplanation.get())
+
+		#Run a global check if available
+		if self.masterWindow:
+			self.masterWindow.checkAll()
+
+	def getDataFromWidget(self):
+		return getDataFromWidget(self.mainWidget)
+
+
 
 class labelWindow(Toplevel):
 	"""
@@ -1205,13 +1294,10 @@ class table(mainFrame):
 		self.titleLabel.pack(expand=True)
 		#Section counter
 		self.sectionCount=0
-
 		#Colour
 		self.titleFrame.colour(self.alternateColour)
-
 		#Store info
 		self.rowInfo={}
-
 		#If table has buttons
 		if self.showButtons:
 			self.buttonInfo={}
@@ -2490,63 +2576,6 @@ class advancedSlider(mainFrame):
 	def getValue(self):
 		return int(float(self.slider.get()))
 
-class dataSection(mainFrame):
-	"""
-	The data section class
-	will be used to store data
-	that meets certain requirements
-	and check if its valid.
-	"""
-	def __init__(self,parent,widgetType,dataName,**kwargs):
-		mainFrame.__init__(self,parent)
-		print("New data section with",kwargs)
-		#Main attributes
-		self.shouldCheck=True
-		self.minLength=0
-		self.maxLength=50
-		self.cannotContain=[]
-		self.mustBe=None
-		#Get needed kwargs
-		self.placeHolder=kwargs.get("placeholder","Enter Data")
-		self.hideData=kwargs.get("hideData",False)
-		self.optionVar=kwargs.get("optionVar",StringVar())
-		self.optionList=kwargs.get("optionList",[])
-
-
-		#Create the containers
-		if widgetType == advancedEntry:
-			self.dataWidget=advancedEntry(self,self.placeHolder,self.hideData,**kwargs)
-		elif widgetType == advancedOptionMenu:
-			self.dataWidget=advancedOptionMenu(self,self.optionVar,self.optionList,**kwargs)
-			self.shouldCheck=False
-		else:
-			self.dataWidget=Entry(self,**kwargs)
-		self.dataWidget.pack(fill=BOTH,expand=True)
-
-	def check(self):
-		"""
-		Method used to check the data
-		to see if it meets the requirements
-		"""
-		if self.shouldCheck:
-			#Get the data from the widget
-			rawData=getDataFromWidget(self.dataWidget)
-			#Check length
-			dataLength=len(rawData)
-			if dataLength < self.minLength:
-				return False
-			if dataLength > self.maxLength:
-				return False
-			#Check cannot contain
-			for word in self.cannotContain:
-				if searchDataSource(word,rawData):
-					return False
-			#Check must be
-			if self.mustBe:
-				if rawData != self.mustBe:
-					return False
-		#Return True
-		return True
 #====================Non UI Classes====================
 """
 The non ui classes are classes that are not based on 

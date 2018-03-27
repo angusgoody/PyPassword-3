@@ -337,7 +337,7 @@ genReviewTree.addSection("Field")
 genReviewTree.addSection("Report")
 
 genReviewTree.addTag("Pass", "#66CD84")
-genReviewTree.addTag("Fail", "#CD426C")
+genReviewTree.addTag("Fail", "#ED4D79")
 
 #endregion
 #======Password screen======
@@ -369,13 +369,14 @@ passwordDataListbox.pack(expand=True,fill=BOTH)
 
 #endregion
 #======Audit screen======
-auditScreen=screen(window,"Audit")
+auditScreen=screen(window,"Audit",protected=True)
 auditScreen.context=context
 
+#Context
+auditScreen.addContextInfo(0,text="Go Home",enabledColour=mainBlueColour)
 #Configure weights
 auditScreen.rowconfigure(2,weight=5)
 auditScreen.columnconfigure(0,weight=3)
-auditScreen.protected=True
 
 #Top section
 auditTopSection=mainFrame(auditScreen)
@@ -410,9 +411,16 @@ resultsTreeLabel.pack()
 
 auditResultsTree=advancedTree(resultsTreeFrame,["Pod Name","Security"])
 auditResultsTree.pack(expand=True,fill=BOTH)
+
 #Add Tree Sections
 auditResultsTree.addSection("Pod Name")
 auditResultsTree.addSection("Security")
+
+#Add Tree tags
+auditResultsTree.addTag("Strong", "#66CD84")
+auditResultsTree.addTag("Medium", "#EDC121")
+auditResultsTree.addTag("Weak", "#ED4D79")
+
 #======Log screen======
 logScreen=screen(window,"Log")
 logScreen.context=context
@@ -554,6 +562,20 @@ def createNewMasterPodWindow():
 	newWindow=dataWindow(window,"Create Master Pod")
 	#Add the sections
 
+	masterPodNameSection=dataSection(newWindow.contentArea,advancedEntry,"Master Pod Name",cannotContain=masterPod.loadedPods.keys())
+	masterPodNameSection.pack()
+	masterPodPassword=dataSection(newWindow.contentArea,advancedEntry,"Password")
+	masterPodPassword.pack()
+	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword)
+	masterPodConfirm.pack()
+
+	#Add to window
+	newWindow.addDataSection(masterPodNameSection)
+	newWindow.addDataSection(masterPodPassword)
+	newWindow.addDataSection(masterPodConfirm)
+
+
+
 
 
 	
@@ -644,6 +666,7 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				elif lockedValue < currentTime:
 					#Reset the screen
 					loginScreen.colour(mainFrame.windowColour)
+
 def attemptMasterPodUnlock():
 	"""
 	This function gets the user input
@@ -888,6 +911,7 @@ def reviewPassword():
 	and tell the user
 	how to improve
 	the password
+	
 	"""
 	#Collect data
 	passwordData=genReviewEntry.get()
@@ -897,14 +921,23 @@ def reviewPassword():
 	#Clear tree
 	genReviewTree.delete(*genReviewTree.get_children())
 	#Add the data to the tree
+	"""
+	False = Passed Test
+	True = Failed Test
+	"""
+	#Iterate through the Tree
 	for item in results:
+		#Get the result in the dictionary
 		value=results[item]
+		#If the value is true the test failed
 		if value:
 			tag="Fail"
 			message="Incomplete"
+		#Test passed
 		else:
 			tag="Pass"
 			message="Complete"
+		#Add data to tree
 		genReviewTree.insertData((item, message), tag)
 
 def changeGenerateType(indicator):
@@ -972,15 +1005,25 @@ def displayAudit():
 	Will dislpay the results from an audit
 	"""
 	auditResults=runAudit(masterPod.currentMasterPod)
+	#Get results and duplicates
 	allResults=auditResults["ResultDict"]
 	duplicateResults=auditResults["DuplicateDict"]
-	auditScoreVar.set(str(auditResults["Overall"])+"%")
+
+	#Display score
+	auditScore=auditResults["Overall"]
+	auditScoreVar.set(str(auditScore)+"%")
+
+	if auditScore >= 60:
+		auditScoreLabel.update(fg=mainGreenColour)
+	elif auditScore >= 45:
+		auditScoreLabel.update(fg=mainOrangeColour)
+	else:
+		auditScoreLabel.update(fg=mainRedColour)
 
 	#Go through the results
 	for itemName in auditTable.rowInfo:
 		if itemName in auditResults:
 			#Update the label
-			print("Update",auditResults[itemName])
 			auditTable.updateRow(itemName,auditResults[itemName])
 
 
@@ -1009,6 +1052,11 @@ def displayAudit():
 				sendResults[i]=allResults[i]
 			auditTable.updateButtonCommand(rowText,lambda s=sendResults: showAuditResults(s))
 
+		elif rowText == "Duplicates":
+			auditTable.updateButtonCommand(rowText,lambda: showAuditResults(duplicateResults))
+
+	#Clear the tree
+	auditResultsTree.delete(*auditResultsTree.get_children())
 
 def showAuditResults(resultsDict):
 	"""
@@ -1020,7 +1068,9 @@ def showAuditResults(resultsDict):
 	auditResultsTree.delete(*auditResultsTree.get_children())
 	#Add the results
 	for item in resultsDict:
-		auditResultsTree.insertData((item.peaName,resultsDict[item]),[])
+		strength=resultsDict[item]
+		auditResultsTree.insertData((item.peaName,strength),[strength])
+
 
 #======Other functions========
 
@@ -1132,6 +1182,8 @@ genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar
 genPasswordScreen.updateCommand(2,command=lambda: goHome())
 #Password screen
 passwordScreen.updateCommand(1,command=lambda: goHome())
+#Audit screen
+auditScreen.updateCommand(0,command=lambda: goHome())
 #====================Screen commands====================
 #Login Screen
 loginScreen.addScreenCommand(lambda: loginAttemptNumberVar.set(0))

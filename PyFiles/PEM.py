@@ -387,9 +387,12 @@ def generateWordPassword(numberOfWords,seperator,commonWordVar):
 	"""
 	global randomWords
 	newPassword=""
+	#Loop to number of words needed
 	for x in range(numberOfWords):
+		#If the user chooses no common words
 		if commonWordVar:
 			newPassword+=random.choice(randomFilterWords)
+		#If they want common words
 		else:
 			newPassword+=random.choice(randomWords)
 		if x != numberOfWords-1:
@@ -408,7 +411,6 @@ def calculatePasswordStrength(password,**kwargs):
 		1 lowercase letter or more
 	a false result means it passed
 	"""
-
 	# calculating the length
 	length_error = len(password) < 10
 	reallyLong = len(password) < 15
@@ -471,6 +473,12 @@ def calculatePasswordStrength(password,**kwargs):
 	         "No common words":9
 	         }
 
+
+	#SPECIAL CASE FOR EMPTY PASSWORDS
+	if len(password.split()) < 1:
+		results["No common words"]=True
+		results['At least 1 symbol']=True
+
 	#Track number of fails and pass
 	fails=0
 	success=0
@@ -518,6 +526,7 @@ def runAudit(masterPodInstance):
 
 		results={}
 		duplicateDict={}
+		passwordRef={}
 		allPasswords=[]
 		#--------Calculate Passwords--------
 		#Iterate through pod passwords
@@ -528,23 +537,30 @@ def runAudit(masterPodInstance):
 			if "Password" in peaInstance.vault:
 				#Get the raw data
 				passwordData=peaInstance.vault["Password"]
+				passwordRef[peaInstance]=passwordData
 				#Calculate the strength
 				passwordStrength=calculatePasswordStrength(passwordData)
 				strengthValue=passwordStrength[5]
 				strengthScore=passwordStrength[4]
-
+				print("Password strength is",strengthScore)
 				#Store pod with score
 				results[peaInstance]=strengthValue
 				#-----Add some stats-----
 
-				#Add to running total
-				runningTotal+=strengthScore
+
 				#Check duplicates
 				if passwordData in allPasswords:
 					duplicates+=1
 					duplicateDict[peaInstance]=strengthValue
+					#Add the other duplicates
+					others=[k for k,v in passwordRef.items() if v == passwordData]
+					for o in others:
+						duplicateDict[o]=strengthValue
 				else:
 					allPasswords.append(passwordData)
+					#Add to running total
+					runningTotal+=strengthScore
+
 				#Store results about strength
 				if strengthValue == "Strong":
 					strongPasswords+=1
@@ -987,14 +1003,28 @@ newMaster=masterPod("Frank")
 newMaster.addKey("frankBoi")
 newMaster.hint="Frankly"
 
-newMaster.addPeaPod("Nationwide",template="Credit Card")
-newMaster.addPeaPodData("Nationwide","Card Holder Name","Frank")
-newMaster.addPeaPodData("Nationwide","Pin","12345")
+newMaster.addPeaPod("Gmail")
+newMaster.addPeaPodData("Gmail","Username","googleUser")
+newMaster.addPeaPodData("Gmail","Password","niceSecureGooglePassword123")
+newMaster.addPeaPodData("Gmail","Notes","Section for gmail notes")
 
-newMaster.addPeaPod("Vault",template="Password")
-newMaster.addPeaPodData("Vault","Password","MePassword")
-newMaster.addPeaPodData("Vault","Notes","Notes about me password")
+newMaster.addPeaPod("Twitter")
+newMaster.addPeaPodData("Twitter","Username","twitterUser")
+newMaster.addPeaPodData("Twitter","Password","weak")
+newMaster.addPeaPodData("Twitter","Notes","Section for twitter notes")
+
+newMaster.addPeaPod("Amazon")
+newMaster.addPeaPodData("Amazon","Username","JeffBezos")
+newMaster.addPeaPodData("Amazon","Password","mediumPassword456")
+newMaster.addPeaPodData("Amazon","Notes","Section for amazon notes")
+
+newMaster.addPeaPod("Laptop Password",template="Password")
+newMaster.addPeaPodData("Laptop Password","Password","MePassword")
+newMaster.addPeaPodData("Laptop Password","Notes","Notes about me password")
 newMaster.save()
+
+
+
 """
 
 
