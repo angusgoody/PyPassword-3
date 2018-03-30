@@ -553,6 +553,22 @@ def loadMasterPodToLogin():
 	else:
 		showMessage("Select Pod","Please select a master pod")
 
+def initiateNewMasterPod(**kwargs):
+	"""
+	Function called when user clicks
+	the button to create a new master pod
+	"""
+	masterPodName=kwargs.get("Master Pod Name",None)
+	masterPodPassword=kwargs.get("Password",None)
+	if masterPodName and masterPodPassword:
+		newMasterPod=masterPod(masterPodName)
+		newMasterPod.addKey(masterPodPassword)
+		newMasterPod.save()
+		#Add to screen
+		addMasterPodToScreen(newMasterPod)
+		#Report to log
+		log.report("Created a new masterPod",masterPodName)
+
 def createNewMasterPodWindow():
 	"""
 	Launches a new data window
@@ -560,13 +576,13 @@ def createNewMasterPodWindow():
 	master pod
 	"""
 	newWindow=dataWindow(window,"Create Master Pod")
+	newWindow.functionToRun=initiateNewMasterPod
 	#Add the sections
-
 	masterPodNameSection=dataSection(newWindow.contentArea,advancedEntry,"Master Pod Name",cannotContain=masterPod.loadedPods.keys())
 	masterPodNameSection.pack()
-	masterPodPassword=dataSection(newWindow.contentArea,advancedEntry,"Password")
+	masterPodPassword=dataSection(newWindow.contentArea,advancedEntry,"Password",hide=True)
 	masterPodPassword.pack()
-	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword)
+	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword,hide=True)
 	masterPodConfirm.pack()
 
 	#Add to window
@@ -575,10 +591,6 @@ def createNewMasterPodWindow():
 	newWindow.addDataSection(masterPodConfirm)
 
 
-
-
-
-	
 #======Login Screen========
 
 def showHint():
@@ -772,14 +784,43 @@ def exitPod():
 	#Show the correct frame
 	openScreen.show()
 
-def createNewPeaPodWindow():
+def initiateNewPeaPod(**kwargs):
+	"""
+	Initiate a new peaPod
+	given the correct parameters
+	"""
+	podName=kwargs.get("Pod Name",None)
+	template=kwargs.get("Template",None)
+	if podName and template:
+		#Create the pea
+		newPeaPod=masterPod.currentMasterPod.addPeaPod(podName,template=template)
+		#Add to listbox
+		podListbox.addObject(podName,newPeaPod)
+		#Refresh the listbox
+		loadPodsToScreen()
+		#Save
+		masterPod.currentMasterPod.save()
+		#Report to log
+		log.report("Created a new pea pod for",masterPod.currentMasterPod.masterName)
+
+def createNewPeaPodWindow(**kwargs):
 	"""
 	Function to launch the window
 	to allow the user to enter
 	name and details for a new peaPod
 	"""
 	newWindow=dataWindow(window,"Create Pea Pod")
-
+	newWindow.functionToRun=initiateNewPeaPod
+	#Create Section
+	allPodNames=masterPod.currentMasterPod.peas.keys()
+	podName=dataSection(newWindow.contentArea,advancedEntry,"Pod Name",cannotContain=allPodNames)
+	podName.pack()
+	templateOption=dataSection(newWindow.contentArea,advancedOptionMenu,"Template",
+	                           values=podTemplate.templates.keys(),default="Login")
+	templateOption.pack()
+	#Add the sections
+	newWindow.addDataSection(podName)
+	newWindow.addDataSection(templateOption)
 def initiatePeaPodInstance(dataWindowInstance):
 	"""
 	This function takes

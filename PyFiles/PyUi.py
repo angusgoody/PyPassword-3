@@ -178,7 +178,7 @@ def getDataFromWidget(widget):
 	Function to get data
 	from a range of widgets 
 	"""
-	validWidgets=[Entry,mainLabel,Text,OptionMenu,advancedEntry]
+	validWidgets=[Entry,mainLabel,Text,OptionMenu,advancedEntry,advancedOptionMenu]
 	widgetType=type(widget)
 	if widgetType in validWidgets:
 		if widgetType == Entry or widgetType == advancedEntry:
@@ -989,7 +989,7 @@ class dataWindow(Toplevel):
 		self.name=name
 		#Configure window
 		self.title=self.name
-		self.geometry("400x200")
+		self.geometry("400x300")
 		#Status
 		self.statusVar=StringVar()
 		self.status=mainLabel(self,font="Avenir 15",textvariable=self.statusVar)
@@ -997,21 +997,32 @@ class dataWindow(Toplevel):
 		self.statusVar.set(self.name)
 		self.status.colour("#3F5B65")
 		#Context bar
-		self.context=contextBar(self,places=2)
+		self.context=contextBar(self,places=3)
 		self.context.pack(side=BOTTOM,fill=X)
 		self.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
-		self.context.addButton(1,text="Create",enabledColour=mainBlueColour)
+		self.context.addButton(1,text="Clear",enabledColour=mainBlueColour)
+		self.context.addButton(2,text="Create",enabledColour=mainGreenColour)
 		self.context.getButton("Create").changeState(False)
 		self.context.updateContextButton(0,command=lambda: self.quit())
+		self.context.updateContextButton(1,command=lambda: self.clearAll())
+		self.context.updateContextButton(2,command=lambda: self.runConfirm())
+		#Help Bar
+		self.helpVar=StringVar()
+		self.helpBar=mainLabel(self,font="Avenir 12",textvariable=self.helpVar)
+		self.helpBar.pack(side=BOTTOM,fill=X)
+		self.helpBar.colour("#F3F2F4")
+
 		#Content area
 		self.contentArea=mainFrame(self)
 		self.contentArea.pack(expand=True)
 		#Display label
-		self.statusVar.set("Please enter data")
+		self.helpVar.set("Please enter data")
 
-		#Storage
+		#Storage (stores the data sections key=name)
 		self.sectionData={}
-
+		#Store the command to be run after
+		self.functionToRun=None
+		self.storedDataDict={}
 		#Run
 		self.runWindow()
 
@@ -1050,18 +1061,56 @@ class dataWindow(Toplevel):
 		and check if they meet the criteria
 		"""
 		valid=True
+		reasonForFail=None
 		for section in self.sectionData:
 			currentSection=self.sectionData[section]
-			print("Checking section data for",currentSection.displayText,currentSection.dataValid)
 			if currentSection.dataValid != True:
+				#Get the reason for fail
+				reasonForFail=currentSection.invalidExplanation.get()
 				valid=False
 
-		print("Ending valid is",valid)
+		#If the data is valid
 		if valid == True:
+			#Enable the button
 			self.context.getButton("Create").changeState(True)
-		else:
-			self.context.getButton("Create").changeState(False)
+			self.helpVar.set("Data Valid")
 
+		#If the data is not valid
+		else:
+			#Disable the button and tell use why invalid
+			self.context.getButton("Create").changeState(False)
+			if reasonForFail:
+				self.helpVar.set(reasonForFail)
+
+	def clearAll(self):
+		"""
+		Function to clear all the 
+		data in the window
+		"""
+		for sec in self.sectionData:
+			section=self.sectionData[sec]
+			addDataToWidget(section.mainWidget,"")
+			section.check()
+
+		self.checkAll()
+
+	def runConfirm(self):
+		"""
+		This is the function executed when
+		the user clicks the "NEXT" or "Confirm" button
+		"""
+		#Check if there is a function to run
+		if self.functionToRun:
+			#Collect and store data
+			for sec in self.sectionData:
+				currentSection=self.sectionData[sec]
+				data=currentSection.dataVar.get()
+				#Store the data in a dictionary
+				self.storedDataDict[currentSection.displayText]=data
+			#Run the function passing kwargs
+			self.functionToRun(**self.storedDataDict)
+			#Kill the window
+			self.quit()
 
 class dataSection(mainFrame):
 	"""
@@ -1084,13 +1133,28 @@ class dataSection(mainFrame):
 		self.contentSection.pack(expand=True)
 		#Defaults
 		self.defaultFont="Avenir 17"
-
+		self.defaultColour="#FFFFFF"
 		#Store info
 		self.mainWidget=None
-		self.dataVar=StringVar()
-		self.dataVar.set(self.displayText)
-		self.values=kwargs.get("values",[])
+		self.defaultData=kwargs.get("default",self.displayText) #Default data is iniital data
+		self.dataVar=StringVar() #Store the actual data
+		self.dataVar.set(self.defaultData)
+		self.values=kwargs.get("values",[]) #Values for an option menu
 		self.hideOrNot=kwargs.get("hide",False)
+		self.changeColour=True #SHould the widget change colour
+		#Store requirements
+		self.checkNeeded=kwargs.get("checkNeeded",True)
+		self.minLength=kwargs.get("minLength",1)
+		self.maxLength=kwargs.get("maxLength",50)
+		self.cannotContain=kwargs.get("cannotContain",[])
+		self.mustContain=kwargs.get("mustContain",None)
+		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
+
+		#Store explanation for invalid data
+		self.invalidExplanation=StringVar()
+
+
+		#-----Create the widget-----
 		#OptionMenu
 		if widgetType == advancedOptionMenu:
 			#Add a label
@@ -1101,22 +1165,14 @@ class dataSection(mainFrame):
 			self.mainWidget.pack(pady=6)
 			#Update var because option menu doesnt need validation
 			self.dataValid=True
+			self.checkNeeded=False
+			self.changeColour=False
 
+		#Entry
 		else:
 			self.mainWidget=advancedEntry(self.contentSection,self.displayText,self.hideOrNot,font=self.defaultFont)
 			self.mainWidget.bind("<KeyRelease>",lambda event: self.check())
 			self.mainWidget.pack(pady=6)
-
-		#Store requirements
-		self.checkNeeded=kwargs.get("checkNeeded",True)
-		self.minLength=kwargs.get("minLength",1)
-		self.maxLength=kwargs.get("maxLength",50)
-		self.cannotContain=kwargs.get("cannotContain",[])
-		self.mustContain=kwargs.get("mustContain",None)
-		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
-		#Store explanation for invalid data
-		self.invalidExplanation=StringVar()
-
 	def check(self):
 		"""
 		This method runs and will check
@@ -1152,12 +1208,16 @@ class dataSection(mainFrame):
 
 		#Update colour depending on outcome
 		if valid:
-			self.mainWidget.config(bg=mainGreenColour)
+			if self.changeColour:
+				self.mainWidget.config(bg=mainGreenColour)
 			self.dataValid=True
+			#Stores the data if it is valid
+			self.dataVar.set(getDataFromWidget(self.mainWidget))
 		else:
-			self.mainWidget.config(bg=mainRedColour)
+			if self.changeColour:
+				self.mainWidget.config(bg=self.defaultColour)
 			self.dataValid=False
-			print("Invalid because",self.invalidExplanation.get())
+			self.dataVar.set(self.defaultData)
 
 		#Run a global check if available
 		if self.masterWindow:
@@ -2299,7 +2359,8 @@ class podNotebook(advancedNotebook):
 		if context:
 			context.updateContextButton(0, text="Cancel", command=lambda: self.cancelEdit())
 			context.updateContextButton(1,text="Save",command=lambda: self.saveEdit())
-			context.setPlaceholders(2)
+			context.updateContextButton(2,text="Rename",command=lambda: self.launchRenameWindow())
+			context.setPlaceholders(3)
 
 	def cancelEdit(self):
 		"""
@@ -2356,6 +2417,18 @@ class podNotebook(advancedNotebook):
 		#Save the current master pod
 		masterPod.currentMasterPod.save()
 		self.cancelEdit()
+
+	def launchRenameWindow(self):
+		"""
+		Creates a popup window
+		to allow user to create a new 
+		name for the pod
+		"""
+		newWindow=dataWindow(self,"Rename")
+		currentPeaName=masterPod.currentMasterPod.currentPeaPod.peaName
+		newName=dataSection(newWindow.contentArea,advancedEntry,"Name Name",cannotContain=[currentPeaName])
+		newName.pack()
+		newWindow.addDataSection(newName)
 
 class selectionBar(mainFrame):
 	"""
