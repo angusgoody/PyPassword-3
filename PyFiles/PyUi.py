@@ -1147,6 +1147,7 @@ class dataSection(mainFrame):
 		self.minLength=kwargs.get("minLength",1)
 		self.maxLength=kwargs.get("maxLength",50)
 		self.cannotContain=kwargs.get("cannotContain",[])
+		self.cannotExactMatch=kwargs.get("exactMatch",True) #False = not exact match True = exact match
 		self.mustContain=kwargs.get("mustContain",None)
 		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
 
@@ -1190,7 +1191,7 @@ class dataSection(mainFrame):
 				self.invalidExplanation.set("Invalid Length")
 			#Check cannot contain
 			for item in self.cannotContain:
-				if searchDataSource(item,[rawData]) != False:
+				if searchDataSource(item,[rawData],capital=self.cannotExactMatch) != False:
 					valid=False
 					self.invalidExplanation.set("Contains blocked data")
 			#Check must contain
@@ -2426,7 +2427,7 @@ class podNotebook(advancedNotebook):
 		"""
 		newWindow=dataWindow(self,"Rename")
 		currentPeaName=masterPod.currentMasterPod.currentPeaPod.peaName
-		newName=dataSection(newWindow.contentArea,advancedEntry,"Name Name",cannotContain=[currentPeaName])
+		newName=dataSection(newWindow.contentArea,advancedEntry,"New Name",cannotContain=[currentPeaName],exactMatch=False)
 		newName.pack()
 		newWindow.addDataSection(newName)
 
