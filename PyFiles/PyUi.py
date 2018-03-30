@@ -918,6 +918,7 @@ class advancedEntry(Entry):
 		so the placeholder is removed
 		and the settings are reset
 		"""
+		print("HERE")
 		if self.placeHolderActive:
 			#Remove content
 			self.delete(0,END)
@@ -928,6 +929,10 @@ class advancedEntry(Entry):
 				self.config(show="•")
 			#Update Variable
 			self.placeHolderActive=False
+
+		#Focus
+		self.focus_force()
+		self.icursor(END)
 
 	def getData(self):
 		"""
@@ -971,7 +976,6 @@ class advancedEntry(Entry):
 		"""
 		if len(self.get().split()) < 1:
 			self.resetEntry()
-		self.parent.focus()
 
 class dataWindow(Toplevel):
 	"""
