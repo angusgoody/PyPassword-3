@@ -62,8 +62,8 @@ processLanguageOn=True
 
 #Current type of password generator
 currentGenPasswordMethod=StringVar()
-currentGeneratedPasswordString=StringVar()
-currentGeneratedReviewPasswordString=StringVar()
+currentReviewOrGen=StringVar()
+
 #The current launched popup windows
 currentPeaWindow=None
 currentMasterWindow=None
@@ -749,13 +749,13 @@ def loadPodsToScreen():
 	#Clear the search so it resets when loading screen
 	resetSearch(podSearchEntry,runSearch)
 
-def openPod():
+def openPod(podObject):
 	"""
 	This function is run
 	when user double clicks
 	on a pod in the listbox
 	"""
-	selectedPod=podListbox.getSelection()
+	selectedPod=podObject
 	#Check something was selected
 	if selectedPod:
 		#Get the template type of the pod
@@ -992,17 +992,83 @@ def reviewPassword():
 		#Add data to tree
 		genReviewTree.insertData((item, message), tag)
 
+def launchPasswordToPodPopup():
+	"""
+	Launches a popup window
+	to allow user to select pod
+	to add password to
+	"""
+
+	#Get list of pods with password fields
+	allPeaPods=masterPod.currentMasterPod.peas
+	filter=[]
+	for item in allPeaPods:
+		peaObject=allPeaPods[item]
+		if peaObject.vaultState:
+			peaObject.unlockVault("Unlock")
+
+		if "Password" in peaObject.vault:
+			filter.append(item)
+
+	if len(filter) > 0:
+		newWindow=dataWindow(window,"Select Pod")
+		#Remove the clear button
+		newWindow.context.hideButton(1)
+
+		#Create option menu
+		podOption=dataSection(newWindow.contentArea,advancedOptionMenu,"Select Pod",values=filter,optionCommand=lambda event:newWindow.checkAll())
+		podOption.pack()
+		newWindow.addDataSection(podOption)
+		newWindow.functionToRun=addPasswordToPod
+	else:
+		showMessage("No Password","No Pods found to add password to")
+
+def addPasswordToPod(**kwargs):
+	"""
+	Function that will take the password
+	that has been generated and add it
+	to the selected pod
+	"""
+	chosenPod=kwargs.get("Select Pod",None)
+	if chosenPod:
+		#Get the correct pod
+		allPeaPods=masterPod.currentMasterPod.peas
+		if chosenPod in allPeaPods:
+			currentPeaPod=allPeaPods[chosenPod]
+			if currentPeaPod.vaultState:
+				currentPeaPod.unlockVault("Unlock")
+
+			#Get password
+			password=None
+			if currentReviewOrGen.get() == "Review":
+				password=getDataFromWidget(genReviewEntry)
+			elif currentReviewOrGen.get() == "Generate":
+				password=genPasswordVar.get()
+			#Update password
+			if password:
+				currentPeaPod.vault["Password"]=password
+			#Show the screen
+			openPod(currentPeaPod)
+			#Save
+			masterPod.currentPeaPod.save()
+
+
+
+
+
 def changeGenerateType(indicator):
 	"""
 	Function is called when user
 	switches from generate to review
 	to know what data to copy to clipboard
 	"""
+	global currentReviewOrGen
 	if indicator == "Review":
 		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
+		currentReviewOrGen.set("Review")
 	else:
-		context.updateContextButton(0,command=lambda:copyToClipboard(getDataFromWidget(genReviewEntry)))
-
+		context.updateContextButton(0,command=lambda:copyToClipboard(genPasswordVar.get()))
+		currentReviewOrGen.set("Generate")
 def toggleGenerateEntry():
 	"""
 	Function to hide and show
@@ -1235,13 +1301,14 @@ loginScreen.updateCommand(1,command=lambda: attemptMasterPodUnlock())
 #Pod screen
 podScreen.updateCommand(0, command=createNewPeaPodWindow)
 podScreen.updateCommand(2,command=lambda: exitPod())
-podScreen.updateCommand(1,command=lambda: openPod())
+podScreen.updateCommand(1,command=lambda: openPod(podListbox.getSelection()))
 #View Pod screen
 viewPodScreen.updateCommand(2,command=lambda: podScreen.show())
 viewPodScreen.updateCommand(1,command=lambda: viewPodNotebook.startEdit())
 viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterPod.currentPeaPod))
 #Generate screen
 genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPasswordMethod.get()))
+genPasswordScreen.updateCommand(2,command=lambda: launchPasswordToPodPopup())
 genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
 genPasswordScreen.updateCommand(3,command=lambda: goHome())
 #Password screen
@@ -1279,7 +1346,7 @@ recursiveBind(openListbox,"<Button-1>",lambda event: openScreen.updateCommand(1,
 #Login Screen
 recursiveBind(loginEntry,"<Return>",lambda event: attemptMasterPodUnlock())
 #Pod screen
-recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod())
+recursiveBind(podListbox,"<Double-Button-1>",lambda event: openPod(podListbox.getSelection()))
 recursiveBind(podSearchEntry,"<KeyRelease>",lambda event: runSearch())
 #Generate password
 genReviewEntry.bind("<KeyRelease>",lambda event: reviewPassword())

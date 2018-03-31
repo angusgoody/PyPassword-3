@@ -132,8 +132,10 @@ def runCommand(command,**kwargs):
 	#Collect idetifier from KWARGS
 	identifier="No Data Available"
 	identifier=kwargs.get("name",identifier)
+	content=command()
 	try:
-		content=command()
+		#content=command()
+		pass
 	except Exception as e:
 		print("Error running command",identifier,e,command)
 		log.report("Error executing command through function",e,command,tag="Error")
@@ -1749,9 +1751,16 @@ class contextBar(mainFrame):
 		for button in self.buttonArray:
 			if button.textVar.get() == buttonName:
 				return button
+
 	def getButtonFromIndex(self,index):
 		return self.buttonArray[index]
 
+	def hideButton(self,index):
+		"""
+		Hides a button
+		"""
+		buttonObject=self.getButtonFromIndex(index)
+		buttonObject.pack_forget()
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
