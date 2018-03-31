@@ -918,7 +918,6 @@ class advancedEntry(Entry):
 		so the placeholder is removed
 		and the settings are reset
 		"""
-		print("HERE")
 		if self.placeHolderActive:
 			#Remove content
 			self.delete(0,END)
@@ -1006,7 +1005,7 @@ class dataWindow(Toplevel):
 		self.context.addButton(0,text="Cancel",enabledColour=mainRedColour)
 		self.context.addButton(1,text="Clear",enabledColour=mainBlueColour)
 		self.context.addButton(2,text="Create",enabledColour=mainGreenColour)
-		self.context.getButton("Create").changeState(False)
+		self.context.getButtonFromIndex(2).changeState(False)
 		self.context.updateContextButton(0,command=lambda: self.quit())
 		self.context.updateContextButton(1,command=lambda: self.clearAll())
 		self.context.updateContextButton(2,command=lambda: self.runConfirm())
@@ -1076,13 +1075,13 @@ class dataWindow(Toplevel):
 		#If the data is valid
 		if valid == True:
 			#Enable the button
-			self.context.getButton("Create").changeState(True)
+			self.context.getButtonFromIndex(2).changeState(True)
 			self.helpVar.set("Data Valid")
 
 		#If the data is not valid
 		else:
 			#Disable the button and tell use why invalid
-			self.context.getButton("Create").changeState(False)
+			self.context.getButtonFromIndex(2).changeState(False)
 			if reasonForFail:
 				self.helpVar.set(reasonForFail)
 
@@ -1146,6 +1145,8 @@ class dataSection(mainFrame):
 		self.values=kwargs.get("values",[]) #Values for an option menu
 		self.hideOrNot=kwargs.get("hide",False)
 		self.changeColour=True #SHould the widget change colour
+		self.optionCommand=kwargs.get("optionCommand",None)
+
 		#Store requirements
 		self.checkNeeded=kwargs.get("checkNeeded",True)
 		self.minLength=kwargs.get("minLength",1)
@@ -1165,7 +1166,7 @@ class dataSection(mainFrame):
 			#Add a label
 			self.label=mainLabel(self.contentSection,text=self.displayText,font="Avenir 13")
 			self.label.pack()
-			self.mainWidget=advancedOptionMenu(self.contentSection,self.dataVar,*self.values)
+			self.mainWidget=advancedOptionMenu(self.contentSection,self.dataVar,*self.values,command=self.optionCommand)
 			self.mainWidget.config(width=15)
 			self.mainWidget.pack(pady=6)
 			#Update var because option menu doesnt need validation
@@ -1744,6 +1745,8 @@ class contextBar(mainFrame):
 		for button in self.buttonArray:
 			if button.textVar.get() == buttonName:
 				return button
+	def getButtonFromIndex(self,index):
+		return self.buttonArray[index]
 
 class privateSection(mainFrame):
 	"""
@@ -2423,6 +2426,7 @@ class podNotebook(advancedNotebook):
 		masterPod.currentMasterPod.save()
 		self.cancelEdit()
 
+
 	def launchRenameWindow(self):
 		"""
 		Creates a popup window
@@ -2430,14 +2434,33 @@ class podNotebook(advancedNotebook):
 		name for the pod
 		"""
 		newWindow=dataWindow(self,"Rename")
+		newWindow.context.updateContextButton(2,text="Rename")
+		newWindow.functionToRun=lambda **kwargs: self.renamePod(**kwargs)
 		currentPeaName=masterPod.currentMasterPod.currentPeaPod.peaName
 		newName=dataSection(newWindow.contentArea,advancedEntry,"New Name",cannotContain=[currentPeaName],exactMatch=False)
 		newName.pack()
 		newWindow.addDataSection(newName)
 
+	def renamePod(self,**kwargs):
+		newName=kwargs.get("New Name",None)
+		if newName:
+			#Update the actual pod
+			currentPea=masterPod.currentMasterPod.currentPeaPod
+			currentPea.peaName=newName
+			#Save
+			masterPod.currentMasterPod.save()
+			#Update label
+			if "podLabelVar" in mainVars:
+				mainVars["podLabelVar"].set(newName)
+			#Report
+			log.report("Renamed pod")
+			#Run Save on notebook
+			self.saveEdit()
+
 class selectionBar(mainFrame):
 	"""
-	The selection bar
+
+		The selection bar
 	is a bar that allows a single 
 	selection. This can be used
 	to naivgate etc.
@@ -2718,7 +2741,7 @@ class podTemplate:
 
 
 #=====Login======
-loginTemplate=podTemplate("Login","#A9F955")
+loginTemplate=podTemplate("Login","#2BD590")
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
@@ -2733,7 +2756,7 @@ secureNoteTemplate.addTab("Note")
 secureNoteTemplate.addTemplateSection("Note","Note",Text,Text,["Copy"])
 
 #=====Card======
-cardTemplate=podTemplate("Credit Card","#EE658A")
+cardTemplate=podTemplate("Credit Card","#D57191")
 cardTemplate.addTab("Card")
 cardTemplate.addTemplateSection("Card","Card Holder Name",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Card","Bank",mainLabel,Entry,["Copy","Hide"])

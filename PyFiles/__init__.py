@@ -64,7 +64,9 @@ processLanguageOn=True
 currentGenPasswordMethod=StringVar()
 currentGeneratedPasswordString=StringVar()
 currentGeneratedReviewPasswordString=StringVar()
-
+#The current launched popup windows
+currentPeaWindow=None
+currentMasterWindow=None
 #====================User Interface====================
 
 #======Status and context======
@@ -219,7 +221,7 @@ viewPodScreen.addContextInfo(2,text="Back")
 #Top Label
 viewPodLabelVar=StringVar()
 viewPodLabelVar.set("Pod")
-
+mainVars["podLabelVar"]=viewPodLabelVar
 viewPodLabel=topLabel(viewPodScreen,textvariable=viewPodLabelVar)
 viewPodLabel.pack(side=TOP,fill=X)
 
@@ -741,7 +743,7 @@ def loadPodsToScreen():
 			podColour=podTemplate.templateColours[podTemplateType]
 
 		#Add to listbox
-		podListbox.addObject(pod,podInstance,colour=podColour)
+		podListbox.addObject(podInstance.peaName,podInstance,colour=podColour)
 
 	#Clear the search so it resets when loading screen
 	resetSearch(podSearchEntry,runSearch)
@@ -809,18 +811,26 @@ def createNewPeaPodWindow(**kwargs):
 	to allow the user to enter
 	name and details for a new peaPod
 	"""
+	global currentPeaWindow
 	newWindow=dataWindow(window,"Create Pea Pod")
+	#Update the global variable
+	currentPeaWindow=newWindow
 	newWindow.functionToRun=initiateNewPeaPod
 	#Create Section
 	allPodNames=masterPod.currentMasterPod.peas.keys()
 	podName=dataSection(newWindow.contentArea,advancedEntry,"Pod Name",cannotContain=allPodNames)
 	podName.pack()
 	templateOption=dataSection(newWindow.contentArea,advancedOptionMenu,"Template",
-	                           values=podTemplate.templates.keys(),default="Login")
+	                           values=podTemplate.templates.keys(),default="Login",
+	                           optionCommand=changePopupColour)
 	templateOption.pack()
+
 	#Add the sections
 	newWindow.addDataSection(podName)
 	newWindow.addDataSection(templateOption)
+	#Ititate colour
+	changePopupColour("Login")
+
 def initiatePeaPodInstance(dataWindowInstance):
 	"""
 	This function takes
@@ -1193,6 +1203,18 @@ def resetSearch(entry,searchCommand):
 	"""
 	addDataToWidget(entry,"")
 	runCommand(searchCommand)
+
+def changePopupColour(templateVar):
+	"""
+	Function will change the colour
+	of the popup window when the user selects
+	a template
+	"""
+	global currentPeaWindow
+	if templateVar in podTemplate.templateColours and currentPeaWindow:
+		correctColour=podTemplate.templateColours[templateVar]
+		currentPeaWindow.status.colour(correctColour)
+
 
 #====================Thread commands====================
 mainThreadController.createThread("runCountdown",runCountdown)
