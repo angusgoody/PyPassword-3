@@ -31,6 +31,7 @@ mainGreyColour="#CDD7D6"
 mainClickedColour="#A9F955"
 mainWhiteColour="#E8EDEA"
 mainLockedColour="#685DE3"
+mainPurpleColour="#6876D5"
 
 mainSecondOrangeColour="#D89633"
 mainSecondBlueColour="#13C770"
@@ -1254,10 +1255,11 @@ class labelWindow(Toplevel):
 		self.status.colour("#45655F")
 
 		#Add a context
-		self.context=contextBar(self,places=2)
+		self.context=contextBar(self,places=3)
 		self.context.pack(side=BOTTOM,fill=X)
 		self.context.addButton(0,text="Copy",enabledColour=mainBlueColour)
-		self.context.addButton(1,text="Exit",enabledColour=mainRedColour)
+		self.context.addButton(1,text="Anchor",enabledColour=mainPurpleColour)
+		self.context.addButton(2,text="Exit",enabledColour=mainRedColour)
 
 		self.centerFrame=mainFrame(self)
 		self.centerFrame.pack(expand=True)
@@ -1273,7 +1275,9 @@ class labelWindow(Toplevel):
 
 		#Context commands
 		self.context.updateContextButton(0,command=lambda: copyToClipboard(self.data.get()))
-		self.context.updateContextButton(1,command=lambda: self.destroy())
+		self.context.updateContextButton(1,command=lambda: self.grab_release())
+
+		self.context.updateContextButton(2,command=lambda: self.destroy())
 
 	def run(self):
 		self.focus_set()

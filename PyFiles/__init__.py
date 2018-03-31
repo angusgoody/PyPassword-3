@@ -237,8 +237,9 @@ genPasswordScreen.context=context
 
 #Context
 genPasswordScreen.addContextInfo(0,text="Copy",enabledColour=mainBlueColour)
-genPasswordScreen.addContextInfo(1,text="Regnerate",enabledColour=mainGreenColour)
-genPasswordScreen.addContextInfo(2,text="Home",enabledColour=mainRedColour)
+genPasswordScreen.addContextInfo(1,text="Regenerate",enabledColour=mainGreenColour)
+genPasswordScreen.addContextInfo(2,text="Add to pod",enabledColour=mainPurpleColour)
+genPasswordScreen.addContextInfo(3,text="Home",enabledColour=mainRedColour)
 
 genPasswordNotebook=advancedNotebook(genPasswordScreen)
 genPasswordNotebook.pack(fill=BOTH,expand=True)
@@ -1242,7 +1243,7 @@ viewPodScreen.updateCommand(0,command=lambda: deletePod(masterPod.currentMasterP
 #Generate screen
 genPasswordScreen.updateCommand(1,command=lambda: genPassword(currentGenPasswordMethod.get()))
 genPasswordScreen.updateCommand(0,command=lambda: copyToClipboard(genPasswordVar.get()))
-genPasswordScreen.updateCommand(2,command=lambda: goHome())
+genPasswordScreen.updateCommand(3,command=lambda: goHome())
 #Password screen
 passwordScreen.updateCommand(1,command=lambda: goHome())
 #Audit screen
