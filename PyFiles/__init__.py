@@ -1012,8 +1012,11 @@ def launchPasswordToPodPopup():
 
 	if len(filter) > 0:
 		newWindow=dataWindow(window,"Select Pod")
+
 		#Remove the clear button
 		newWindow.context.hideButton(1)
+		#Change button name
+		newWindow.context.updateContextButton(2,text="Update")
 
 		#Create option menu
 		podOption=dataSection(newWindow.contentArea,advancedOptionMenu,"Select Pod",values=filter,optionCommand=lambda event:newWindow.checkAll())
@@ -1050,7 +1053,7 @@ def addPasswordToPod(**kwargs):
 			#Show the screen
 			openPod(currentPeaPod)
 			#Save
-			masterPod.currentPeaPod.save()
+			masterPod.currentMasterPod.save()
 
 
 
