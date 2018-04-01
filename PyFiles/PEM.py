@@ -252,6 +252,8 @@ def pad(text):
 	be in multiples of 16 so the pad function
 	adds padding to make it the right length
 	"""
+	print(text)
+	result=text +((16-len(text) % 16)*"\n")
 	return text +((16-len(text) % 16)*"\n")
 
 def encrypt(plainText, key):
@@ -578,7 +580,13 @@ def runAudit(masterPodInstance):
 		42*numberOfPasswords
 		Percentage = totalScores/(42*numberOfPasswords)*100
 		"""
-		mainScore=round(runningTotal/(42*len(allPasswords))*100,2)
+		if runningTotal > 0:
+			try:
+				mainScore=round(runningTotal/(42*len(allPasswords))*100,2)
+			except:
+				mainScore=0
+		else:
+			mainScore=0
 		numberOfPods=len(results)
 		#--------Results end-------------
 		returnDict={"Overall":mainScore,
@@ -635,18 +643,10 @@ class peaPod:
 		#Encrypted vault where info is stored
 		self.vault={}
 		#Store template type
-		self.templateType="Login"
+		self.templateType=kwargs.get("template","Login")
 		#Store Vault state True = Locked False = Unlocked
 		self.vaultState=False
 
-		#Update
-		self.update(**kwargs)
-
-	def update(self,**kwargs):
-		"""
-		The update method for peaPod.
-		"""
-		self.templateType=kwargs.get("template",self.templateType)
 
 	def updateVault(self,sectionName,data):
 		"""

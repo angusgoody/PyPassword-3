@@ -2716,7 +2716,7 @@ class podTemplate:
 	#Store valid data types
 	validDataTypes=[Entry,advancedEntry,Text,advancedOptionMenu,Label,mainLabel]
 
-	def __init__(self,templateName,templateColour):
+	def __init__(self,templateName,templateColour,**kwargs):
 		#Name and Colour of template
 		self.templateName=templateName
 		self.templateColour=templateColour
@@ -2724,6 +2724,9 @@ class podTemplate:
 		self.tabs={}
 		#Stores the tab names in their order
 		self.tabOrder=[]
+		#Stores if the template contains password field
+		self.containsPassword=kwargs.get("containsPassword",False)
+
 		#Add to class dict for reference
 		podTemplate.templateColours[self.templateName]=self.templateColour
 		podTemplate.templates[self.templateName]=self
@@ -2760,7 +2763,7 @@ class podTemplate:
 
 
 #=====Login======
-loginTemplate=podTemplate("Login","#2BD590")
+loginTemplate=podTemplate("Login","#2BD590",containsPassword=True)
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
 loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
@@ -2786,10 +2789,22 @@ cardTemplate.addTemplateSection("Advanced","Pin",mainLabel,Entry,["Copy","Hide"]
 cardTemplate.addTemplateSection("Advanced","Credit limit",mainLabel,Entry,["Copy","Hide"])
 cardTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 #=====Password======
-passwordTemplate=podTemplate("Password","#E6BE3E")
+passwordTemplate=podTemplate("Password","#E6BE3E",containsPassword=True)
 passwordTemplate.addTab("Password")
 passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
 passwordTemplate.addTemplateSection("Password","Notes",Text,Text,["Copy"])
+#=====Receipt======
+receiptTemplate=podTemplate("Receipt","#AB87F4")
+receiptTemplate.addTab("Receipt")
+receiptTemplate.addTemplateSection("Receipt","Amount",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTemplateSection("Receipt","Product",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTemplateSection("Receipt","Company",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTemplateSection("Receipt","Date",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTab("Advanced")
+receiptTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"],hide=False)
+receiptTemplate.addTemplateSection("Advanced","Payment Method",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
+
 
 
 

@@ -196,7 +196,7 @@ podSearchEntry=advancedEntry(podScreen,"Search",False,justify=CENTER,font="Aveni
 podSearchEntry.pack(fill=X,side=TOP)
 
 #Search context
-podSearchContext=contextBar(podScreen,places=3,font="Avenir 11")
+podSearchContext=contextBar(podScreen,places=2,font="Avenir 11")
 podSearchContext.pack(fill=X,side=TOP)
 #Create the listbox
 podListbox=advancedListbox(podScreen,font="Avenir 25")
@@ -884,37 +884,6 @@ def createNewPeaPodWindow(**kwargs):
 	#Ititate colour
 	changePopupColour("Login")
 
-def initiatePeaPodInstance(dataWindowInstance):
-	"""
-	This function takes
-	the value from the
-	data window that the user
-	entered and creates a pod
-
-	The names given to input sources
-	in the createWindow function must
-	match the names in this function
-	"""
-	#Gather the data
-	data=dataWindowInstance.getData()
-	if "Name" in data and "PodType" in data:
-		peaName=data["Name"]
-		podType=data["PodType"].get()
-		#Create the peaPod for the currently loaded pod
-		newPeaPod=masterPod.currentMasterPod.addPeaPod(peaName,template=podType)
-		#Add to listbox
-		podListbox.addObject(peaName,newPeaPod)
-		#Refresh the listbox
-		loadPodsToScreen()
-		#Disable the popup window
-		dataWindowInstance.quit()
-
-		#todo save to file here
-
-		#Report to log
-		log.report("Created a new pea pod",peaName)
-		print("Creating pea pod")
-
 def runSearch():
 	"""
 	This function is called when the user
@@ -1056,10 +1025,9 @@ def launchPasswordToPodPopup():
 	filter=[]
 	for item in allPeaPods:
 		peaObject=allPeaPods[item]
-		if peaObject.vaultState:
-			peaObject.unlockVault("Unlock")
-
-		if "Password" in peaObject.vault:
+		peaTemplate=peaObject.templateType
+		peaTemplate=podTemplate.templates[peaTemplate]
+		if peaTemplate.containsPassword:
 			filter.append(item)
 
 	if len(filter) > 0:
@@ -1387,9 +1355,9 @@ genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review"
 #Audit screen
 auditScreen.addScreenCommand(lambda: displayAudit())
 #====================Context====================
-podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
-podSearchContext.updateContextButton(1,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))
-podSearchContext.updateContextButton(2,text="Reset",command=lambda: resetSearch(podSearchEntry,runSearch),enabledColour="#DCE9E7")
+#podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
+podSearchContext.updateContextButton(0,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))
+podSearchContext.updateContextButton(1,text="Reset",command=lambda: resetSearch(podSearchEntry,runSearch),enabledColour="#DCE9E7")
 #Password screen
 passwordScreenTopContext.updateContextButton(0,command=lambda: resetSearch(passwordSearchEntry,searchCommonPasswords))
 #====================Bindings====================
