@@ -164,7 +164,7 @@ openScreen=screen(window,"Open")
 openScreen.colour("#ADDCFC")
 
 #Top label
-openTopLabel=topLabel(openScreen,text="Select Master Pod")
+openTopLabel=topLabel(openScreen,text="Select or create Master Pod")
 openTopLabel.pack(side=TOP,fill=X)
 
 #Context
@@ -428,6 +428,24 @@ auditResultsTree.addTag("Weak", "#ED4D79")
 logScreen=screen(window,"Log")
 logScreen.context=context
 
+#Update context
+logScreen.addContextInfo(0,text="Refresh",enabledColour=mainBlueColour)
+logScreen.addContextInfo(1,text="Home",enabledColour=mainGreenColour)
+
+#Log dictionary
+logDict={"EncryptionLog":"Encryption",
+ "MainLog":"Main",
+ "User InterfaceLog":"Ui"}
+
+#Create a bar
+logSelectionBar=selectionBar(logScreen)
+logSelectionBar.pack(side=TOP,fill=X)
+
+logTree=advancedTree(logScreen,["Description","Time","Tag"])
+logTree.pack(expand=True,fill=BOTH)
+
+#Create the log tags
+logTree.addTag("Error",mainRedColour)
 
 #====================Functions====================
 
@@ -486,6 +504,32 @@ def processSearchLanguage(dataField):
 
 #======Splash Screen========
 
+#======Log Screen========
+
+def displayLog(logDirectory):
+	"""
+	Function to load a log to the
+	screen
+	"""
+	#Open the log file
+	try:
+		file=open(logDirectory,"r")
+	except:
+		log.report("Error opening log file")
+	else:
+		content=file.readlines()
+		file.close()
+		#Clear the tree
+		logTree.delete(*logTree.get_children())
+		#Get data
+		for line in content:
+			sections=line.split(",")
+			tag=""
+			try:
+				tag=sections[2]
+			except:
+				log.report("Log index error getting tag")
+			logTree.insertData(sections,tag)
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
     """
@@ -563,8 +607,12 @@ def initiateNewMasterPod(**kwargs):
 	"""
 	masterPodName=kwargs.get("Master Pod Name",None)
 	masterPodPassword=kwargs.get("Password",None)
+	masterPodHint=kwargs.get("Hint",None)
 	if masterPodName and masterPodPassword:
 		newMasterPod=masterPod(masterPodName)
+		#Add the hint
+		if masterPodHint:
+			newMasterPod.hint=masterPodHint
 		newMasterPod.addKey(masterPodPassword)
 		newMasterPod.save()
 		#Add to screen
@@ -587,12 +635,16 @@ def createNewMasterPodWindow():
 	masterPodPassword.pack()
 	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword,hide=True)
 	masterPodConfirm.pack()
+	masterHint=dataSection(newWindow.contentArea,advancedEntry,"Hint",checkNeeded=False)
+	masterHint.pack()
+	masterHint.dataValid=True
+	masterHint.changeColour=False
 
 	#Add to window
 	newWindow.addDataSection(masterPodNameSection)
 	newWindow.addDataSection(masterPodPassword)
 	newWindow.addDataSection(masterPodConfirm)
-
+	newWindow.addDataSection(masterHint)
 
 #======Login Screen========
 
@@ -1056,9 +1108,6 @@ def addPasswordToPod(**kwargs):
 			masterPod.currentMasterPod.save()
 
 
-
-
-
 def changeGenerateType(indicator):
 	"""
 	Function is called when user
@@ -1072,6 +1121,7 @@ def changeGenerateType(indicator):
 	else:
 		context.updateContextButton(0,command=lambda:copyToClipboard(genPasswordVar.get()))
 		currentReviewOrGen.set("Generate")
+
 def toggleGenerateEntry():
 	"""
 	Function to hide and show
@@ -1283,7 +1333,8 @@ def changePopupColour(templateVar):
 	global currentPeaWindow
 	if templateVar in podTemplate.templateColours and currentPeaWindow:
 		correctColour=podTemplate.templateColours[templateVar]
-		currentPeaWindow.status.colour(correctColour)
+		currentPeaWindow.sectionData["Template"].label.config(fg=correctColour)
+		#currentPeaWindow.status.colour(correctColour)
 
 
 #====================Thread commands====================
@@ -1292,8 +1343,11 @@ mainThreadController.createThread("runCountdown",runCountdown)
 #====================Button commands====================
 
 #Splash Screen
+splashScreen.updateCommand(0,command=lambda: logScreen.show())
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: closeProgram())
+#Log screen
+logScreen.updateCommand(1,command=lambda: goHome())
 #Open Screen
 openScreen.updateCommand(0,command=lambda: createNewMasterPodWindow())
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
@@ -1394,6 +1448,14 @@ runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master po
 genPassword("char")
 changeGenerateType("Generate")
 addCommonPasswordToListbox(commonPasswords)
+#Add sections to log screen
+allLogs=findFiles(getWorkingDirectory(),".log")
+for l in allLogs:
+	base=getRootName(l)
+	if base in logDict:
+		base=logDict[base]
+	#Add to selection bar
+	logSelectionBar.addTab(base,command=lambda n=l: displayLog(n))
 
 #Last call
 runCommand(lambda: splashScreen.show(),name="Splash loader")

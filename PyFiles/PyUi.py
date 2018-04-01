@@ -977,7 +977,8 @@ class advancedEntry(Entry):
 		of the entry is empty
 		"""
 		if len(self.get().split()) < 1:
-			self.resetEntry()
+			if self.focus_get():
+				self.resetEntry()
 
 class dataWindow(Toplevel):
 	"""
@@ -1097,8 +1098,11 @@ class dataWindow(Toplevel):
 			section=self.sectionData[sec]
 			addDataToWidget(section.mainWidget,"")
 			section.check()
+			if type(section.mainWidget) is advancedEntry:
+				section.mainWidget.resetEntry()
 
 		self.checkAll()
+		self.focus_set()
 
 	def runConfirm(self):
 		"""
@@ -1182,6 +1186,7 @@ class dataSection(mainFrame):
 			self.mainWidget=advancedEntry(self.contentSection,self.displayText,self.hideOrNot,font=self.defaultFont)
 			self.mainWidget.bind("<KeyRelease>",lambda event: self.check())
 			self.mainWidget.pack(pady=6)
+
 	def check(self):
 		"""
 		This method runs and will check
@@ -1316,7 +1321,8 @@ class advancedTree(ttk.Treeview):
 	def __init__(self,parent,columns,**kwargs):
 		ttk.Treeview.__init__(self,parent,show="headings",columns=columns)
 		self.columns=columns
-
+		for item in self.columns:
+			self.addSection(item)
 		#Add the scrollbar
 		self.scroll=Scrollbar(self)
 		self.scroll.pack(side=RIGHT,fill=Y)
