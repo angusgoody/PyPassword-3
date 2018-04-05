@@ -202,6 +202,15 @@ podSearchContext.pack(fill=X,side=TOP)
 podListbox=advancedListbox(podScreen,font="Avenir 25")
 podListbox.pack(expand=True,fill=BOTH)
 
+#Small context
+podContext=contextBar(podScreen,font="Avenir 10",places=4)
+podContext.pack(side=BOTTOM,fill=X)
+
+podContext.addButton(0,text="Generate")
+podContext.addButton(1,text="Review")
+podContext.addButton(2,text="Audit")
+podContext.addButton(3,text="View Key")
+
 #Create the context buttons
 podScreen.addContextInfo(0,text="New Pod",enabledColour=mainBlueColour)
 podScreen.addContextInfo(1,text="Open Pod",enabledColour=mainGreenColour)
@@ -372,6 +381,7 @@ passwordDataListbox.pack(expand=True,fill=BOTH)
 
 #endregion
 #======Audit screen======
+#region auditScreen
 auditScreen=screen(window,"Audit",protected=True)
 auditScreen.context=context
 
@@ -423,8 +433,9 @@ auditResultsTree.addSection("Security")
 auditResultsTree.addTag("Strong", "#66CD84")
 auditResultsTree.addTag("Medium", "#EDC121")
 auditResultsTree.addTag("Weak", "#ED4D79")
-
+#endregion
 #======Log screen======
+#region logscreen
 logScreen=screen(window,"Log")
 logScreen.context=context
 
@@ -446,7 +457,7 @@ logTree.pack(expand=True,fill=BOTH)
 
 #Create the log tags
 logTree.addTag("Error",mainRedColour)
-
+#endregion
 #====================Functions====================
 
 
@@ -908,6 +919,28 @@ def runSearch():
 	if processLanguageOn:
 		processSearchLanguage(podSearchEntry)
 
+def showKey():
+	"""
+	Function will show
+	the user a key explaining
+	the pods
+	"""
+	newWindow=topWindow(window)
+	#Config Context Bar
+	newWindow.context.removePlaceholder(0)
+	#Context commands
+	newWindow.context.updateContextButton(0,command=lambda n=newWindow: n.grab_release())
+	newWindow.context.updateContextButton(1,command=lambda n=newWindow: n.destroy())
+	#Add Table
+	newTable=table(newWindow,"Pod Templates",False)
+	newTable.pack(fill=BOTH,expand=True)
+	#Add the content to the table
+	for t in podTemplate.templateColours:
+		rowName=t+" colour:"
+		rowColour=podTemplate.templateColours[t]
+		newTable.addRow(rowName,t,rowColour)
+
+	newWindow.run()
 
 #======View Pod Screen========
 
@@ -1075,7 +1108,6 @@ def addPasswordToPod(**kwargs):
 			#Save
 			masterPod.currentMasterPod.save()
 
-
 def changeGenerateType(indicator):
 	"""
 	Function is called when user
@@ -1103,6 +1135,13 @@ def toggleGenerateEntry():
 		genReviewEntry.config(show="")
 		genReviewEntryToggleHide.config(text="Hide")
 
+def loadReview():
+	"""
+	Function to load review password
+	when clicked in the menu
+	"""
+	genPasswordScreen.show()
+	genPasswordNotebook.selectionBar.runTabCommand(1)
 
 #======Password Screen========
 
@@ -1355,9 +1394,14 @@ genPasswordNotebook.addScreenCommand("Review",lambda:changeGenerateType("Review"
 #Audit screen
 auditScreen.addScreenCommand(lambda: displayAudit())
 #====================Context====================
-#podSearchContext.updateContextButton(0,text="Sort by type",enabledColour="#DCE9E7",command=lambda: orderPodListbox("Type"))
+#Pod Screen
 podSearchContext.updateContextButton(0,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))
 podSearchContext.updateContextButton(1,text="Reset",command=lambda: resetSearch(podSearchEntry,runSearch),enabledColour="#DCE9E7")
+podContext.updateContextButton(0,command=lambda: genPasswordScreen.show())
+podContext.updateContextButton(1,command=lambda: loadReview())
+podContext.updateContextButton(2,command=lambda: auditScreen.show())
+podContext.updateContextButton(3,command=showKey)
+
 #Password screen
 passwordScreenTopContext.updateContextButton(0,command=lambda: resetSearch(passwordSearchEntry,searchCommonPasswords))
 #====================Bindings====================
@@ -1400,6 +1444,7 @@ privateMenu.add_cascade(label="Password",menu=privatePasswordMenu)
 privateFileMenu.add_command(label="Show threads",command=lambda: print(mainThreadController))
 #Password
 privatePasswordMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
+privatePasswordMenu.add_command(label="Review Password",command=loadReview)
 privatePasswordMenu.add_command(label="View common passwords",command=lambda: passwordScreen.show())
 privatePasswordMenu.add_command(label="Security Audit",command=lambda: auditScreen.show())
 

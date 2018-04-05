@@ -252,10 +252,17 @@ def pad(text):
 	be in multiples of 16 so the pad function
 	adds padding to make it the right length
 	"""
-	print(text)
-	result=text +((16-len(text) % 16)*"\n")
 	return text +((16-len(text) % 16)*"\n")
 
+def stripRaw(text):
+	"""
+	A function to strip away
+	any characters other than
+	ASCII numbers and letters
+	"""
+	regex=re.compile(r'[\W_]+')
+	newText=regex.sub('', text)
+	return newText
 def encrypt(plainText, key):
 	"""
 	This is the encrypt function 
@@ -264,11 +271,17 @@ def encrypt(plainText, key):
 	"""
 	if plainText:
 		#Pad the key to ensure its multiple of 16
+		rawKey=key
 		key=AES.new(pad(key))
 		#Pad the plain text to ensure multiple of 16
 		text=pad(str(plainText))
 		#Encrypt using module
-		encrypted=key.encrypt(text)
+		try:
+			encrypted=key.encrypt(text)
+		except:
+			#If the encryption fails remove the symbols and try again
+			newText=stripRaw(plainText)
+			encrypted=encrypt(newText,rawKey)
 		return encrypted
 	else:
 		return plainText
@@ -777,7 +790,6 @@ class masterPod:
 		"""
 		#Close the pod (Encrypt etc)
 		self.close()
-		print("Closing complete")
 		#First check location is valid
 		if checkLocation(self.location) is False:
 			#If not create a new file in the correct place
@@ -788,7 +800,7 @@ class masterPod:
 
 		#Save self to pickle
 		savePickle(self,fileName)
-
+		print("Saving complete")
 	def addPeaPod(self,podName,**kwargs):
 		"""
 		This method allows a pea

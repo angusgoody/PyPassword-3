@@ -1240,21 +1240,16 @@ class dataSection(mainFrame):
 	def getDataFromWidget(self):
 		return getDataFromWidget(self.mainWidget)
 
-
-
-class labelWindow(Toplevel):
+class topWindow(Toplevel):
 	"""
-	The label window class
-	is a popup window that 
-	displays a string value to 
-	the user and will be go
-	when user clicks off
+	The topWindow will be a 
+	class for the master toplevel
+	and provide basic context and status
 	"""
 	def __init__(self,root):
 		Toplevel.__init__(self,root)
-
 		#Configure window
-		self.title="Data window"
+		self.title="Top window"
 		self.statusVar=StringVar()
 		self.statusVar.set("Data")
 		self.status=mainLabel(self,textvariable=self.statusVar)
@@ -1267,6 +1262,24 @@ class labelWindow(Toplevel):
 		self.context.addButton(0,text="Copy",enabledColour=mainBlueColour)
 		self.context.addButton(1,text="Anchor",enabledColour=mainPurpleColour)
 		self.context.addButton(2,text="Exit",enabledColour=mainRedColour)
+
+
+	def run(self):
+		self.focus_set()
+		self.grab_set()
+		self.transient(self.master)
+
+
+class labelWindow(topWindow):
+	"""
+	The label window class
+	is a popup window that 
+	displays a string value to 
+	the user and will be go
+	when user clicks off
+	"""
+	def __init__(self,root):
+		topWindow.__init__(self,root)
 
 		self.centerFrame=mainFrame(self)
 		self.centerFrame.pack(expand=True)
@@ -1285,11 +1298,6 @@ class labelWindow(Toplevel):
 		self.context.updateContextButton(1,command=lambda: self.grab_release())
 
 		self.context.updateContextButton(2,command=lambda: self.destroy())
-
-	def run(self):
-		self.focus_set()
-		self.grab_set()
-		self.transient(self.master)
 
 	def addName(self,name):
 		self.statusVar.set(name)
@@ -1435,6 +1443,7 @@ class table(mainFrame):
 		if self.showButtons:
 			if rowText in self.buttonInfo:
 				self.buttonInfo[rowText].updateButton(command=command)
+
 class topLabel(mainFrame):
 	"""
 	The top strip class
@@ -1607,7 +1616,6 @@ class contextBar(mainFrame):
 		self.sections=0
 		#Section Types
 		self.sectionTypes=["Button","Checkbutton"]
-
 
 		#Update
 		self.storedKwargs=None
