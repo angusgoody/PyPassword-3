@@ -246,7 +246,7 @@ def openPickle(fileName):
 	try:
 		content=pickle.load( open( fileName, "rb" ) )
 	except:
-		log.report("Error reading file when pickling")
+		log.report("Error reading file when pickling",tag="Error")
 		return None
 	else:
 		return content

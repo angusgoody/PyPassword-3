@@ -67,6 +67,10 @@ currentReviewOrGen=StringVar()
 #The current launched popup windows
 currentPeaWindow=None
 currentMasterWindow=None
+
+#Store the currently loaded logs key=selection bar index value=directory
+loadedLogs={}
+
 #====================User Interface====================
 
 #======Status and context======
@@ -525,12 +529,30 @@ def showAllLogs():
 	"""
 	#Add sections to log screen
 	allLogs=findFiles(getWorkingDirectory(),".log")
+	counter=-1
 	for l in allLogs:
+		counter+=1
 		base=getRootName(l)
 		if base in logDict:
 			base=logDict[base]
 		#Add to selection bar
 		logSelectionBar.addTab(base,command=lambda n=l: displayLog(n))
+		#Store
+		loadedLogs[counter]=l
+
+def refreshLogs():
+	"""
+	Will refresh the logs
+	this works by getting the current index
+	of the selection bar. When each log is added
+	it is stored with an index and these indexes
+	are used to indentify the logs
+	"""
+	#Get the current log being viewed
+	currentLog=logSelectionBar.currentIndex
+	if currentLog in loadedLogs:
+		displayLog(loadedLogs[currentLog])
+
 
 def displayLog(logDirectory):
 	"""
@@ -1418,6 +1440,7 @@ splashScreen.updateCommand(0,command=lambda: logScreen.show())
 splashScreen.updateCommand(1,command=lambda: openScreen.show())
 splashScreen.updateCommand(2,command=lambda: closeProgram())
 #Log screen
+logScreen.updateCommand(0,command=lambda: refreshLogs())
 logScreen.updateCommand(1,command=lambda: goHome())
 #Open Screen
 openScreen.updateCommand(0,command=lambda: createNewMasterPodWindow())
