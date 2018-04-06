@@ -17,8 +17,9 @@ from PEM import *
 from random import randint
 import webbrowser
 import threading
+from tkinter import filedialog
+import shutil
 import time
-
 #====================Log====================
 
 log=logClass("User Interface")
@@ -153,6 +154,26 @@ def showMessage(pre,message):
 	except:
 		print(message)
 
+def moveFile(source,destination):
+	"""
+	Used to copy files
+	"""
+	try:
+		shutil.move(source,destination)
+	except:
+		log.report("Error coying file")
+		print("Error copy")
+def askForFile(*fileType):
+	"""
+	Will ask the user
+	for a file to open
+	"""
+	try:
+		content=filedialog.askopenfilename(filetypes=fileType)
+	except Exception as e:
+		log.report("Error launching dialog",e,tag="Error")
+	else:
+		return content
 def addDataToWidget(widget,data):
 	"""
 	Function to add data to a variety

@@ -100,13 +100,13 @@ splashScreen=screen(window,"PyPassword")
 splashScreen.context=context
 #Go to pods
 splashScreen.addContextInfo(0,text="View Log",enabledColour=mainBlueColour,
-                            hoverColour=mainSecondBlueColour,clickedColour=mainClickedColour)
+							hoverColour=mainSecondBlueColour,clickedColour=mainClickedColour)
 #View Log
 splashScreen.addContextInfo(1,text="Go to pods",enabledColour=mainGreenColour,
-                            hoverColour=mainSecondGreenColour,clickedColour=mainClickedColour)
+							hoverColour=mainSecondGreenColour,clickedColour=mainClickedColour)
 #Exit
 splashScreen.addContextInfo(2,text="Exit",enabledColour=mainRedColour,
-                            hoverColour=mainSecondRedColour,clickedColour=mainClickedColour)
+							hoverColour=mainSecondRedColour,clickedColour=mainClickedColour)
 
 #Create centered frame for logo
 splashCenter=mainFrame(splashScreen)
@@ -457,6 +457,7 @@ logTree.pack(expand=True,fill=BOTH)
 
 #Create the log tags
 logTree.addTag("Error",mainRedColour)
+logTree.addTag("Important",mainGreenColour)
 #endregion
 #====================Functions====================
 
@@ -517,6 +518,20 @@ def processSearchLanguage(dataField):
 
 #======Log Screen========
 
+def showAllLogs():
+	"""
+	Will load all the logs
+	:return:
+	"""
+	#Add sections to log screen
+	allLogs=findFiles(getWorkingDirectory(),".log")
+	for l in allLogs:
+		base=getRootName(l)
+		if base in logDict:
+			base=logDict[base]
+		#Add to selection bar
+		logSelectionBar.addTab(base,command=lambda n=l: displayLog(n))
+
 def displayLog(logDirectory):
 	"""
 	Function to load a log to the
@@ -539,45 +554,50 @@ def displayLog(logDirectory):
 			try:
 				tag=sections[2]
 			except:
-				log.report("Log index error getting tag")
+				log.report("Log index error getting tag",tag="Error")
 			logTree.insertData(sections,tag)
 #======Open Screen========
 def addMasterPodToScreen(masterPodInstance):
-    """
-    This function will add a master pod
-    class to the screen on the UI and 
-    ensure it's in the loaded dictionary
-    """
-    if type(masterPodInstance) is masterPod:
-        #Get the name to be displayed
-        displayName=masterPodInstance.masterName
-        #Check for master pod colour
-        masterPodColour=masterPodInstance.masterColour
-        #Add to listbox
-        openListbox.addObject(displayName,masterPodInstance,colour=masterPodColour)
-        #Add to dictionary
-        masterPod.loadedPods[displayName]=masterPodInstance
+	"""
+	This function will add a master pod
+	class to the screen on the UI and
+	ensure it's in the loaded dictionary
+	"""
+	if type(masterPodInstance) is masterPod:
+		#Get the name to be displayed
+		displayName=masterPodInstance.masterName
+		#Check for master pod colour
+		masterPodColour=masterPodInstance.masterColour
+		#Add to listbox
+		openListbox.addObject(displayName,masterPodInstance,colour=masterPodColour)
+		#Add to dictionary
+		masterPod.loadedPods[displayName]=masterPodInstance
 
 def findMasterPods(directory):
-    """
-    This function will find master pod
-    files in a certain directory and 
-    load them into the listbox 
-    """
-    files=findFiles(directory,".mp")
-    if len(files) > 0:
-        #Iterate
-        for file in files:
-            #Get master pod name
-            displayName=getRootName(file)
-            #Create instance
-            masterPodInstance=loadMasterPodFromFile(file)
-            #Add to listbox
-            addMasterPodToScreen(masterPodInstance)
+	"""
+	This function will find master pod
+	files in a certain directory and
+	load them into the listbox
+	"""
+	files=findFiles(directory,".mp")
+	#Clear listbox
+	openListbox.secureClear()
+	if len(files) > 0:
+		#Iterate
+		for file in files:
+			#Get master pod name
+			displayName=getRootName(file)
+			#Create instance
+			masterPodInstance=loadMasterPodFromFile(file)
+			#First check if the master pod is valid
+			if masterPodInstance:
+				addMasterPodToScreen(masterPodInstance)
+			else:
+				log.report("Invalid Master Pod found",tag="Important")
 
-    else:
-        log.report("No mp files found in directory")
-        return None
+	else:
+		log.report("No mp files found in directory")
+		return None
 
 def goHome():
 	"""
@@ -657,6 +677,50 @@ def createNewMasterPodWindow():
 	newWindow.addDataSection(masterPodConfirm)
 	newWindow.addDataSection(masterHint)
 
+def openExternalMasterPod(importOrMove):
+	"""
+	Launch a dialog to allow
+	user to move a master pod locally
+
+	ImportOrMove = "Import" = Edit in own directory
+	ImportOrMove = "Move" = move the file locally then edit
+	"""
+	directory=askForFile(("Master Pod",".mp"))
+	#If user did not cancel
+	if directory:
+		baseName=getRootName(directory)
+		if baseName in masterPod.loadedPods:
+			showMessage("Loaded","This master pod has been loaded")
+		else:
+
+			if importOrMove == "Move":
+				"""
+				If the master pod should be moved 
+				to a local directory for future use
+				"""
+				#Move locally
+				newDirectory=getCertainDirectory("Data")
+				moveFile(directory,newDirectory)
+				#Re scan
+				findMasterPods(getWorkingDirectory())
+
+			else:
+				"""
+				If the master pod should be opened
+				and saved externally
+				"""
+				masterPodInstance=loadMasterPodFromFile(directory)
+				if masterPodInstance:
+					#Update the location
+					masterPodInstance.location=directory
+					#Add to listbox
+					addMasterPodToScreen(masterPodInstance)
+				else:
+					log.report("Not a valid master pod loaded",tag="Important")
+					showMessage("Error","This is not a valid Master Pod")
+
+			#Show the correct screen
+			openScreen.show()
 #======Login Screen========
 
 def showHint():
@@ -885,8 +949,8 @@ def createNewPeaPodWindow(**kwargs):
 	podName=dataSection(newWindow.contentArea,advancedEntry,"Pod Name",cannotContain=allPodNames)
 	podName.pack()
 	templateOption=dataSection(newWindow.contentArea,advancedOptionMenu,"Template",
-	                           values=podTemplate.templates.keys(),default="Login",
-	                           optionCommand=changePopupColour)
+							   values=podTemplate.templates.keys(),default="Login",
+							   optionCommand=changePopupColour)
 	templateOption.pack()
 
 	#Add the sections
@@ -1453,22 +1517,22 @@ privatePasswordMenu.add_command(label="Security Audit",command=lambda: auditScre
 publicMenu.add_cascade(label="File",menu=publicFileMenu)
 
 #File
+publicFileMenu.add_command(label="Move Master Pod Locally", command=lambda: openExternalMasterPod("Move"))
+publicFileMenu.add_command(label="Open External Master Pod", command=lambda: openExternalMasterPod("Import"))
+
 #====================Testing Area====================
 
 #====================Initial Loaders====================
 
+#Find the current master pods
 runCommand(lambda: findMasterPods(getWorkingDirectory()),name="Finding master pods")
+#Generate a password initially on screen
 genPassword("char")
 changeGenerateType("Generate")
+#Load the common passwords to the program
 addCommonPasswordToListbox(commonPasswords)
-#Add sections to log screen
-allLogs=findFiles(getWorkingDirectory(),".log")
-for l in allLogs:
-	base=getRootName(l)
-	if base in logDict:
-		base=logDict[base]
-	#Add to selection bar
-	logSelectionBar.addTab(base,command=lambda n=l: displayLog(n))
+#Load the log files
+showAllLogs()
 
 #Last call
 runCommand(lambda: splashScreen.show(),name="Splash loader")

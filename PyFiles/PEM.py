@@ -170,6 +170,20 @@ def getLocalFileName(baseFileName,indicator):
 	#Return
 	return wholeFileName
 
+def getCertainDirectory(indicator):
+	"""
+	Get the directory for a certain
+	fodler in PyPassword using
+	an indicator
+	"""
+	base=getWorkingDirectory()
+	indicatorDict={"FILES":filesDirectory,
+	               "ASSETS":assetDirectory,
+	               "DATA":dataDirectory,
+	               "LOGS":logDirectory}
+	indicator=indicator.upper()
+	if indicator in indicatorDict:
+		return base+"/"+indicatorDict[indicator]
 def checkLocation(fileName):
 	"""
 	This function will check a file name
@@ -794,6 +808,8 @@ class masterPod:
 			#If not create a new file in the correct place
 			fileName=getLocalFileName(self.baseName,"Data")
 			self.location=fileName
+			log.report("Location for",self.baseName,"was not valid created a new one")
+
 		else:
 			fileName=self.location
 
