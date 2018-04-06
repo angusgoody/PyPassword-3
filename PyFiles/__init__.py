@@ -805,12 +805,18 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				currentTime=getCurrentTime()
 				if lockedValue > currentTime:
 					#---------THREAD------------
+
 					#Calculate time remaining
 					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-
-					mainThreadController.createThread(masterPodInstance,runCountdown)
-					mainThreadController.runThread(masterPodInstance,lockedValue=lockedValue,masterPodInstance=masterPodInstance)
+					#Unique thread identifier
+					threadName=masterPodInstance.masterName
+					#Add a new thread and run
+					mainThreadController.createThread(threadName,runCountdown)
+					mainThreadController.runThread(threadName,lockedValue=lockedValue,masterPodInstance=masterPodInstance)
 					loginScreen.colour(mainLockedColour)
+					#Disable the entry
+					addDataToWidget(loginEntry,"LOCKED")
+					loginEntry.config(state=DISABLED)
 					#Show messagebox if specified
 					if showLocked:
 						showMessage("Locked","This master pod is locked")
@@ -834,6 +840,9 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 				elif lockedValue < currentTime:
 					#Reset the screen
 					loginScreen.colour(mainFrame.windowColour)
+					loginEntry.config(state=NORMAL)
+					loginEntry.resetEntry()
+					window.focus_set()
 
 def attemptMasterPodUnlock():
 	"""

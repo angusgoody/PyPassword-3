@@ -461,7 +461,7 @@ class threadController:
 			self.threadCommands[threadName]=command
 			self.threadLocks[threadName]=False
 		else:
-			print("Thread already exists")
+			log.report("Thread already exists",threadName)
 
 	def createRawThread(self,threadName,**kwargs):
 		"""
@@ -475,6 +475,15 @@ class threadController:
 		self.threadObjects[threadName]=newThread
 		newThread.start()
 		log.report("A new raw thread has been created")
+
+	def checkThreadStatus(self,threadName):
+		"""
+		Will check the status of a thread 
+		"""
+		if self.threadObjects[threadName].isAlive() is not True:
+			self.threadLocks[threadName]=False
+			return False
+		return True
 
 	def runThread(self,threadName,**args):
 		"""
@@ -496,7 +505,6 @@ class threadController:
 
 			#First check if running
 			if self.threadLocks[threadName] is True:
-				print("Thread in progress")
 				log.report("Thread is currently in progress")
 				#Check if thread object has ended
 				if threadName in self.threadObjects:
@@ -519,7 +527,7 @@ class threadController:
 		print("Current number of threads: ",len(self.threadObjects))
 		print("Active threads...")
 		for thread in self.threadLocks:
-			print(thread,":",self.threadLocks[thread])
+			print(thread,":",self.checkThreadStatus(thread))
 		return ""
 #====================Core Classes====================
 """
