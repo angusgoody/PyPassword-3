@@ -2802,7 +2802,7 @@ passwordTemplate.addTab("Password")
 passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
 passwordTemplate.addTemplateSection("Password","Notes",Text,Text,["Copy"])
 #=====Receipt======
-receiptTemplate=podTemplate("Receipt","#AB87F4")
+receiptTemplate=podTemplate("Receipt","#AB87F4",containsPassword=False)
 receiptTemplate.addTab("Receipt")
 receiptTemplate.addTemplateSection("Receipt","Amount",mainLabel,Entry,["Copy","Hide"],hide=False)
 receiptTemplate.addTemplateSection("Receipt","Product",mainLabel,Entry,["Copy","Hide"],hide=False)

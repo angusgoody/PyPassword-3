@@ -557,7 +557,6 @@ def runAudit(masterPodInstance):
 				passwordStrength=calculatePasswordStrength(passwordData)
 				strengthValue=passwordStrength[5]
 				strengthScore=passwordStrength[4]
-				print("Password strength is",strengthScore)
 				#Store pod with score
 				results[peaInstance]=strengthValue
 				#-----Add some stats-----
@@ -801,6 +800,7 @@ class masterPod:
 		#Save self to pickle
 		savePickle(self,fileName)
 		print("Saving complete")
+
 	def addPeaPod(self,podName,**kwargs):
 		"""
 		This method allows a pea
