@@ -769,7 +769,8 @@ def runCountdown(lockedValue,masterPodInstance):
 		currentTime=getCurrentTime()
 		if lockedValue > currentTime:
 			timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-			loginAttemptVar.set(masterPodInstance.masterName+" pod has been locked\nTime remaining: "+timeRemaining)
+			if masterPodInstance == masterPod.currentMasterPod:
+				loginAttemptVar.set(masterPodInstance.masterName+" pod has been locked\nTime remaining: "+timeRemaining)
 		else:
 			checkTimeRemaining(masterPodInstance)
 			loginAttemptVar.set(masterPodInstance.masterName+" pod has been unlocked")
@@ -803,9 +804,12 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 			if lockedValue is not None:
 				currentTime=getCurrentTime()
 				if lockedValue > currentTime:
+					#---------THREAD------------
 					#Calculate time remaining
 					timeRemaining=calculateTimeRemaining(lockedValue,currentTime,"string")
-					mainThreadController.runThread("runCountdown",lockedValue=lockedValue,masterPodInstance=masterPodInstance)
+
+					mainThreadController.createThread(masterPodInstance,runCountdown)
+					mainThreadController.runThread(masterPodInstance,lockedValue=lockedValue,masterPodInstance=masterPodInstance)
 					loginScreen.colour(mainLockedColour)
 					#Show messagebox if specified
 					if showLocked:
@@ -1065,7 +1069,7 @@ def genPassword(charOrWords):
 		numberOfWords=genPasswordWordsLengthSlider.getValue()
 		seperator=genPasswordWordsSeperatorVar.get()
 		commonWords=genPasswordWordCommonVar.get()
-		password=generateWordPassword(numberOfWords,seperator,genPasswordWordCommonVar.get())
+		password=generateWordPassword(numberOfWords,seperator,commonWords)
 	else:
 		#Get the length and amount of symbols etc
 		numberOfCharacters=genPasswordCharLengthSlider.getValue()
@@ -1077,7 +1081,6 @@ def genPassword(charOrWords):
 
 	#Calculate password strength
 	passwordStrength=calculatePasswordStrength(password,split=genPasswordWordsSeperatorVar.get())
-	passwordWeight=passwordStrength[4]
 	passwordScoreString=passwordStrength[5]
 	#Show labels
 	if passwordScoreString == "Strong":
@@ -1214,7 +1217,7 @@ def toggleGenerateEntry():
 	the contents of the review
 	password entry
 	"""
-	if genHideEntryVar.get() == True:
+	if genHideEntryVar.get() is True:
 		genReviewEntry.config(show="•")
 		genReviewEntryToggleHide.config(text="Show")
 	else:
@@ -1428,10 +1431,6 @@ def changePopupColour(templateVar):
 		correctColour=podTemplate.templateColours[templateVar]
 		currentPeaWindow.sectionData["Template"].label.config(fg=correctColour)
 		#currentPeaWindow.status.colour(correctColour)
-
-
-#====================Thread commands====================
-mainThreadController.createThread("runCountdown",runCountdown)
 
 #====================Button commands====================
 

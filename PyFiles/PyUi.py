@@ -457,8 +457,11 @@ class threadController:
 		the thread.
 		"""
 		#Store the thread value
-		self.threadCommands[threadName]=command
-		self.threadLocks[threadName]=False
+		if threadName not in self.threadCommands:
+			self.threadCommands[threadName]=command
+			self.threadLocks[threadName]=False
+		else:
+			print("Thread already exists")
 
 	def createRawThread(self,threadName,**kwargs):
 		"""
@@ -505,6 +508,7 @@ class threadController:
 
 			else:
 				self.createRawThread(threadName,**args)
+
 
 	def __str__(self):
 		"""
