@@ -743,6 +743,7 @@ def openExternalMasterPod(importOrMove):
 
 			#Show the correct screen
 			openScreen.show()
+
 #======Login Screen========
 
 def showHint():
@@ -1453,6 +1454,8 @@ logScreen.updateCommand(1,command=lambda: goHome())
 #Open Screen
 openScreen.updateCommand(0,command=lambda: createNewMasterPodWindow())
 openScreen.updateCommand(1,command=lambda: loadMasterPodToLogin())
+openScreen.updateCommand(2,command=lambda: openExternalMasterPod("Import"))
+
 #Login Screen
 loginScreen.updateCommand(2,command=lambda: openScreen.show())
 loginScreen.updateCommand(0,command=lambda: showHint())
@@ -1550,6 +1553,7 @@ publicMenu.add_cascade(label="File",menu=publicFileMenu)
 #File
 publicFileMenu.add_command(label="Move Master Pod Locally", command=lambda: openExternalMasterPod("Move"))
 publicFileMenu.add_command(label="Open External Master Pod", command=lambda: openExternalMasterPod("Import"))
+
 
 #====================Testing Area====================
 

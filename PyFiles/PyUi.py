@@ -818,6 +818,9 @@ class advancedListbox(Listbox):
 		self.data={}
 		#Store names and colours
 		self.colourData={}
+		#Add a righht click menu
+		self.popupMenu=Menu(self,tearoff=0)
+		self.bind("<Button-2>",lambda event: self.showMenu(event))
 		#Update
 		self.updateListbox(**kwargs)
 
@@ -919,6 +922,15 @@ class advancedListbox(Listbox):
 		for item in self.data:
 			self.addExisting(item)
 
+	def showMenu(self,event):
+		"""
+		Will show the context buttons
+		if an item is selected
+		"""
+		current=self.curselection()
+		if len(current) > 0:
+			#Post the menu
+			self.popupMenu.tk_popup(event.x_root, event.y_root, 0)
 class advancedEntry(Entry):
 	"""
 	Modified entry that can
@@ -1819,7 +1831,8 @@ class privateSection(mainFrame):
 	validWidgets=[mainLabel,Label,Entry,advancedEntry,OptionMenu,Text]
 	def __init__(self,parent):
 		mainFrame.__init__(self,parent)
-
+		#Store a master notebook
+		self.masterNotebook=None
 		#-----Widgets------
 
 		#Container to manage the widgets
@@ -1910,8 +1923,10 @@ class privateSection(mainFrame):
 					newWidget=advancedOptionMenu(self.widgetFrame,self.widgetVar,self.widgetVar.get())
 				else:
 					newWidget=mainLabel(self.widgetFrame,font=self.widgetFont,width=self.widgetWidth)
-					newWidget.bind("<Double-Button-1>",lambda event: newWidget.expandText(self.textVar.get()))
-
+					widgetName=mainLabel
+				#This means edit will start when user double clicks
+				if self.masterNotebook and widgetName in [Text,mainLabel]:
+					newWidget.bind("<Double-Button-1>",lambda event: self.masterNotebook.startEdit())
 				#Colour to match background colour
 				basicChangeColour(newWidget,self.cget("bg"))
 				#Add the widget to dict
@@ -2324,6 +2339,8 @@ class podNotebook(advancedNotebook):
 							hideDataValue=section[5]
 							#Create section
 							newPrivateSection=privateSection(newFrame)
+							#Add the notebook to the section
+							newPrivateSection.masterNotebook=self
 							newPrivateSection.textVar.set(sectionName)
 							newPrivateSection.defaultWidget=viewType
 							newPrivateSection.editWidget=editType
