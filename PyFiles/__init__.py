@@ -684,7 +684,7 @@ def createNewMasterPodWindow():
 	#Add the sections
 	masterPodNameSection=dataSection(newWindow.contentArea,advancedEntry,"Master Pod Name",cannotContain=masterPod.loadedPods.keys())
 	masterPodNameSection.pack()
-	masterPodPassword=dataSection(newWindow.contentArea,advancedEntry,"Password",hide=True)
+	masterPodPassword=dataSection(newWindow.contentArea,advancedEntry,"Password",hide=True,cannotContain=["£"])
 	masterPodPassword.pack()
 	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword,hide=True)
 	masterPodConfirm.pack()

@@ -277,6 +277,8 @@ def stripRaw(text):
 	regex=re.compile(r'[\W_]+')
 	newText=regex.sub('', text)
 	return newText
+
+
 def encrypt(plainText, key):
 	"""
 	This is the encrypt function 
@@ -289,6 +291,7 @@ def encrypt(plainText, key):
 		key=AES.new(pad(key))
 		#Pad the plain text to ensure multiple of 16
 		text=pad(str(plainText))
+		#Check
 		#Encrypt using module
 		try:
 			encrypted=key.encrypt(text)

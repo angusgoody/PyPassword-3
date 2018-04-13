@@ -94,6 +94,7 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	a data structure 
 	False = No data
 	"""
+	print("Searching for",dataToFind,"in",dataSource,kwargs)
 	#Check for kwargs
 	capital=True
 	capital=kwargs.get("capital",capital)
@@ -1204,7 +1205,8 @@ class dataSection(mainFrame):
 		self.minLength=kwargs.get("minLength",1)
 		self.maxLength=kwargs.get("maxLength",50)
 		self.cannotContain=kwargs.get("cannotContain",[])
-		self.cannotExactMatch=kwargs.get("exactMatch",True) #False = not exact match True = exact match
+		#True = will compare capitals False = exact matches only
+		self.cannotExactMatch=kwargs.get("exactMatch",True)
 		self.mustContain=kwargs.get("mustContain",None)
 		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
 
@@ -1249,6 +1251,7 @@ class dataSection(mainFrame):
 				self.invalidExplanation.set("Invalid Length")
 			#Check cannot contain
 			for item in self.cannotContain:
+				print(searchDataSource(item,[rawData],capital=self.cannotExactMatch))
 				if searchDataSource(item,[rawData],capital=self.cannotExactMatch) != False:
 					valid=False
 					self.invalidExplanation.set("Contains blocked data")
@@ -1275,6 +1278,7 @@ class dataSection(mainFrame):
 		else:
 			if self.changeColour:
 				self.mainWidget.config(bg=self.defaultColour)
+			self.invalidExplanation.set(self.invalidExplanation.get()+" ("+self.displayText+")")
 			self.dataValid=False
 			self.dataVar.set(self.defaultData)
 
