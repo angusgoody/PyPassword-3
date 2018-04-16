@@ -4379,3 +4379,39 @@ Command executing success MainButton,2018-04-12 21:34:04,System
 Command executing success Splash loader,2018-04-12 21:34:02,System
 Command executing success Running selection bar tab command,2018-04-12 21:34:01,System
 Command executing success MainButton,2018-04-12 21:34:03,System
+Command executing success No Data Available,2018-04-14 09:40:57,System
+Command executing success MainButton,2018-04-14 09:41:00,System
+Command executing success MainButton,2018-04-14 09:41:10,System
+Command executing success MainButton,2018-04-14 09:40:53,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-14 09:41:41,Default
+Command executing success MainButton,2018-04-14 09:40:43,System
+Command executing success MainButton,2018-04-14 09:41:52,System
+Command executing success MainButton,2018-04-14 09:41:28,System
+Command executing success MainButton,2018-04-14 09:41:51,System
+Command executing success MainButton,2018-04-14 09:41:42,System
+Command executing success MainButton,2018-04-14 09:40:44,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-14 09:41:29,Default
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-14 09:41:09,Default
+Command executing success MainButton,2018-04-14 09:40:55,System
+Command executing success Splash loader,2018-04-14 09:40:41,System
+Command executing success MainButton,2018-04-14 09:41:06,System
+Command executing success MainButton,2018-04-14 09:41:40,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-14 09:41:39,Default
+Adding pod data,2018-04-14 09:41:08,Default
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-14 09:41:21,Default
+Command executing success MainButton,2018-04-14 09:41:31,System
+Command executing success Finding master pods,2018-04-14 09:40:40,System
+Command executing success MainButton,2018-04-16 09:20:37,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-16 09:21:09,Default
+Command executing success MainButton,2018-04-16 09:25:39,System
+Command executing success MainButton,2018-04-16 09:21:13,System
+Command executing success Finding master pods,2018-04-16 09:20:33,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-16 09:21:12,Default
+Command executing success Splash loader,2018-04-16 09:20:34,System
+Command executing success Running selection bar tab command,2018-04-16 09:20:32,System
+Command executing success No Data Available,2018-04-16 09:20:40,System
+Adding pod data,2018-04-16 09:21:08,Default
+Command executing success MainButton,2018-04-16 09:21:10,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-16 09:25:35,Default
+Command executing success MainButton,2018-04-16 09:20:53,System
+Command executing success MainButton,2018-04-16 09:25:36,System

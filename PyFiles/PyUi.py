@@ -94,7 +94,6 @@ def searchDataSource(dataToFind,dataSource,**kwargs):
 	a data structure 
 	False = No data
 	"""
-	print("Searching for",dataToFind,"in",dataSource,kwargs)
 	#Check for kwargs
 	capital=True
 	capital=kwargs.get("capital",capital)
@@ -1209,7 +1208,7 @@ class dataSection(mainFrame):
 		self.cannotExactMatch=kwargs.get("exactMatch",True)
 		self.mustContain=kwargs.get("mustContain",None)
 		self.mustBeSameAs=kwargs.get("mustBeSameAs",None)
-
+		self.bannedSymbols=kwargs.get("bannedSymbols",[])
 		#Store explanation for invalid data
 		self.invalidExplanation=StringVar()
 
@@ -1251,7 +1250,6 @@ class dataSection(mainFrame):
 				self.invalidExplanation.set("Invalid Length")
 			#Check cannot contain
 			for item in self.cannotContain:
-				print(searchDataSource(item,[rawData],capital=self.cannotExactMatch))
 				if searchDataSource(item,[rawData],capital=self.cannotExactMatch) != False:
 					valid=False
 					self.invalidExplanation.set("Contains blocked data")
@@ -1267,7 +1265,11 @@ class dataSection(mainFrame):
 					if rawData != self.mustBeSameAs.getDataFromWidget():
 						valid=False
 						self.invalidExplanation.set("Data does not match")
-
+			#Check symbols
+			for item in self.bannedSymbols:
+				if searchDataSource(item,[rawData],capital=self.cannotExactMatch,full=False):
+					valid=False
+					self.invalidExplanation.set("Contains invalid symbol")
 		#Update colour depending on outcome
 		if valid:
 			if self.changeColour:
