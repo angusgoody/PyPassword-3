@@ -491,10 +491,13 @@ def closeProgram():
 	except Exception as e:
 		print("Error saving logs because..",e)
 		#Exit even if error saving logs
-		window.destroy()
-	else:
-		#Exit the program
-		window.destroy()
+	try:
+		if masterPod.currentMasterPod:
+			masterPod.currentMasterPod.save()
+	except:
+		print("Error saving master pod")
+	#Destory the window
+	window.destroy()
 
 def processSearchLanguage(dataField):
 	"""
@@ -1157,10 +1160,11 @@ def launchPasswordToPodPopup():
 	filter=[]
 	for item in allPeaPods:
 		peaObject=allPeaPods[item]
+		peaName=peaObject.peaName
 		peaTemplate=peaObject.templateType
 		peaTemplate=podTemplate.templates[peaTemplate]
 		if peaTemplate.containsPassword:
-			filter.append(item)
+			filter.append(peaName)
 
 	if len(filter) > 0:
 		newWindow=dataWindow(window,"Select Pod")
@@ -1234,13 +1238,14 @@ def toggleGenerateEntry():
 		genReviewEntry.config(show="")
 		genReviewEntryToggleHide.config(text="Hide")
 
-def loadReview():
+def loadGenerateTab(index):
 	"""
 	Function to load review password
-	when clicked in the menu
+	when clicked in the menu, the index parameter
+	indicates which tab should be loaded
 	"""
 	genPasswordScreen.show()
-	genPasswordNotebook.selectionBar.runTabCommand(1)
+	genPasswordNotebook.selectionBar.runTabCommand(index)
 
 #======Password Screen========
 
@@ -1495,8 +1500,8 @@ auditScreen.addScreenCommand(lambda: displayAudit())
 #Pod Screen
 podSearchContext.updateContextButton(0,text="Sort by name",enabledColour="#EBF2F2",command=lambda: orderPodListbox("Name"))
 podSearchContext.updateContextButton(1,text="Reset",command=lambda: resetSearch(podSearchEntry,runSearch),enabledColour="#DCE9E7")
-podContext.updateContextButton(0,command=lambda: genPasswordScreen.show())
-podContext.updateContextButton(1,command=lambda: loadReview())
+podContext.updateContextButton(0,command=lambda: loadGenerateTab(0))
+podContext.updateContextButton(1, command=lambda: loadGenerateTab(1))
 podContext.updateContextButton(2,command=lambda: auditScreen.show())
 podContext.updateContextButton(3,command=showKey)
 
@@ -1541,8 +1546,8 @@ privateMenu.add_cascade(label="Password",menu=privatePasswordMenu)
 #File
 privateFileMenu.add_command(label="Show threads",command=lambda: print(mainThreadController))
 #Password
-privatePasswordMenu.add_command(label="Generate Password",command=lambda: genPasswordScreen.show())
-privatePasswordMenu.add_command(label="Review Password",command=loadReview)
+privatePasswordMenu.add_command(label="Generate Password",command=lambda: loadGenerateTab(0))
+privatePasswordMenu.add_command(label="Review Password", command=lambda: loadGenerateTab(1))
 privatePasswordMenu.add_command(label="View common passwords",command=lambda: passwordScreen.show())
 privatePasswordMenu.add_command(label="Security Audit",command=lambda: auditScreen.show())
 

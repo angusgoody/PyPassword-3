@@ -771,8 +771,9 @@ class masterPod:
 	which stores all the smaller data
 	for every account stored in PyPassword
 	"""
+	#Key variables for every instance
 	currentMasterPod=None
-	loadedPods={}
+	loadedPods={} #Dict for loaded pods
 	mainCheckKey="key"
 	def __init__(self,name):
 		#Name of the master peaPod

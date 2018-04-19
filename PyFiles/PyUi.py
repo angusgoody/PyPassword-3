@@ -244,21 +244,21 @@ def loadWebsite(address):
 	if address:
 		if len(address.split()) > 0:
 			#Check for a prefix
-			if "https://" in address or "http://" in address:
+			if "https://".upper() in address.upper() or "http://".upper() in address.upper():
 				httpCheck=True
-			else:
-				if "www." in address:
-					wwwCheck=True
+			if "www.".upper() in address.upper():
+				wwwCheck=True
 
 			#Add if needed
-			if wwwCheck == False:
+			if wwwCheck == False and httpCheck == False:
 				address="www."+str(address)
 			if httpCheck == False:
-				address="https://"+str(address)
+				address="http://"+str(address)
 
 			#Add the www
 			try:
-				webbrowser.open_new(address)
+				print("Loading:",address)
+				webbrowser.open_new_tab(address)
 			except:
 				showMessage("Error","Could not open address")
 				log.report("Error opening address",tag="Error")
@@ -755,8 +755,14 @@ class mainLabel(Label):
 		self.colourVar="#FFFFFF"
 		self.font="Avenir 14"
 		self.width=None
+		#Add right click
+		self.contextMenu=Menu(self)
+		self.contextMenu.add_command(label="Expand")
+		self.contextMenu.add_command(label="Copy")
+		self.bind("<Button-2>",lambda event:self.showMenu(event))
 		#Initiate update
 		self.update(**kwargs)
+
 	def update(self,**kwargs):
 		"""
 		The update method will allow the
@@ -797,6 +803,14 @@ class mainLabel(Label):
 		newWindow.data.set(self.textVar.get())
 		newWindow.run()
 
+	def showMenu(self,event):
+		"""
+		Will load the right click
+		context menu for the label
+		:param event: 
+		:return: 
+		"""
+		self.contextMenu.post(event.x_root,event.y_root)
 class advancedListbox(Listbox):
 	"""
 	The advanced Listbox class is a class that
@@ -1826,6 +1840,7 @@ class contextBar(mainFrame):
 		"""
 		buttonObject=self.getButtonFromIndex(index)
 		buttonObject.pack_forget()
+
 class privateSection(mainFrame):
 	"""
 	The private section is a frame
@@ -2037,7 +2052,7 @@ class privateSection(mainFrame):
 			self.context.addButton(index,text=buttonName,command=lambda: loadWebsite(self.getData(stored=True)),**self.contextKwargs)
 		#Generate a password for the entry
 		elif buttonName == "Generate":
-			self.context.addButton(index,text=buttonName,**self.contextKwargs)
+			self.context.addButton(index,text=buttonName,command=lambda: self.insertGeneratedPassword(),**self.contextKwargs)
 		#Not specified do nothing
 		else:
 			self.context.addButton(index,text=buttonName,**self.contextKwargs)
@@ -2134,7 +2149,10 @@ class privateSection(mainFrame):
 			button=self.context.getButton("Hide")
 			if button:
 				button.changeState(True)
-
+			#Disable the generate button
+			button=self.context.getButton("Generate")
+			if button:
+				button.changeState(False)
 			#Hide the password
 			if self.hideData:
 				self.toggleHide(forced=False)
@@ -2153,6 +2171,10 @@ class privateSection(mainFrame):
 			button=self.context.getButton("Hide")
 			if button:
 				button.changeState(False)
+			#Enable the generate button
+			button=self.context.getButton("Generate")
+			if button:
+				button.changeState(True)
 			#Update the var
 			self.widgetState=False
 
@@ -2173,6 +2195,16 @@ class privateSection(mainFrame):
 				addDataToWidget(widget,self.savedWidgetData[widgetName])
 				log.report("Restored data for widget",widgetName)
 
+	def insertGeneratedPassword(self):
+		"""
+		Will automatically 
+		generate a strong passwords
+		and add it to the pod
+		"""
+		password=generatePassword(random.randint(14,17),random.randint(3,5),random.randint(2,5))
+		widget=self.savedWidgets[self.loadedWidget]
+		if widget:
+			addDataToWidget(widget,password)
 class advancedNotebook(mainFrame):
 	"""
 	The advanced notebook class
@@ -2529,7 +2561,12 @@ class podNotebook(advancedNotebook):
 		if newName:
 			#Update the actual pod
 			currentPea=masterPod.currentMasterPod.currentPeaPod
+			oldName=currentPea.peaName
 			currentPea.peaName=newName
+			#Update dictionary keys
+			peaDict=masterPod.currentMasterPod.peas
+			if oldName in peaDict:
+				peaDict[newName]=peaDict.pop(oldName)
 			#Save
 			masterPod.currentMasterPod.save()
 			#Update label
@@ -2790,7 +2827,8 @@ class podTemplate:
 		self.tabOrder=[]
 		#Stores if the template contains password field
 		self.containsPassword=kwargs.get("containsPassword",False)
-
+		#Store option menu list
+		self.optionList=[]
 		#Add to class dict for reference
 		podTemplate.templateColours[self.templateName]=self.templateColour
 		podTemplate.templates[self.templateName]=self
@@ -2830,7 +2868,7 @@ class podTemplate:
 loginTemplate=podTemplate("Login","#2BD590",containsPassword=True)
 loginTemplate.addTab("Login")
 loginTemplate.addTemplateSection("Login","Username",mainLabel,Entry,["Copy","Hide"])
-loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
+loginTemplate.addTemplateSection("Login","Password",mainLabel,Entry,["Copy","Hide","Generate"],hide=True)
 
 loginTemplate.addTab("Advanced")
 loginTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"])
@@ -2855,7 +2893,7 @@ cardTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 #=====Password======
 passwordTemplate=podTemplate("Password","#E6BE3E",containsPassword=True)
 passwordTemplate.addTab("Password")
-passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide"],hide=True)
+passwordTemplate.addTemplateSection("Password","Password",mainLabel,Entry,["Copy","Hide","Generate"],hide=True)
 passwordTemplate.addTemplateSection("Password","Notes",Text,Text,["Copy"])
 #=====Receipt======
 receiptTemplate=podTemplate("Receipt","#AB87F4",containsPassword=False)
@@ -2866,7 +2904,7 @@ receiptTemplate.addTemplateSection("Receipt","Company",mainLabel,Entry,["Copy","
 receiptTemplate.addTemplateSection("Receipt","Date",mainLabel,Entry,["Copy","Hide"],hide=False)
 receiptTemplate.addTab("Advanced")
 receiptTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"],hide=False)
-receiptTemplate.addTemplateSection("Advanced","Payment Method",mainLabel,Entry,["Copy","Hide"],hide=False)
+receiptTemplate.addTemplateSection("Advanced","Payment Method",mainLabel,OptionMenu,["Copy","Hide"],hide=False)
 receiptTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
 
 
