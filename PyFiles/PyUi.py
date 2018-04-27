@@ -1877,7 +1877,7 @@ class privateSection(mainFrame):
 		self.loadedWidget=None #String Value
 		self.defaultWidget=mainLabel
 		self.editWidget=Entry
-		self.widgetFont="Avenir 16"
+		self.widgetFont="Avenir-Bold 16"
 		self.widgetWidth=20
 
 		self.savedWidgets={}
@@ -2906,6 +2906,21 @@ receiptTemplate.addTab("Advanced")
 receiptTemplate.addTemplateSection("Advanced","Website",mainLabel,Entry,["Copy","Hide","Launch"],hide=False)
 receiptTemplate.addTemplateSection("Advanced","Payment Method",mainLabel,OptionMenu,["Copy","Hide"],hide=False)
 receiptTemplate.addTemplateSection("Advanced","Notes",Text,Text,["Copy"])
+#=====Drivers Licence======
+driversTemplate=podTemplate("Driving Licence","#0DA3B0")
+driversTemplate.addTab("Personal")
+driversTemplate.addTemplateSection("Personal","First Name",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Personal","Second Name",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Personal","Date of birth",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Personal","Sex",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTab("Extra")
+driversTemplate.addTemplateSection("Extra","Height",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Extra","Address",Text,Text,["Copy"],hide=False)
+driversTemplate.addTab("Licence")
+driversTemplate.addTemplateSection("Licence","Driver number",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Licence","Expires",mainLabel,Entry,["Copy","Hide"],hide=False)
+driversTemplate.addTemplateSection("Licence","Country",mainLabel,Entry,["Copy","Hide"],hide=False)
+
 
 
 
