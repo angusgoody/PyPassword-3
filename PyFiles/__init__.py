@@ -463,6 +463,24 @@ logTree.pack(expand=True,fill=BOTH)
 logTree.addTag("Error",mainRedColour)
 logTree.addTag("Important",mainGreenColour)
 #endregion
+#======Customise pod=====
+customScreen=screen(window,"Customise")
+customScreen.context=context
+
+customLabel=mainLabel(customScreen,font="Avenir 27",text="Customise")
+customLabel.pack(pady=10)
+customLabel=mainLabel(customScreen,font="Avenir 15",text="Here you can customise your MasterPod details")
+customLabel.pack(pady=5)
+
+customBasicFrame=mainFrame(customScreen)
+customAdvancedFrame=mainFrame(customScreen)
+
+customNotebook=advancedNotebook(customScreen)
+customNotebook.selectionBar.selectedTabColour="#666CE6"
+customNotebook.pack(fill=BOTH,expand=True)
+customNotebook.addPage("Info",customBasicFrame)
+customNotebook.addPage("Advanced",customAdvancedFrame)
+
 #====================Functions====================
 
 
@@ -1545,6 +1563,8 @@ privateMenu.add_cascade(label="Password",menu=privatePasswordMenu)
 
 #File
 privateFileMenu.add_command(label="Show threads",command=lambda: print(mainThreadController))
+privateFileMenu.add_command(label="Customise Master Pod",command=lambda: customScreen.show())
+
 #Password
 privatePasswordMenu.add_command(label="Generate Password",command=lambda: loadGenerateTab(0))
 privatePasswordMenu.add_command(label="Review Password", command=lambda: loadGenerateTab(1))

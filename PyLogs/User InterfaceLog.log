@@ -4684,3 +4684,165 @@ Command executing success MainButton,2018-04-27 12:01:29,System
 Command executing success Splash loader,2018-04-27 11:48:16,System
 Command executing success MainButton,2018-04-27 11:48:44,System
 Command executing success MainButton,2018-04-27 11:48:59,System
+Command executing success MainButton,2018-04-27 12:03:50,System
+Command executing success MainButton,2018-04-27 12:07:49,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-27 12:03:48,Default
+Command executing success No Data Available,2018-04-27 12:03:36,System
+Command executing success MainButton,2018-04-27 12:07:34,System
+Adding pod data,2018-04-27 12:03:43,Default
+Command executing success MainButton,2018-04-27 12:10:07,System
+Command executing success MainButton,2018-04-27 12:03:33,System
+Adding pod data,2018-04-27 12:03:37,Default
+Command executing success Finding master pods,2018-04-27 12:03:31,System
+Command executing success Splash loader,2018-04-27 12:03:32,System
+Non supported widget used to add data <class 'PyUi.advancedOptionMenu'>,2018-04-27 21:10:05,Default
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-27 12:06:49,Default
+Command executing success MainButton,2018-04-27 21:10:00,System
+Command executing success MainButton,2018-04-27 12:07:35,System
+Command executing success MainButton,2018-04-27 12:07:30,System
+Command executing success MainButton,2018-04-27 12:10:04,System
+Command executing success MainButton,2018-04-27 21:10:07,System
+Command executing success MainButton,2018-04-27 12:06:51,System
+Command executing success MainButton,2018-04-27 12:03:42,System
+Command executing success MainButton,2018-04-27 12:07:45,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-27 12:07:48,Default
+Command executing success MainButton,2018-04-27 12:07:42,System
+Command executing success MainButton,2018-04-28 07:59:37,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-28 07:58:27,Default
+Command executing success MainButton,2018-04-28 07:57:39,System
+Command executing success MainButton,2018-04-28 07:57:57,System
+Command executing success MainButton,2018-04-28 07:57:49,System
+Command executing success MainButton,2018-04-28 07:58:29,System
+Command executing success MainButton,2018-04-28 07:58:59,System
+Command executing success Finding master pods,2018-04-28 07:57:35,System
+Command executing success MainButton,2018-04-28 07:58:50,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-28 07:58:37,Default
+Command executing success MainButton,2018-04-28 07:59:15,System
+Command executing success Splash loader,2018-04-28 07:57:36,System
+Command executing success MainButton,2018-04-28 07:59:04,System
+Command executing success MainButton,2018-04-28 07:58:38,System
+Command executing success MainButton,2018-04-28 07:58:03,System
+Command executing success MainButton,2018-04-28 07:58:57,System
+Command executing success Running selection bar tab command,2018-04-28 07:58:40,System
+Adding pod data,2018-04-28 07:58:25,Default
+Command executing success MainButton,2018-04-28 07:59:45,System
+Command executing success No Data Available,2018-04-28 07:57:44,System
+A new raw thread has been created,2018-04-28 07:59:26,Default
+Command executing success MainButton,2018-04-28 07:59:31,System
+Command executing success MainButton,2018-04-28 07:58:32,System
+Thread is currently in progress,2018-04-28 07:59:38,Default
+Command executing success MainButton,2018-04-29 18:24:26,System
+Command executing success MainButton,2018-04-29 18:07:17,System
+Command executing success MainButton,2018-04-29 18:07:50,System
+Adding pod data,2018-04-29 18:11:39,Default
+Command executing success Finding master pods,2018-04-29 18:05:20,System
+Command executing success MainButton,2018-04-29 18:17:45,System
+Command executing success MainButton,2018-04-29 18:15:14,System
+No data found to display on mainLabel,2018-04-29 18:11:57,Default
+Command executing success MainButton,2018-04-29 18:11:45,System
+Command executing success MainButton,2018-04-29 18:19:25,System
+Adding pod data,2018-04-29 18:18:48,Default
+Command executing success MainButton,2018-04-29 18:05:26,System
+Command executing success MainButton,2018-04-29 18:15:00,System
+Command executing success MainButton,2018-04-29 18:10:07,System
+Command executing success MainButton,2018-04-29 18:15:05,System
+Command executing success MainButton,2018-04-29 18:07:06,System
+Command executing success MainButton,2018-04-29 18:19:24,System
+Command executing success MainButton,2018-04-29 18:15:09,System
+Command executing success MainButton,2018-04-29 18:05:50,System
+Command executing success MainButton,2018-04-29 18:06:32,System
+Command executing success MainButton,2018-04-29 18:15:06,System
+Command executing success MainButton,2018-04-29 18:11:17,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:13:50,Default
+Command executing success MainButton,2018-04-29 18:10:58,System
+Command executing success MainButton,2018-04-29 18:16:53,System
+Command executing success MainButton,2018-04-29 18:19:26,System
+Command executing success MainButton,2018-04-29 18:19:00,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:12:23,Default
+Command executing success MainButton,2018-04-29 18:24:29,System
+Command executing success MainButton,2018-04-29 18:13:41,System
+Command executing success MainButton,2018-04-29 18:20:04,System
+Command executing success MainButton,2018-04-29 18:17:20,System
+Thread is currently in progress,2018-04-29 18:24:27,Default
+Command executing success MainButton,2018-04-29 18:16:08,System
+Command executing success MainButton,2018-04-29 18:06:04,System
+Command executing success No Data Available,2018-04-29 18:10:26,System
+Command executing success MainButton,2018-04-29 18:21:44,System
+Command executing success MainButton,2018-04-29 18:18:52,System
+Command executing success MainButton,2018-04-29 18:25:13,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:16:59,Default
+Command executing success MainButton,2018-04-29 18:15:27,System
+Command executing success MainButton,2018-04-29 18:23:26,System
+Command executing success MainButton,2018-04-29 18:16:27,System
+Command executing success MainButton,2018-04-29 18:17:32,System
+Command executing success MainButton,2018-04-29 18:17:47,System
+Command executing success MainButton,2018-04-29 18:17:46,System
+Command executing success MainButton,2018-04-29 18:17:03,System
+Command executing success MainButton,2018-04-29 18:15:08,System
+Command executing success MainButton,2018-04-29 18:17:06,System
+Command executing success MainButton,2018-04-29 18:16:17,System
+Command executing success MainButton,2018-04-29 18:14:23,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:17:13,Default
+Command executing success MainButton,2018-04-29 18:13:44,System
+Command executing success MainButton,2018-04-29 18:15:33,System
+Command executing success MainButton,2018-04-29 18:15:28,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:18:50,Default
+Command executing success MainButton,2018-04-29 18:22:55,System
+Command executing success No Data Available,2018-04-29 18:07:10,System
+Command executing success Splash loader,2018-04-29 18:05:22,System
+Command executing success MainButton,2018-04-29 18:15:31,System
+Command executing success MainButton,2018-04-29 18:24:04,System
+Command executing success MainButton,2018-04-29 18:24:20,System
+Command executing success MainButton,2018-04-29 18:17:38,System
+A new raw thread has been created,2018-04-29 18:24:24,Default
+Command executing success MainButton,2018-04-29 18:14:24,System
+Command executing success MainButton,2018-04-29 18:11:37,System
+Attempt to load same widget:  <class 'tkinter.Text'>,2018-04-29 18:14:28,Default
+Command executing success MainButton,2018-04-29 18:21:16,System
+Command executing success MainButton,2018-04-29 18:20:05,System
+Command executing success MainButton,2018-04-29 18:15:07,System
+Command executing success MainButton,2018-04-29 18:18:46,System
+Command executing success MainButton,2018-04-29 18:22:36,System
+Command executing success MainButton,2018-04-29 18:16:22,System
+Command executing success MainButton,2018-04-29 18:24:01,System
+Command executing success MainButton,2018-04-29 18:20:01,System
+Command executing success No Data Available,2018-04-29 18:06:01,System
+Adding pod data,2018-04-29 18:17:11,Default
+A new raw thread has been created,2018-04-29 18:24:10,Default
+Command executing success MainButton,2018-04-29 18:13:36,System
+Command executing success MainButton,2018-04-29 18:14:21,System
+Adding pod data,2018-04-29 18:17:41,Default
+Command executing success MainButton,2018-04-29 18:06:33,System
+Command executing success MainButton,2018-04-29 18:11:15,System
+Command executing success MainButton,2018-04-29 18:07:05,System
+Command executing success MainButton,2018-04-30 10:18:48,System
+Command executing success MainButton,2018-04-30 10:14:10,System
+Command executing success MainButton,2018-04-30 10:14:15,System
+Command executing success MainButton,2018-04-30 10:14:31,System
+Command executing success No Data Available,2018-04-30 10:14:21,System
+Command executing success MainButton,2018-04-30 10:18:33,System
+Command executing success Finding master pods,2018-04-30 10:14:00,System
+Command executing success MainButton,2018-04-30 10:14:19,System
+Command executing success No Data Available,2018-04-30 10:18:35,System
+Command executing success Splash loader,2018-04-30 10:14:01,System
+Command executing success MainButton,2018-04-30 10:29:28,System
+Command executing success Splash loader,2018-04-30 10:27:38,System
+Command executing success MainButton,2018-04-30 10:29:39,System
+Command executing success MainButton,2018-04-30 10:29:41,System
+Command executing success Finding master pods,2018-04-30 10:27:37,System
+Command executing success No Data Available,2018-04-30 10:29:30,System
+Command executing success MainButton,2018-04-30 10:29:13,System
+Command executing success MainButton,2018-04-30 10:29:37,System
+Command executing success MainButton,2018-04-30 10:29:42,System
+Command executing success No Data Available,2018-04-30 10:28:48,System
+Command executing success MainButton,2018-04-30 10:29:38,System
+Command executing success MainButton,2018-04-30 10:27:40,System
+Command executing success Finding master pods,2018-04-30 11:01:22,System
+Command executing success MainButton,2018-04-30 11:01:31,System
+Command executing success No Data Available,2018-04-30 11:01:27,System
+Command executing success MainButton,2018-04-30 11:01:24,System
+Command executing success MainButton,2018-04-30 11:34:20,System
+Command executing success MainButton,2018-04-30 11:34:24,System
+Command executing success MainButton,2018-04-30 11:01:37,System
+Command executing success MainButton,2018-04-30 11:34:19,System
+Command executing success Splash loader,2018-04-30 11:01:23,System

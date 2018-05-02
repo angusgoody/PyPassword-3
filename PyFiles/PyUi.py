@@ -972,6 +972,8 @@ class advancedEntry(Entry):
 		#Add bindings
 		self.bind("<Button-1>",lambda event: self.updatePlaceHolder())
 		self.bind("<FocusOut>",lambda event: self.clickOff())
+		self.bind("<KeyRelease>",lambda event: self.runCheck())
+		self.runCommands=[]
 
 	def updatePlaceHolder(self):
 		"""
@@ -994,6 +996,13 @@ class advancedEntry(Entry):
 		#Focus
 		self.focus_force()
 		self.icursor(END)
+
+	def addRunCommand(self,command):
+		"""
+		Add a command to run when user
+		types
+		"""
+		self.runCommands.append(command)
 
 	def getData(self):
 		"""
@@ -1038,6 +1047,17 @@ class advancedEntry(Entry):
 		if len(self.get().split()) < 1:
 			if self.focus_get():
 				self.resetEntry()
+
+	def runCheck(self):
+		"""
+		Runs as user types
+		"""
+		if self.placeHolderActive:
+			content=getDataFromWidget(self)
+			self.updatePlaceHolder()
+		#Run Any functions
+		for com in self.runCommands:
+			runCommand(com)
 
 class dataWindow(Toplevel):
 	"""
@@ -1244,7 +1264,7 @@ class dataSection(mainFrame):
 		#Entry
 		else:
 			self.mainWidget=advancedEntry(self.contentSection,self.displayText,self.hideOrNot,font=self.defaultFont)
-			self.mainWidget.bind("<KeyRelease>",lambda event: self.check())
+			self.mainWidget.addRunCommand(lambda: self.check())
 			self.mainWidget.pack(pady=6)
 
 	def check(self):
