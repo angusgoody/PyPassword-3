@@ -464,7 +464,8 @@ logTree.addTag("Error",mainRedColour)
 logTree.addTag("Important",mainGreenColour)
 #endregion
 #======Customise pod=====
-customScreen=screen(window,"Customise")
+#region customise
+customScreen=screen(window,"Customise",protected=True)
 customScreen.context=context
 
 customLabel=mainLabel(customScreen,font="Avenir 27",text="Customise")
@@ -480,7 +481,7 @@ customNotebook.selectionBar.selectedTabColour="#666CE6"
 customNotebook.pack(fill=BOTH,expand=True)
 customNotebook.addPage("Info",customBasicFrame)
 customNotebook.addPage("Advanced",customAdvancedFrame)
-
+#endregion
 #====================Functions====================
 
 
@@ -709,6 +710,7 @@ def createNewMasterPodWindow():
 	masterPodPassword.pack()
 	masterPodConfirm=dataSection(newWindow.contentArea,advancedEntry,"Confirm",mustBeSameAs=masterPodPassword,hide=True)
 	masterPodConfirm.pack()
+
 	masterHint=dataSection(newWindow.contentArea,advancedEntry,"Hint",checkNeeded=False)
 	masterHint.pack()
 	masterHint.dataValid=True
