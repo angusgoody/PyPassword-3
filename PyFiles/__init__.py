@@ -16,6 +16,7 @@ from PyUi import *
 from PEM import *
 import random
 import threading
+from tkinter.colorchooser import *
 #====================Window====================
 """
 This is where the basic window
@@ -475,18 +476,47 @@ customLabel.pack(pady=5)
 
 customBasicFrame=mainFrame(customScreen)
 customAdvancedFrame=mainFrame(customScreen)
+customAdvancedFrame.colour("#F951A3")
 
 customNotebook=advancedNotebook(customScreen)
 customNotebook.selectionBar.selectedTabColour="#666CE6"
 customNotebook.pack(fill=BOTH,expand=True)
 customNotebook.addPage("Info",customBasicFrame)
 customNotebook.addPage("Advanced",customAdvancedFrame)
+
+
+#Basic info
+customMasterPodNameEntry=advancedEntry(customBasicFrame,"New name",False,font="Avenir 17")
+customMasterPodNameEntry.pack(pady=5)
+
+customMasterPodCurrentPasswordEntry=advancedEntry(customBasicFrame,"Old Password",True,font="Avenir 17")
+customMasterPodCurrentPasswordEntry.pack(pady=5)
+
+customMasterPodNewPasswordEntry=advancedEntry(customBasicFrame,"New Password",True,font="Avenir 17")
+customMasterPodNewPasswordEntry.pack(pady=5)
+
+customMasterPodBasicSaveButton=mainButton(customBasicFrame,text="Save",enabledColour=mainBlueColour,clickedColour=mainSecondBlueColour)
+customMasterPodBasicSaveButton.pack(pady=10)
+
+#Advanced info
+
+customPickColourButton=mainButton(customAdvancedFrame,font="Avenir 18",text="Pick Colour")
+customPickColourButton.pack()
 #endregion
 #====================Functions====================
 
 
 #======System functions========
 
+def changeMasterPodColour():
+	try:
+		colour=askcolor()[1]
+	except:
+		log.report("Error launching colour picker")
+	else:
+		customAdvancedFrame.colour(colour)
+
+customPickColourButton.updateButton(command=changeMasterPodColour)
 def saveLogs():
 	"""
 	This function will save the log files

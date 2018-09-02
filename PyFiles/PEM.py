@@ -8,6 +8,8 @@
 This file is the encryption module
 and all decrypting and encrypting of 
 data takes place here.
+
+Windows Pip install pycryptodomex
 """
 
 #====================Imports====================
