@@ -31,7 +31,7 @@ mainBlueColour="#17F388"
 mainGreyColour="#CDD7D6"
 mainClickedColour="#A9F955"
 mainWhiteColour="#E8EDEA"
-mainLockedColour="#685DE3"
+mainLockedColour="#3A3A3F"
 mainPurpleColour="#6876D5"
 
 mainSecondOrangeColour="#D89633"
@@ -757,7 +757,7 @@ class mainLabel(Label):
 		self.width=None
 		#Add right click
 		self.contextMenu=Menu(self)
-		self.contextMenu.add_command(label="Expand")
+		self.contextMenu.add_command(label="Expand",command=lambda: self.expandText("Expanded Text"))
 		self.contextMenu.add_command(label="Copy")
 		self.bind("<Button-2>",lambda event:self.showMenu(event))
 		#Initiate update
@@ -1434,6 +1434,7 @@ class advancedTree(ttk.Treeview):
 		"""
 		Method to insert data into the treeview
 		"""
+		#print("Inserting values",values)
 		self.insert("" , 0,values=values,tags=tags)
 
 	def addTag(self,tag,colour):
@@ -1481,7 +1482,7 @@ class table(mainFrame):
 		self.sectionCount+=1
 		#Create a new frame
 		newSection=mainFrame(self.dataFrame)
-		newSection.pack(fill=X)
+		newSection.pack(fill=X,expand=True)
 		newSectionCenter=mainFrame(newSection)
 		newSectionCenter.pack(expand=True)
 		#Display the description
@@ -2600,7 +2601,7 @@ class podNotebook(advancedNotebook):
 class selectionBar(mainFrame):
 	"""
 
-		The selection bar
+	The selection bar
 	is a bar that allows a single 
 	selection. This can be used
 	to naivgate etc.
@@ -2940,6 +2941,11 @@ driversTemplate.addTab("Licence")
 driversTemplate.addTemplateSection("Licence","Driver number",mainLabel,Entry,["Copy","Hide"],hide=False)
 driversTemplate.addTemplateSection("Licence","Expires",mainLabel,Entry,["Copy","Hide"],hide=False)
 driversTemplate.addTemplateSection("Licence","Country",mainLabel,Entry,["Copy","Hide"],hide=False)
+#=====WIFI Router======
+wifiTemplate=podTemplate("Wifi Router","#A4A6AC",containsPassword=True)
+wifiTemplate.addTab("Wifi")
+wifiTemplate.addTemplateSection("Wifi","Network Name",mainLabel,Entry,["Copy","Hide"])
+wifiTemplate.addTemplateSection("Wifi","Password",mainLabel,Entry,["Copy","Hide","Generate"],hide=True)
 
 
 

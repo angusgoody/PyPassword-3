@@ -280,7 +280,6 @@ def stripRaw(text):
 	newText=regex.sub('', text)
 	return newText
 
-
 def encrypt(plainText, key):
 	"""
 	This is the encrypt function 

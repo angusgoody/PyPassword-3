@@ -549,7 +549,7 @@ def closeProgram():
 	window.destroy()
 
 def processSearchLanguage(dataField):
-	"""
+	"""                     
 	This function will process the
 	data from a data source and
 	check for any natural language
@@ -810,8 +810,15 @@ def showHint():
 	currentMasterPod=masterPod.currentMasterPod
 	#Get the hint
 	hint=currentMasterPod.hint
-	#Update the control variable
-	loginAttemptVar.set(hint)
+	#Check if the pod is disabled
+	if hasattr(currentMasterPod,"locked"):
+		currentTime = getCurrentTime()
+		if currentMasterPod.locked < currentTime:
+			loginAttemptVar.set(hint)
+
+	else:
+		#Update the control variable
+		loginAttemptVar.set(hint)
 
 def runCountdown(lockedValue,masterPodInstance):
 	"""
@@ -828,6 +835,7 @@ def runCountdown(lockedValue,masterPodInstance):
 		else:
 			checkTimeRemaining(masterPodInstance)
 			loginAttemptVar.set(masterPodInstance.masterName+" pod has been unlocked")
+		#Update Interval
 		time.sleep(0.2)
 
 def checkTimeRemaining(masterPodInstance,**kwargs):
@@ -874,6 +882,8 @@ def checkTimeRemaining(masterPodInstance,**kwargs):
 					#Show messagebox if specified
 					if showLocked:
 						showMessage("Locked","This master pod is locked")
+
+
 					return True
 
 				elif resetScreen == False:
