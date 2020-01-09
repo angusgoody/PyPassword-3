@@ -20,6 +20,7 @@ import string
 from random import choice
 from tkinter import PhotoImage,messagebox
 from Crypto.Cipher import AES
+import base64
 import random
 import re
 #====================Variables====================
@@ -268,7 +269,9 @@ def pad(text):
 	be in multiples of 16 so the pad function
 	adds padding to make it the right length
 	"""
-	return text +((16-len(text) % 16)*"\n")
+	padded = text +((16-len(text) % 16)*"\n")
+	byteCode = (padded).encode()
+	return byteCode
 
 def stripRaw(text):
 	"""
@@ -288,19 +291,11 @@ def encrypt(plainText, key):
 	"""
 	if plainText:
 		#Pad the key to ensure its multiple of 16
-		rawKey=key
-		key=AES.new(pad(key))
-		#Pad the plain text to ensure multiple of 16
-		text=pad(str(plainText))
-		#Check
-		#Encrypt using module
-		try:
-			encrypted=key.encrypt(text)
-		except:
-			#If the encryption fails remove the symbols and try again
-			newText=stripRaw(plainText)
-			encrypted=encrypt(newText,rawKey)
-		return encrypted
+		key=pad(key)
+		plainText=(plainText).encode().rjust(32)
+		cipher = AES.new(key,AES.MODE_ECB)
+		ciphertext = base64.b64encode(cipher.encrypt(plainText))
+		return ciphertext
 	else:
 		return plainText
 
@@ -311,20 +306,12 @@ def decrypt(data, key):
 	data and return the result.
 	"""
 	try:
-		#Pad the key
-		key=AES.new(pad(key))
-		#Use module to decrypt data
-		data=key.decrypt(data).rstrip()
-		#Report
-		log.report("Data decrypted")
-		try:
-			data=data.decode("utf-8")
-		except:
-			return None
-		else:
-			return data
-	except:
-		log.report("An error occurred when attempting to decrypt","(Decrypt)",tag="Error")
+		key=pad(key)
+		cipher = AES.new(key,AES.MODE_ECB)
+		newData=cipher.decrypt(base64.b64decode(data))
+		return newData
+	except Exception as d:
+		log.report("Decryption error"+str(d),"(Decrypt)",tag="Error")
 		return None
 
 #Time functions
@@ -766,6 +753,7 @@ class peaPod:
 			return self.vault[itemName]
 		else:
 			return None
+
 class masterPod:
 	"""
 	The master peaPod class is the class
