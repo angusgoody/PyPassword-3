@@ -1,9 +1,9 @@
-
 PyLogs/*
-PyData/*
-PyLogs/*
-.idea/*
+**/PyData
+**/PyLogs
+**/.idea
 __pycache__/*
+
 
 
 

@@ -2946,6 +2946,28 @@ wifiTemplate=podTemplate("Wifi Router","#A4A6AC",containsPassword=True)
 wifiTemplate.addTab("Wifi")
 wifiTemplate.addTemplateSection("Wifi","Network Name",mainLabel,Entry,["Copy","Hide"])
 wifiTemplate.addTemplateSection("Wifi","Password",mainLabel,Entry,["Copy","Hide","Generate"],hide=True)
+#=====Identity======
+identityTemplate=podTemplate("Identity","#D44A40",containsPassword=False)
+identityTemplate.addTab("Basic")
+identityTemplate.addTemplateSection("Basic","First Name",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Basic","Second Name",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Basic","Date of birth",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Basic","Gender",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTab("Contact")
+identityTemplate.addTemplateSection("Contact","Mobile",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Contact","Home #",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Contact","Email",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTemplateSection("Contact","Email 2",mainLabel,Entry,["Copy","Hide"])
+identityTemplate.addTab("Address")
+identityTemplate.addTemplateSection("Address","House Name",mainLabel,Entry,["Copy"])
+identityTemplate.addTemplateSection("Address","Road name",mainLabel,Entry,["Copy"])
+identityTemplate.addTemplateSection("Address","City",mainLabel,Entry,["Copy"])
+identityTemplate.addTemplateSection("Address","County",mainLabel,Entry,["Copy"])
+identityTemplate.addTemplateSection("Address","Country",mainLabel,Entry,["Copy"])
+identityTemplate.addTemplateSection("Address","Postcode",mainLabel,Entry,["Copy"])
+identityTemplate.addTab("Notes")
+identityTemplate.addTemplateSection("Notes","Notes",Text,Text,["Copy"])
+
 
 
 
